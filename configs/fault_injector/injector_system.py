@@ -29,11 +29,9 @@
 
 """ This file creates a barebones system and executes 'hello', a simple Hello
 World application.
-See Part 1, Chapter 2: Creating a simple configuration script in the
-learning_gem5 book for more information about this script.
 
-IMPORTANT: If you modify this file, it's likely that the Learning gem5 book
-           also needs to be updated. For now, email Jason <power.jg@gmail.com>
+This config file assumes that the x86 ISA was built.
+See gem5/configs/learning_gem5/part1/simple.py for a general script.
 
 """
 
@@ -57,24 +55,29 @@ system.mem_ranges = [AddrRange('512MB')] # Create an address range
 # Create a simple CPU
 system.cpu = MinorCPU()
 
-system.cpu.branchPred
-
-# Create a memory bus, a system crossbar, in this case
+# Create a memory bus, a coherent crossbar, in this case
 system.membus = SystemXBar()
 
 # Hook the CPU ports up to the membus
 system.cpu.icache_port = system.membus.slave
 system.cpu.dcache_port = system.membus.slave
 
+# Inject a fault into the branch predictor
+system.cpu.branchPred.faultEnabled = False
+system.cpu.branchPred.faultLabel = "hello world"
+system.cpu.branchPred.faultStuckBit = 1
+system.cpu.branchPred.faultField = 2
+system.cpu.branchPred.faultEntry = 3
+system.cpu.branchPred.faultBitPosition = 7
+system.cpu.branchPred.faultPermanent = True
+system.cpu.branchPred.faultTickBegin = 0
+system.cpu.branchPred.faultTickEnd = 10
+
 # create the interrupt controller for the CPU and connect to the membus
 system.cpu.createInterruptController()
-
-# For x86 only, make sure the interrupts are connected to the memory
-# Note: these are directly connected to the memory bus and are not cached
-if m5.defines.buildEnv['TARGET_ISA'] == "x86":
-    system.cpu.interrupts[0].pio = system.membus.master
-    system.cpu.interrupts[0].int_master = system.membus.slave
-    system.cpu.interrupts[0].int_slave = system.membus.master
+#system.cpu.interrupts[0].pio = system.membus.master
+#system.cpu.interrupts[0].int_master = system.membus.slave
+#system.cpu.interrupts[0].int_slave = system.membus.master
 
 # Create a DDR3 memory controller and connect it to the membus
 system.mem_ctrl = DDR3_1600_x64()
@@ -84,17 +87,11 @@ system.mem_ctrl.port = system.membus.master
 # Connect the system up to the membus
 system.system_port = system.membus.slave
 
-# get ISA for the binary to run.
-isa = str(m5.defines.buildEnv['TARGET_ISA']).lower()
-
-# Run 'hello' and use the compiled ISA to find the binary
-binary = 'tests/test-progs/hello/bin/' + isa + '/linux/hello'
-
 # Create a process for a simple "Hello World" application
 process = LiveProcess()
 # Set the command
 # cmd is a list which begins with the executable (like argv)
-process.cmd = [binary]
+process.cmd = ['./tests/test-progs/hello/bin/alpha/linux/hello']
 # Set the cpu to use the process as its workload and create thread contexts
 system.cpu.workload = process
 system.cpu.createThreads()

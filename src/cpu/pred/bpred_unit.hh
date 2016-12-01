@@ -266,7 +266,6 @@ class BPredUnit : public SimObject
     /** Number of the threads for which the branch history is maintained. */
     const unsigned numThreads;
 
-
     /**
      * The per-thread predictor history. This is used to update the predictor
      * as instructions are committed, or restore it to the proper state after
@@ -317,6 +316,46 @@ class BPredUnit : public SimObject
   protected:
     /** Number of bits to shift instructions by for predictor addresses. */
     const unsigned instShiftAmt;
+
+    typedef struct Fault {
+        /** Whether the fault is enabled or not */
+        bool faultEnabled;
+        /** Injected fault label */
+        std::string faultLabel;
+        /** Faulted value */
+        unsigned faultStuckBit;
+        /** 0 = Tag, 1 = Target, 2 = Valid */
+        unsigned faultField;
+        /** The entry number where we are injecting the fault */
+        unsigned faultEntry;
+        /** The bit target of the fault */
+        unsigned faultBitPosition;
+        /** Whether the fault is permantent or not.
+            If it is permanent we ignore faultTickBegin and faultTickEnd */
+        bool faultPermanent;
+        /** Fault begin time */
+        int64_t faultTickBegin;
+        /** Fault end time */
+        int64_t faultTickEnd;
+
+        Fault(bool _faultEnabled, std::string _faultLabel, unsigned
+                _faultStuckBit, unsigned _faultField, unsigned _faultEntry,
+                unsigned _faultBitPosition, bool _faultPermanent,
+                unsigned _faultTickBegin, unsigned _faultTickEnd) :
+            faultEnabled(_faultEnabled),
+            faultLabel(_faultLabel),
+            faultStuckBit(_faultStuckBit),
+            faultField(_faultField),
+            faultEntry(_faultEntry),
+            faultBitPosition(_faultBitPosition),
+            faultPermanent(_faultPermanent),
+            faultTickBegin(_faultTickBegin),
+            faultTickEnd(_faultTickEnd)
+             {}
+
+    } Fault;
+
+    Fault injectedFault;
 
     /**
      * @{

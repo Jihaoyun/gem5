@@ -71,7 +71,16 @@ BPredUnit::BPredUnit(const Params *params)
             params->indirectPathLength,
             params->instShiftAmt,
             params->numThreads),
-      instShiftAmt(params->instShiftAmt)
+      instShiftAmt(params->instShiftAmt),
+      injectedFault(params->faultEnabled,
+            params->faultLabel,
+            params->faultStuckBit,
+            params->faultField,
+            params->faultEntry,
+            params->faultBitPosition,
+            params->faultPermanent,
+            params->faultTickBegin,
+            params->faultTickEnd)
 {
     for (auto& r : RAS)
         r.init(params->RASSize);
@@ -184,6 +193,16 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
     // If so, get its target addr either from the BTB or the RAS.
     // Save off record of branch stuff so the RAS can be fixed
     // up once it's done.
+
+    std::cout << injectedFault.faultEnabled << std::endl;
+    std::cout << injectedFault.faultLabel << std::endl;
+    std::cout << injectedFault.faultStuckBit << std::endl;
+    std::cout << injectedFault.faultField << std::endl;
+    std::cout << injectedFault.faultEntry << std::endl;
+    std::cout << injectedFault.faultBitPosition << std::endl;
+    std::cout << injectedFault.faultPermanent << std::endl;
+    std::cout << injectedFault.faultTickBegin << std::endl;
+    std::cout << injectedFault.faultTickEnd << std::endl;
 
     bool pred_taken = false;
     TheISA::PCState target = pc;

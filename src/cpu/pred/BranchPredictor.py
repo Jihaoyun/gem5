@@ -42,6 +42,16 @@ class BranchPredictor(SimObject):
     RASSize = Param.Unsigned(16, "RAS size")
     instShiftAmt = Param.Unsigned(2, "Number of bits to shift instructions by")
 
+    faultEnabled = Param.Bool(False, "Whether the fault is enabled or not")
+    faultLabel = Param.String(None, "Injected fault label")
+    faultStuckBit = Param.Unsigned(0, "Faulted value")
+    faultField = Param.Unsigned(0, "0 = Tag, 1 = Target, 2 = Valid")
+    faultEntry = Param.Unsigned(0, "The entry where inject the fault")
+    faultBitPosition = Param.Unsigned(0, "The bit target of the fault")
+    faultPermanent = Param.Bool(True, "Whether the fault is permanent or not")
+    faultTickBegin = Param.Int64(0, "Fault begin time")
+    faultTickEnd = Param.Int64(-1, "Fault end time")
+
     useIndirect = Param.Bool(True, "Use indirect branch predictor")
     indirectHashGHR = Param.Bool(True, "Hash branch predictor GHR")
     indirectHashTargets = Param.Bool(True, "Hash path history targets")
@@ -85,4 +95,3 @@ class BiModeBP(BranchPredictor):
     globalCtrBits = Param.Unsigned(2, "Bits per counter")
     choicePredictorSize = Param.Unsigned(8192, "Size of choice predictor")
     choiceCtrBits = Param.Unsigned(2, "Bits of choice counters")
-
