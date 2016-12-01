@@ -68,6 +68,45 @@ class BPredUnit : public SimObject
 {
   public:
       typedef BranchPredictorParams Params;
+
+      typedef struct Fault {
+        /** Whether the fault is enabled or not */
+        bool enabled;
+        /** Injected fault label */
+        std::string label;
+        /** Faulted value */
+        unsigned stuckBit;
+        /** 0 = Tag, 1 = Target, 2 = Valid */
+        unsigned field;
+        /** The entry number where we are injecting the fault */
+        unsigned entry;
+        /** The bit target of the fault */
+        unsigned bitPosition;
+        /** Whether the fault is permantent or not.
+            If it is permanent we ignore tickBegin and tickEnd */
+        bool permanent;
+        /** Fault begin time */
+        int64_t tickBegin;
+        /** Fault end time */
+        int64_t tickEnd;
+
+        Fault(bool _enabled, std::string _label, unsigned
+                _stuckBit, unsigned _field, unsigned _entry,
+                unsigned _bitPosition, bool _permanent,
+                unsigned _tickBegin, unsigned _tickEnd) :
+            enabled(_enabled),
+            label(_label),
+            stuckBit(_stuckBit),
+            field(_field),
+            entry(_entry),
+            bitPosition(_bitPosition),
+            permanent(_permanent),
+            tickBegin(_tickBegin),
+            tickEnd(_tickEnd)
+             {}
+
+    } Fault;
+
     /**
      * @param params The params object, that has the size of the BP and BTB.
      */
@@ -273,6 +312,9 @@ class BPredUnit : public SimObject
      */
     std::vector<History> predHist;
 
+    /** The eventual injected fault */
+    Fault injectedFault;
+
     /** The BTB. */
     DefaultBTB BTB;
 
@@ -316,46 +358,6 @@ class BPredUnit : public SimObject
   protected:
     /** Number of bits to shift instructions by for predictor addresses. */
     const unsigned instShiftAmt;
-
-    typedef struct Fault {
-        /** Whether the fault is enabled or not */
-        bool faultEnabled;
-        /** Injected fault label */
-        std::string faultLabel;
-        /** Faulted value */
-        unsigned faultStuckBit;
-        /** 0 = Tag, 1 = Target, 2 = Valid */
-        unsigned faultField;
-        /** The entry number where we are injecting the fault */
-        unsigned faultEntry;
-        /** The bit target of the fault */
-        unsigned faultBitPosition;
-        /** Whether the fault is permantent or not.
-            If it is permanent we ignore faultTickBegin and faultTickEnd */
-        bool faultPermanent;
-        /** Fault begin time */
-        int64_t faultTickBegin;
-        /** Fault end time */
-        int64_t faultTickEnd;
-
-        Fault(bool _faultEnabled, std::string _faultLabel, unsigned
-                _faultStuckBit, unsigned _faultField, unsigned _faultEntry,
-                unsigned _faultBitPosition, bool _faultPermanent,
-                unsigned _faultTickBegin, unsigned _faultTickEnd) :
-            faultEnabled(_faultEnabled),
-            faultLabel(_faultLabel),
-            faultStuckBit(_faultStuckBit),
-            faultField(_faultField),
-            faultEntry(_faultEntry),
-            faultBitPosition(_faultBitPosition),
-            faultPermanent(_faultPermanent),
-            faultTickBegin(_faultTickBegin),
-            faultTickEnd(_faultTickEnd)
-             {}
-
-    } Fault;
-
-    Fault injectedFault;
 
     /**
      * @{

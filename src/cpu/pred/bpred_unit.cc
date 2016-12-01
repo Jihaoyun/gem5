@@ -57,10 +57,20 @@ BPredUnit::BPredUnit(const Params *params)
     : SimObject(params),
       numThreads(params->numThreads),
       predHist(numThreads),
+      injectedFault(params->faultEnabled,
+            params->faultLabel,
+            params->faultStuckBit,
+            params->faultField,
+            params->faultEntry,
+            params->faultBitPosition,
+            params->faultPermanent,
+            params->faultTickBegin,
+            params->faultTickEnd),
       BTB(params->BTBEntries,
           params->BTBTagSize,
           params->instShiftAmt,
-          params->numThreads),
+          params->numThreads,
+          injectedFault),
       RAS(numThreads),
       useIndirect(params->useIndirect),
       iPred(params->indirectHashGHR,
@@ -71,16 +81,7 @@ BPredUnit::BPredUnit(const Params *params)
             params->indirectPathLength,
             params->instShiftAmt,
             params->numThreads),
-      instShiftAmt(params->instShiftAmt),
-      injectedFault(params->faultEnabled,
-            params->faultLabel,
-            params->faultStuckBit,
-            params->faultField,
-            params->faultEntry,
-            params->faultBitPosition,
-            params->faultPermanent,
-            params->faultTickBegin,
-            params->faultTickEnd)
+      instShiftAmt(params->instShiftAmt)
 {
     for (auto& r : RAS)
         r.init(params->RASSize);
@@ -194,15 +195,15 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
     // Save off record of branch stuff so the RAS can be fixed
     // up once it's done.
 
-    std::cout << injectedFault.faultEnabled << std::endl;
-    std::cout << injectedFault.faultLabel << std::endl;
-    std::cout << injectedFault.faultStuckBit << std::endl;
-    std::cout << injectedFault.faultField << std::endl;
-    std::cout << injectedFault.faultEntry << std::endl;
-    std::cout << injectedFault.faultBitPosition << std::endl;
-    std::cout << injectedFault.faultPermanent << std::endl;
-    std::cout << injectedFault.faultTickBegin << std::endl;
-    std::cout << injectedFault.faultTickEnd << std::endl;
+    /*std::cout << injectedFault.enabled << std::endl;
+    std::cout << injectedFault.label << std::endl;
+    std::cout << injectedFault.stuckBit << std::endl;
+    std::cout << injectedFault.field << std::endl;
+    std::cout << injectedFault.entry << std::endl;
+    std::cout << injectedFault.bitPosition << std::endl;
+    std::cout << injectedFault.permanent << std::endl;
+    std::cout << injectedFault.tickBegin << std::endl;
+    std::cout << injectedFault.tickEnd << std::endl;*/
 
     bool pred_taken = false;
     TheISA::PCState target = pc;
