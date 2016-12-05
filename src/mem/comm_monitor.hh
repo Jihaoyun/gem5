@@ -88,6 +88,8 @@ class CommMonitor : public MemObject
 
   private:
 
+    FILE* fp;
+
     /**
      * Sender state class for the monitor so that we can annotate
      * packets with a transmit time and receive time.

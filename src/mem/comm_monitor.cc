@@ -57,6 +57,7 @@ CommMonitor::CommMonitor(Params* params)
     DPRINTF(CommMonitor,
             "Created monitor %s with sample period %d ticks (%f ms)\n",
             name(), samplePeriodTicks, samplePeriod * 1E3);
+        fp = fopen("memtrace.csv","r");
 }
 
 CommMonitor*
