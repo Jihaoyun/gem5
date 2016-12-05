@@ -41,7 +41,11 @@
 #ifndef __MEM_COMM_MONITOR_HH__
 #define __MEM_COMM_MONITOR_HH__
 
+#include <fstream>
+#include <iomanip>
+
 #include "base/statistics.hh"
+#include "debug/DataCommMonitor.hh"
 #include "mem/mem_object.hh"
 #include "params/CommMonitor.hh"
 #include "sim/probe/mem.hh"
@@ -87,6 +91,9 @@ class CommMonitor : public MemObject
                                 PortID idx = InvalidPortID) override;
 
   private:
+
+    std::ofstream mem_trace_fout;
+    void print(PacketPtr pkt);
 
     /**
      * Sender state class for the monitor so that we can annotate

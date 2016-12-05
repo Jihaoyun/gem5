@@ -57,6 +57,10 @@ CommMonitor::CommMonitor(Params* params)
     DPRINTF(CommMonitor,
             "Created monitor %s with sample period %d ticks (%f ms)\n",
             name(), samplePeriodTicks, samplePeriod * 1E3);
+    if (Debug::DataCommMonitor){
+        mem_trace_fout.open("m5out/mem_trace.csv");
+        mem_trace_fout<<"Req/Res;Tick;Command;Address;Size;Data"<<std::endl;
+    }
 }
 
 CommMonitor*
@@ -131,6 +135,44 @@ CommMonitor::recvAtomicSnoop(PacketPtr pkt)
     return slavePort.sendAtomicSnoop(pkt);
 }
 
+void
+CommMonitor::print(PacketPtr pkt)
+{
+    char cmd;
+    const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
+
+    if ( pkt->isRead() )
+      cmd = 'r';
+    else if ( pkt->isWrite() )
+      cmd = 'w';
+    else
+      cmd = 'u';
+
+    if ( pkt->isResponse() )
+      mem_trace_fout<<"Res;";
+    else if ( pkt->isRequest() )
+      mem_trace_fout<<"Req;";
+    else
+      mem_trace_fout<<"Und;";
+
+    mem_trace_fout<<std::dec<<curTick()<<";"
+                  <<cmd<<";0x"
+                  <<std::setfill('0')<<std::setw(8)<<std::hex
+                  <<pkt->getAddr()<<";"
+                  <<std::dec<<pkt->getSize()<<";0x";
+
+    for ( int i = 0; i < pkt->getSize(); i++ ) {
+      mem_trace_fout<<std::setfill('0')<<std::setw(2)<<std::hex
+                    <<+(*ptr);
+      ptr++;
+    }
+
+    mem_trace_fout<<std::endl;
+}
+
+
+
+
 bool
 CommMonitor::recvTimingReq(PacketPtr pkt)
 {
@@ -163,6 +205,8 @@ CommMonitor::recvTimingReq(PacketPtr pkt)
     }
 
     if (successful) {
+        if (Debug::DataCommMonitor)
+          print(pkt);
         ppPktReq->notify(pkt_info);
     }
 
@@ -293,6 +337,8 @@ CommMonitor::recvTimingResp(PacketPtr pkt)
     }
 
     if (successful) {
+        if (Debug::DataCommMonitor)
+            print(pkt);
         ppPktResp->notify(pkt_info);
     }
 
