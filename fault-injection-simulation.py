@@ -20,10 +20,9 @@ args = parser.parse_args()
 for benchmark in args.benchmarks:
     print "\n\nRunning " + benchmark + " GOLDEN\n"
     call(["./build/ALPHA/gem5.opt",
-        "--stats-file", benchmark.split("/")[-1] + "/" +
+        "--stats-file", benchmark.split("/")[-1] + "_" +
         "GOLDEN.txt",
         "configs/fault_injector/injector_system.py",
-        "-fe", False,
         "-b", benchmark ])
 
     for inputFile in args.faultInput:
@@ -32,10 +31,10 @@ for benchmark in args.benchmarks:
             fe = fp.next()
             print "\n\nRunning " + benchmark + " with fault:\n" + str(fe)
             call(["./build/ALPHA/gem5.opt",
-                "--stats-file", benchmark.split("/")[-1] + "/" +
+                "--stats-file", benchmark.split("/")[-1] + "_" +
                 fe.label + ".txt",
                 "configs/fault_injector/injector_system.py",
-                "-fe", True,
+                "-fe",
                 "-b", benchmark,
                 "-l", fe.label,
                 "-sb", fe.stuckBit,

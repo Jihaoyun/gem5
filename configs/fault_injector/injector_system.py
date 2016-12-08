@@ -8,8 +8,10 @@ import argparse
 #parse and save the arguments
 parser = argparse.ArgumentParser(description='Gem5')
 
-parser.add_argument('-fe', '--fault-enabled', type=bool, dest='faultEnabled',
+parser.add_argument('-fe', '--fault-enabled', dest='faultEnabled',
+                    action='store_true',
                     help='It is true if the BPU is faulted')
+parser.set_defaults(faultEnabled=False)
 
 parser.add_argument('-b', '--benchmark', type=str, dest='benchmark',
                     help='Benchmark set on which to run the simulation')
@@ -95,7 +97,7 @@ if args.faultEnabled:
             (args.tickBegin == 0 and args.tickEnd == -1)
     system.cpu.branchPred.faultTickBegin = args.tickBegin
     system.cpu.branchPred.faultTickEnd = args.tickEnd
-else
+else:
     system.cpu.branchPred.faultEnabled = False
 
 m5.instantiate()
