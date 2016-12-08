@@ -45,7 +45,9 @@ class FaultParser:
         if self.currentLine[0] == '#' or len(self.currentLine.split(":")) < 2:
             return None
 
-        line = self.currentLine.strip().replace(" ", "")
+        # Delete all whitespaces
+        line = "".join(self.currentLine.strip().replace(" ", "").split())
+
         label = line.split(":")[0]
         entries = line.split(":")[1].split(",")
 
