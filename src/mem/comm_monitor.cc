@@ -57,8 +57,10 @@ CommMonitor::CommMonitor(Params* params)
     DPRINTF(CommMonitor,
             "Created monitor %s with sample period %d ticks (%f ms)\n",
             name(), samplePeriodTicks, samplePeriod * 1E3);
-        fp = fopen("memtrace.csv","r");
-                fprintf(fp,"Req/Resp;Tick;Command;Address;Data\n");
+    if (Debug::DataCommMonitor){
+        mem_trace_fout.open("m5out/mem_trace.csv");
+        mem_trace_fout<<"Req/Res;Tick;Command;Address;Size;Data"<<std::endl;
+    }
 }
 
 CommMonitor*
@@ -134,37 +136,36 @@ CommMonitor::recvAtomicSnoop(PacketPtr pkt)
 }
 
 void
-CommMonitor::print(PacketPtr pkt)
+CommMonitor::print(PacketPtr pkt, bool is_req)
 {
+    char cmd;
+    const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
 
-        char cmd;
+    if ( pkt->isRead() )
+      cmd = 'r';
+    else if ( pkt->isWrite() )
+      cmd = 'w';
+    else
+      cmd = 'u';
 
-        const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
+    if (is_req)
+      mem_trace_fout<<"Req;";
+    else
+      mem_trace_fout<<"Res;";
 
-        if ( pkt->isRead() )
-                cmd = 'r';
-        else if ( pkt->isWrite() )
-                cmd = 'w';
-        else
-                cmd = 'u';
+    mem_trace_fout<<std::dec<<curTick()<<";"
+                  <<cmd<<";0x"
+                  <<std::setfill('0')<<std::setw(8)<<std::hex
+                  <<pkt->getAddr()<<";"
+                  <<std::dec<<pkt->getSize()<<";0x";
 
-        if ( pkt->isResponse() )
-                fprintf(fp,"Req;");
-        else if ( pkt->isRequest() )
-                fprintf(fp,"Resp;");
-        else
-                fprintf(fp,"Und;");
+    for ( int i = 0; i < pkt->getSize(); i++ ) {
+      mem_trace_fout<<std::setfill('0')<<std::setw(2)<<std::hex
+                    <<+(*ptr);
+      ptr++;
+    }
 
-        fprintf(fp, "%ld;%c;0x%lx;0x", curTick(),
-                cmd, pkt->getAddr() );
-
-        for ( int i = 0; i < pkt->getSize(); i++ ) {
-                fprintf(fp, "%x ", *ptr);
-                ptr++;
-        }
-
-        fprintf(fp, "\n");
-
+    mem_trace_fout<<std::endl;
 }
 
 
@@ -202,10 +203,11 @@ CommMonitor::recvTimingReq(PacketPtr pkt)
     }
 
     if (successful) {
-        print(pkt);
-                ppPktReq->notify(pkt_info);
 
-        }
+        if (Debug::DataCommMonitor)
+          print(pkt, true);
+        ppPktReq->notify(pkt_info);
+    }
 
     if (successful && is_read) {
         DPRINTF(CommMonitor, "Forwarded read request\n");
@@ -334,9 +336,9 @@ CommMonitor::recvTimingResp(PacketPtr pkt)
     }
 
     if (successful) {
-                print(pkt);
-                ppPktResp->notify(pkt_info);
-
+        if (Debug::DataCommMonitor)
+            print(pkt, false);
+        ppPktResp->notify(pkt_info);
     }
 
     if (successful && is_read) {

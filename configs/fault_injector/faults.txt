@@ -1,0 +1,7 @@
+#stuck bit at 1, in target field, entry 6, bit 9, permanent (start 0, end -1)
+FAULT0: 1 , 1 , 6 , 9 , 0 , -1
+
+#stuck bit at 1, in tag field, entry 7, bit 8, permanent (start 0, end -1)
+FAULT1: 0 , 0 , 7 , 8 , 0 , -1
+
+#asd:ciao

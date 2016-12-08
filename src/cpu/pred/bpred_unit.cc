@@ -69,8 +69,9 @@ BPredUnit::BPredUnit(const Params *params)
       BTB(params->BTBEntries,
           params->BTBTagSize,
           params->instShiftAmt,
-          params->numThreads,
-          injectedFault),
+          params->numThreads
+          //injectedFault
+          ),
       RAS(numThreads),
       useIndirect(params->useIndirect),
       iPred(params->indirectHashGHR,

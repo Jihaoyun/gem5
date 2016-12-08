@@ -37,6 +37,7 @@
  * Authors: Andreas Hansson
  *          Andreas Sandberg
  */
+#define PROTOBUF_INLINE_NOT_IN_HEADERS 0
 
 #include "mem/probes/mem_trace.hh"
 
