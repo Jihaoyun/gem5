@@ -7,6 +7,10 @@ import argparse
 
 #parse and save the arguments
 parser = argparse.ArgumentParser(description='Gem5')
+
+parser.add_argument('-fe', '--fault-enabled', type=bool, dest='faultEnabled',
+                    help='It is true if the BPU is faulted')
+
 parser.add_argument('-b', '--benchmark', type=str, dest='benchmark',
                     help='Benchmark set on which to run the simulation')
 
@@ -80,15 +84,19 @@ system.cpu.createThreads()
 root = Root(full_system = False, system = system)
 
 #run all the simulation
-system.cpu.branchPred.faultLabel = args.label
-system.cpu.branchPred.faultStuckBit = args.stuckBit
-system.cpu.branchPred.faultField = args.field
-system.cpu.branchPred.faultEntry = args.entry
-system.cpu.branchPred.faultBitPosition = args.bitPosition
-system.cpu.branchPred.faultPermanent = \
-        (args.tickBegin == 0 and args.tickEnd == -1)
-system.cpu.branchPred.faultTickBegin = args.tickBegin
-system.cpu.branchPred.faultTickEnd = args.tickEnd
+if args.faultEnabled:
+    system.cpu.branchPred.faultEnabled = True
+    system.cpu.branchPred.faultLabel = args.label
+    system.cpu.branchPred.faultStuckBit = args.stuckBit
+    system.cpu.branchPred.faultField = args.field
+    system.cpu.branchPred.faultEntry = args.entry
+    system.cpu.branchPred.faultBitPosition = args.bitPosition
+    system.cpu.branchPred.faultPermanent = \
+            (args.tickBegin == 0 and args.tickEnd == -1)
+    system.cpu.branchPred.faultTickBegin = args.tickBegin
+    system.cpu.branchPred.faultTickEnd = args.tickEnd
+else
+    system.cpu.branchPred.faultEnabled = False
 
 m5.instantiate()
 print "Beginning simulation!"
