@@ -67,10 +67,10 @@ BPredUnit::BPredUnit(const Params *params)
             params->faultTickBegin,
             params->faultTickEnd),
       BTB(params->BTBEntries,
-          params->BTBTagSize,
-          params->instShiftAmt,
-          params->numThreads,
-          injectedFault),
+            params->BTBTagSize,
+            params->instShiftAmt,
+            params->numThreads,
+            injectedFault),
       RAS(numThreads),
       useIndirect(params->useIndirect),
       iPred(params->indirectHashGHR,
@@ -86,7 +86,7 @@ BPredUnit::BPredUnit(const Params *params)
     for (auto& r : RAS)
         r.init(params->RASSize);
 
-        BTBExcited.init(params->BTBEntries);
+    BTBExcited.init(params->BTBEntries);
 }
 
 void

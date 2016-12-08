@@ -113,8 +113,17 @@ def dump():
         if output.valid():
             output.begin()
             for stat in stats_list:
+                if stat.name == "BTBEntrycount":
+                    createBTBAccessCounter(stat.result())
                 output.visit(stat)
             output.end()
+
+def createBTBAccessCounter(res):
+    # Create BTB access counter file
+    statFile = open("m5out/btb-access-count.txt", "w")
+    for r in res:
+        statFile.write(str(int(r))+"\n")
+    statFile.close()
 
 def reset():
     '''Reset all statistics to the base state'''
