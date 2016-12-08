@@ -24,7 +24,8 @@ for benchmark in args.benchmarks:
             fe = fp.next()
             print "\n\nRunning " + benchmark + " with fault:\n" + str(fe)
             call(["./build/ALPHA/gem5.opt",
-                "--stats-file", benchmark.split("/")[-1] + fe.label + ".txt",
+                "--stats-file", benchmark.split("/")[-1] + "_" +
+                fe.label + ".txt",
                 "configs/fault_injector/injector_system.py",
                 "-b", benchmark,
                 "-l", fe.label,
