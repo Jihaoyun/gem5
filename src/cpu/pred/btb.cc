@@ -51,7 +51,7 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
     btb.resize(numEntries);
 
     for (unsigned i = 0; i < numEntries; ++i) {
-        btb[i].valid = false;
+        btb[i].setValid(false);
     }
 
     idxMask = numEntries - 1;
@@ -61,11 +61,50 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
     tagShiftAmt = instShiftAmt + floorLog2(numEntries);
 }
 
+
+DefaultBTB::DefaultBTB(unsigned _numEntries,
+                       unsigned _tagBits,
+                       unsigned _instShiftAmt,
+                       unsigned _num_threads,
+                                           FaultBPU::injFault f_parameters)
+    : numEntries(_numEntries),
+      tagBits(_tagBits),
+      instShiftAmt(_instShiftAmt),
+      log2NumThreads(floorLog2(_num_threads))
+{
+    DPRINTF(Fetch, "BTB: Creating BTB object.\n");
+
+    if (!isPowerOf2(numEntries)) {
+        fatal("BTB entries is not a power of 2!");
+    }
+
+        btb.resize(numEntries);
+        if ( f_parameters.enabled )
+                btb[f_parameters.entry].setFaulted(
+                                f_parameters.field,
+                f_parameters.bitPosition,
+                f_parameters.stuckBit);
+
+    for (unsigned i = 0; i < numEntries; ++i) {
+        btb[i].setValid(false);
+    }
+
+    idxMask = numEntries - 1;
+
+    tagMask = (1 << tagBits) - 1;
+
+    tagShiftAmt = instShiftAmt + floorLog2(numEntries);
+}
+
+
+
+
+
 void
 DefaultBTB::reset()
 {
     for (unsigned i = 0; i < numEntries; ++i) {
-        btb[i].valid = false;
+        btb[i].setValid(false);
     }
 }
 
@@ -95,9 +134,9 @@ DefaultBTB::valid(Addr instPC, ThreadID tid)
 
     assert(btb_idx < numEntries);
 
-    if (btb[btb_idx].valid
-        && inst_tag == btb[btb_idx].tag
-        && btb[btb_idx].tid == tid) {
+    if (btb[btb_idx].getValid()
+        && inst_tag == btb[btb_idx].getTag()
+        && btb[btb_idx].getTid() == tid) {
         return true;
     } else {
         return false;
@@ -116,24 +155,27 @@ DefaultBTB::lookup(Addr instPC, ThreadID tid)
 
     assert(btb_idx < numEntries);
 
-    if (btb[btb_idx].valid
-        && inst_tag == btb[btb_idx].tag
-        && btb[btb_idx].tid == tid) {
-        return btb[btb_idx].target;
+    printf("%lu %d %lu\n", instPC, btb_idx,
+                        btb[btb_idx].getTarget().instAddr() );
+
+    if ( btb[btb_idx].getValid()
+        && inst_tag == btb[btb_idx].getTag()
+        && btb[btb_idx].getTid() == tid) {
+        return btb[btb_idx].getTarget();
     } else {
         return 0;
     }
 }
 
 void
-DefaultBTB::update(Addr instPC, const TheISA::PCState &target, ThreadID tid)
+DefaultBTB::update(Addr instPC,const TheISA::PCState &target, ThreadID tid)
 {
     unsigned btb_idx = getIndex(instPC, tid);
 
     assert(btb_idx < numEntries);
 
-    btb[btb_idx].tid = tid;
-    btb[btb_idx].valid = true;
-    btb[btb_idx].target = target;
-    btb[btb_idx].tag = getTag(instPC);
+    btb[btb_idx].setTid(tid);
+    btb[btb_idx].setValid(true);
+    btb[btb_idx].setTarget( target );
+    btb[btb_idx].setTag(getTag(instPC));
 }

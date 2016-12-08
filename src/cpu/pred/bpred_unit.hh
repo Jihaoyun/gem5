@@ -51,10 +51,11 @@
 
 #include "base/statistics.hh"
 #include "base/types.hh"
+#include "cpu/inst_seq.hh"
 #include "cpu/pred/btb.hh"
+#include "cpu/pred/faultInjected.hh"
 #include "cpu/pred/indirect.hh"
 #include "cpu/pred/ras.hh"
-#include "cpu/inst_seq.hh"
 #include "cpu/static_inst.hh"
 #include "params/BranchPredictor.hh"
 #include "sim/probe/pmu.hh"
@@ -64,48 +65,16 @@
  * Basically a wrapper class to hold both the branch predictor
  * and the BTB.
  */
+
+
 class BPredUnit : public SimObject
 {
   public:
-      typedef BranchPredictorParams Params;
 
-      typedef struct Fault {
-        /** Whether the fault is enabled or not */
-        bool enabled;
-        /** Injected fault label */
-        std::string label;
-        /** Faulted value */
-        unsigned stuckBit;
-        /** 0 = Tag, 1 = Target, 2 = Valid */
-        unsigned field;
-        /** The entry number where we are injecting the fault */
-        unsigned entry;
-        /** The bit target of the fault */
-        unsigned bitPosition;
-        /** Whether the fault is permantent or not.
-            If it is permanent we ignore tickBegin and tickEnd */
-        bool permanent;
-        /** Fault begin time */
-        int64_t tickBegin;
-        /** Fault end time */
-        int64_t tickEnd;
 
-        Fault(bool _enabled, std::string _label, unsigned
-                _stuckBit, unsigned _field, unsigned _entry,
-                unsigned _bitPosition, bool _permanent,
-                unsigned _tickBegin, unsigned _tickEnd) :
-            enabled(_enabled),
-            label(_label),
-            stuckBit(_stuckBit),
-            field(_field),
-            entry(_entry),
-            bitPosition(_bitPosition),
-            permanent(_permanent),
-            tickBegin(_tickBegin),
-            tickEnd(_tickEnd)
-             {}
+        typedef BranchPredictorParams Params;
 
-    } Fault;
+
 
     /**
      * @param params The params object, that has the size of the BP and BTB.
@@ -313,7 +282,7 @@ class BPredUnit : public SimObject
     std::vector<History> predHist;
 
     /** The eventual injected fault */
-    Fault injectedFault;
+    FaultBPU::injFault injectedFault;
 
     /** The BTB. */
     DefaultBTB BTB;

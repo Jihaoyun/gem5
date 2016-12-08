@@ -89,6 +89,7 @@ class CommMonitor : public MemObject
   private:
 
     FILE* fp;
+        void print(PacketPtr pkt);
 
     /**
      * Sender state class for the monitor so that we can annotate

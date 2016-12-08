@@ -35,30 +35,79 @@
 #include "base/misc.hh"
 #include "base/types.hh"
 #include "config/the_isa.hh"
+#include "cpu/pred/faultInjected.hh"
+#include "tipoTargetspeciale.hh"
+#include "tipospeciale.hh"
+
+class BTBEntry
+{
+        public:
+
+        BTBEntry():
+                valid(false)
+        {
+                tag = new Tipo();
+                target = new TipoTarget();
+        }
+
+        void setFaulted(int field, int numBit, char value) {
+                if ( field == 0 ) {
+                        tag = new Tipospeciale(numBit,value);
+                }
+                if ( field == 1 ) {
+                        target = new TipoTargetSpeciale(numBit,value);
+                }
+        }
+
+        bool getValid() {
+                return valid;
+        }
+
+        void setValid(bool value) {
+                valid = value;
+        }
+
+        uint64_t getTag() {
+                return tag->getData();
+        }
+
+        void setTag(uint64_t value) {
+                tag->setData(value);
+        }
+
+        TheISA::PCState getTarget() {
+                return target->getData();
+        }
+
+        void setTarget(const TheISA::PCState value) {
+                target->setData(value);
+        }
+
+        ThreadID getTid() {
+                return tid;
+        }
+
+        void setTid(ThreadID ntid) {
+                tid = ntid;
+        }
+
+        private:
+        Tipo* tag;
+        TipoTarget* target;
+        bool valid; // TO DO modify this in order to allow injection also here
+        ThreadID tid;
+
+};
+
+
+
+
 
 class DefaultBTB
 {
-  private:
-    struct BTBEntry
-    {
-        BTBEntry()
-            : tag(0), target(0), valid(false)
-        {}
+    private:
 
-        /** The entry's tag. */
-        Addr tag;
-
-        /** The entry's target. */
-        TheISA::PCState target;
-
-        /** The entry's thread id. */
-        ThreadID tid;
-
-        /** Whether or not the entry is valid. */
-        bool valid;
-    };
-
-  public:
+        public:
     /** Creates a BTB with the given number of entries, number of bits per
      *  tag, and instruction offset amount.
      *  @param numEntries Number of entries for the BTB.
@@ -67,6 +116,11 @@ class DefaultBTB
      */
     DefaultBTB(unsigned numEntries, unsigned tagBits,
                unsigned instShiftAmt, unsigned numThreads);
+
+        DefaultBTB(unsigned numEntries, unsigned tagBits,
+               unsigned instShiftAmt, unsigned numThreads,
+                           FaultBPU::injFault f_parameters);
+
 
     void reset();
 
@@ -106,7 +160,9 @@ class DefaultBTB
     inline Addr getTag(Addr instPC);
 
     /** The actual BTB. */
-    std::vector<BTBEntry> btb;
+
+        std::vector<BTBEntry> btb;
+
 
     /** The number of entries in the BTB. */
     unsigned numEntries;

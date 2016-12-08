@@ -63,12 +63,12 @@ system.cpu.icache_port = system.membus.slave
 system.cpu.dcache_port = system.membus.slave
 
 # Inject a fault into the branch predictor
-system.cpu.branchPred.faultEnabled = True
+system.cpu.branchPred.faultEnabled = False
 system.cpu.branchPred.faultLabel = "hello world"
-system.cpu.branchPred.faultStuckBit = 0
-system.cpu.branchPred.faultField = 1
-system.cpu.branchPred.faultEntry = 232
-system.cpu.branchPred.faultBitPosition = 6
+system.cpu.branchPred.faultStuckBit = 1
+system.cpu.branchPred.faultField = 0
+system.cpu.branchPred.faultEntry = 3
+system.cpu.branchPred.faultBitPosition = 7
 system.cpu.branchPred.faultPermanent = True
 system.cpu.branchPred.faultTickBegin = 0
 system.cpu.branchPred.faultTickEnd = 10

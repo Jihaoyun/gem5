@@ -58,6 +58,7 @@ CommMonitor::CommMonitor(Params* params)
             "Created monitor %s with sample period %d ticks (%f ms)\n",
             name(), samplePeriodTicks, samplePeriod * 1E3);
         fp = fopen("memtrace.csv","r");
+                fprintf(fp,"Req/Resp;Tick;Command;Address;Data\n");
 }
 
 CommMonitor*
@@ -132,6 +133,43 @@ CommMonitor::recvAtomicSnoop(PacketPtr pkt)
     return slavePort.sendAtomicSnoop(pkt);
 }
 
+void
+CommMonitor::print(PacketPtr pkt)
+{
+
+        char cmd;
+
+        const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
+
+        if ( pkt->isRead() )
+                cmd = 'r';
+        else if ( pkt->isWrite() )
+                cmd = 'w';
+        else
+                cmd = 'u';
+
+        if ( pkt->isResponse() )
+                fprintf(fp,"Req;");
+        else if ( pkt->isRequest() )
+                fprintf(fp,"Resp;");
+        else
+                fprintf(fp,"Und;");
+
+        fprintf(fp, "%ld;%c;0x%lx;0x", curTick(),
+                cmd, pkt->getAddr() );
+
+        for ( int i = 0; i < pkt->getSize(); i++ ) {
+                fprintf(fp, "%x ", *ptr);
+                ptr++;
+        }
+
+        fprintf(fp, "\n");
+
+}
+
+
+
+
 bool
 CommMonitor::recvTimingReq(PacketPtr pkt)
 {
@@ -164,8 +202,10 @@ CommMonitor::recvTimingReq(PacketPtr pkt)
     }
 
     if (successful) {
-        ppPktReq->notify(pkt_info);
-    }
+        print(pkt);
+                ppPktReq->notify(pkt_info);
+
+        }
 
     if (successful && is_read) {
         DPRINTF(CommMonitor, "Forwarded read request\n");
@@ -294,7 +334,9 @@ CommMonitor::recvTimingResp(PacketPtr pkt)
     }
 
     if (successful) {
-        ppPktResp->notify(pkt_info);
+                print(pkt);
+                ppPktResp->notify(pkt_info);
+
     }
 
     if (successful && is_read) {
