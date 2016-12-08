@@ -66,7 +66,7 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
                        unsigned _tagBits,
                        unsigned _instShiftAmt,
                        unsigned _num_threads,
-                                           FaultBPU::injFault f_parameters)
+                       FaultBPU::injFault f_parameters)
     : numEntries(_numEntries),
       tagBits(_tagBits),
       instShiftAmt(_instShiftAmt),
@@ -94,10 +94,8 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
     tagMask = (1 << tagBits) - 1;
 
     tagShiftAmt = instShiftAmt + floorLog2(numEntries);
+
 }
-
-
-
 
 
 void
@@ -108,7 +106,7 @@ DefaultBTB::reset()
     }
 }
 
-inline
+
 unsigned
 DefaultBTB::getIndex(Addr instPC, ThreadID tid)
 {
@@ -131,6 +129,7 @@ DefaultBTB::valid(Addr instPC, ThreadID tid)
     unsigned btb_idx = getIndex(instPC, tid);
 
     Addr inst_tag = getTag(instPC);
+
 
     assert(btb_idx < numEntries);
 
@@ -155,8 +154,6 @@ DefaultBTB::lookup(Addr instPC, ThreadID tid)
 
     assert(btb_idx < numEntries);
 
-    printf("%lu %d %lu\n", instPC, btb_idx,
-                        btb[btb_idx].getTarget().instAddr() );
 
     if ( btb[btb_idx].getValid()
         && inst_tag == btb[btb_idx].getTag()
@@ -179,3 +176,13 @@ DefaultBTB::update(Addr instPC,const TheISA::PCState &target, ThreadID tid)
     btb[btb_idx].setTarget( target );
     btb[btb_idx].setTag(getTag(instPC));
 }
+
+
+DefaultBTB::~DefaultBTB(){
+        printf("\nSperiamo che me la cavi\n");
+}
+
+
+
+
+

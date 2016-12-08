@@ -69,9 +69,8 @@ BPredUnit::BPredUnit(const Params *params)
       BTB(params->BTBEntries,
           params->BTBTagSize,
           params->instShiftAmt,
-          params->numThreads
-          //injectedFault
-          ),
+          params->numThreads,
+          injectedFault),
       RAS(numThreads),
       useIndirect(params->useIndirect),
       iPred(params->indirectHashGHR,
@@ -86,12 +85,18 @@ BPredUnit::BPredUnit(const Params *params)
 {
     for (auto& r : RAS)
         r.init(params->RASSize);
+
+        BTBExcited.init(params->BTBEntries);
 }
 
 void
 BPredUnit::regStats()
 {
     SimObject::regStats();
+
+        BTBExcited
+                .name("BTBEntrycount");
+
 
     lookups
         .name(name() + ".lookups")
@@ -271,6 +276,7 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
 
             if (inst->isDirectCtrl() || !useIndirect) {
                 // Check BTB on direct branches
+                                ++BTBExcited[BTB.getIndex(pc.instAddr(),tid)];
                 if (BTB.valid(pc.instAddr(), tid)) {
                     ++BTBHits;
 

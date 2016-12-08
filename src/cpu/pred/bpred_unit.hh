@@ -218,7 +218,8 @@ class BPredUnit : public SimObject
                          bool pred_taken, void *bp_history,
                          ThreadID _tid)
             : seqNum(seq_num), pc(instPC), bpHistory(bp_history), RASTarget(0),
-              RASIndex(0), tid(_tid), predTaken(pred_taken), usedRAS(0), pushedRAS(0),
+              RASIndex(0), tid(_tid), predTaken(pred_taken), usedRAS(0),
+                          pushedRAS(0),
               wasCall(0), wasReturn(0), wasSquashed(0), wasIndirect(0)
         {}
 
@@ -323,6 +324,8 @@ class BPredUnit : public SimObject
     Stats::Scalar indirectMisses;
     /** Stat for the number of indirect target mispredictions.*/
     Stats::Scalar indirectMispredicted;
+
+        Stats::Vector BTBExcited;
 
   protected:
     /** Number of bits to shift instructions by for predictor addresses. */

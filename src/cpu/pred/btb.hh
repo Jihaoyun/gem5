@@ -33,9 +33,11 @@
 
 #include "arch/types.hh"
 #include "base/misc.hh"
+#include "base/statistics.hh"
 #include "base/types.hh"
 #include "config/the_isa.hh"
 #include "cpu/pred/faultInjected.hh"
+#include "sim/sim_object.hh"
 #include "tipoTargetspeciale.hh"
 #include "tipospeciale.hh"
 
@@ -121,7 +123,7 @@ class DefaultBTB
                unsigned instShiftAmt, unsigned numThreads,
                            FaultBPU::injFault f_parameters);
 
-
+        ~DefaultBTB();
     void reset();
 
     /** Looks up an address in the BTB. Must call valid() first on the address.
@@ -146,14 +148,18 @@ class DefaultBTB
     void update(Addr instPC, const TheISA::PCState &targetPC,
                 ThreadID tid);
 
+        unsigned getIndex(Addr instPC, ThreadID tid);
+
+
   private:
     /** Returns the index into the BTB, based on the branch's PC.
      *  @param inst_PC The branch to look up.
      *  @return Returns the index into the BTB.
      */
-    inline unsigned getIndex(Addr instPC, ThreadID tid);
 
-    /** Returns the tag bits of a given address.
+
+
+            /** Returns the tag bits of a given address.
      *  @param inst_PC The branch's address.
      *  @return Returns the tag bits.
      */
