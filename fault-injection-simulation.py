@@ -17,21 +17,34 @@ parser.add_argument('-i', '--fault-input', type=str, dest='faultInput',
 
 args = parser.parse_args()
 
+# Run a simulation for each specified benchmark program
 for benchmark in args.benchmarks:
     print "\n\nRunning " + benchmark + " GOLDEN\n"
+
+    # Create a folder to store stats releated to the current benchmark
+    statFolder = benchmark.split("/")[-1]
+    if not os.path.exists("m5out/" + statFolder):
+        os.makedirs("m5out/" + statFolder)
+
+    # Run Golden simulation
     call(["./build/ALPHA/gem5.opt",
-        "--stats-file", benchmark.split("/")[-1] + "_" +
+        "--stats-file", statFolder + "/" +
         "GOLDEN.txt",
         "configs/fault_injector/injector_system.py",
         "-b", benchmark ])
 
+    # Read all fault input files
     for inputFile in args.faultInput:
         fp = FaultParser(inputFile)
         while fp.hasNext():
+            # Load the next fault entry
             fe = fp.next()
+
             print "\n\nRunning " + benchmark + " with fault:\n" + str(fe)
+
+            # Run faulted simulation
             call(["./build/ALPHA/gem5.opt",
-                "--stats-file", benchmark.split("/")[-1] + "_" +
+                "--stats-file", statFolder + "/" +
                 fe.label + ".txt",
                 "configs/fault_injector/injector_system.py",
                 "-fe",
