@@ -136,7 +136,7 @@ CommMonitor::recvAtomicSnoop(PacketPtr pkt)
 }
 
 void
-CommMonitor::print(PacketPtr pkt)
+CommMonitor::print(PacketPtr pkt, bool is_req)
 {
     char cmd;
     const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
@@ -148,12 +148,10 @@ CommMonitor::print(PacketPtr pkt)
     else
       cmd = 'u';
 
-    if ( pkt->isResponse() )
-      mem_trace_fout<<"Res;";
-    else if ( pkt->isRequest() )
+    if (is_req)
       mem_trace_fout<<"Req;";
     else
-      mem_trace_fout<<"Und;";
+      mem_trace_fout<<"Res;";
 
     mem_trace_fout<<std::dec<<curTick()<<";"
                   <<cmd<<";0x"
@@ -206,7 +204,7 @@ CommMonitor::recvTimingReq(PacketPtr pkt)
 
     if (successful) {
         if (Debug::DataCommMonitor)
-          print(pkt);
+          print(pkt, true);
         ppPktReq->notify(pkt_info);
     }
 
@@ -338,7 +336,7 @@ CommMonitor::recvTimingResp(PacketPtr pkt)
 
     if (successful) {
         if (Debug::DataCommMonitor)
-            print(pkt);
+            print(pkt, false);
         ppPktResp->notify(pkt_info);
     }
 

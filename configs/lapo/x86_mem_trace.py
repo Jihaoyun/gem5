@@ -27,7 +27,7 @@ system.mem_ranges = [AddrRange('512MB')] # Create an address range
 system.cpu = TimingSimpleCPU()
 
 system.cpu.monitor = CommMonitor()
-system.cpu.monitor.trace = MemTraceProbe(trace_file="my_trace.trc.gz")
+#system.cpu.monitor.trace = MemTraceProbe(trace_file="my_trace.trc.gz")
 
 # Create a memory bus, a coherent crossbar, in this case
 system.membus = SystemXBar()

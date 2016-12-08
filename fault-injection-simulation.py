@@ -22,7 +22,7 @@ for benchmark in args.benchmarks:
         fp = FaultParser(inputFile)
         while fp.hasNext():
             fe = fp.next()
-            print "Running " + benchmark + " with fault:\n" + str(fe)
+            print "\n\nRunning " + benchmark + " with fault:\n" + str(fe)
             call(["./build/ALPHA/gem5.opt",
                 "configs/fault_injector/injector_system.py",
                 "-b", benchmark,

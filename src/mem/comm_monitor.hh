@@ -93,7 +93,7 @@ class CommMonitor : public MemObject
   private:
 
     std::ofstream mem_trace_fout;
-    void print(PacketPtr pkt);
+    void print(PacketPtr pkt, bool is_req);
 
     /**
      * Sender state class for the monitor so that we can annotate
