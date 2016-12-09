@@ -58,8 +58,7 @@ CommMonitor::CommMonitor(Params* params)
             "Created monitor %s with sample period %d ticks (%f ms)\n",
             name(), samplePeriodTicks, samplePeriod * 1E3);
     if (Debug::DataCommMonitor){
-        mem_trace_fout.open("m5out/mem_trace.csv");
-        mem_trace_fout<<"Req/Res;Tick;Command;Address;Size;Data"<<std::endl;
+        mem_trace_fout.open("m5out/mem_trace.txt");
     }
 }
 
@@ -140,6 +139,7 @@ CommMonitor::print(PacketPtr pkt, bool is_req)
 {
     char cmd;
     const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
+    static uint64_t int_data;
 
     if ( pkt->isRead() )
       cmd = 'r';
@@ -149,23 +149,21 @@ CommMonitor::print(PacketPtr pkt, bool is_req)
       cmd = 'u';
 
     if (is_req)
-      mem_trace_fout<<"Req;";
+      mem_trace_fout<<"r ";
     else
-      mem_trace_fout<<"Res;";
+      mem_trace_fout<<"a ";
 
-    mem_trace_fout<<std::dec<<curTick()<<";"
-                  <<cmd<<";0x"
-                  <<std::setfill('0')<<std::setw(8)<<std::hex
-                  <<pkt->getAddr()<<";"
-                  <<std::dec<<pkt->getSize()<<";0x";
+    mem_trace_fout<<curTick()<<"ps "
+                  <<cmd<<" "
+                  <<pkt->getAddr()<<" ";
 
+    int_data = 0;
     for ( int i = 0; i < pkt->getSize(); i++ ) {
-      mem_trace_fout<<std::setfill('0')<<std::setw(2)<<std::hex
-                    <<+(*ptr);
+      int_data |= (*ptr)<<i*8;
       ptr++;
     }
 
-    mem_trace_fout<<std::endl;
+    mem_trace_fout<<(0x00000000FFFFFFFF & int_data)<<std::endl;
 }
 
 
