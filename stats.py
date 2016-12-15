@@ -68,8 +68,3 @@ if __name__ == "__main__":
 
             # Store the stat object
             statInstances[f] = stat
-
-            print f, stat["system.cpu.branchPred.lookups"]
-            print statInstances["GOLDEN.txt"]["system.cpu.branchPred.lookups"]
-
-    simplestat(statInstances, ["system.cpu.branchPred.condIncorrect"])
