@@ -15,6 +15,9 @@ parser.add_argument('-b', '--benchmarks', type=str, dest='benchmarks',
 parser.add_argument('-i', '--fault-input', type=str, dest='faultInput',
                     nargs='+', help='Fault source files')
 
+parser.add_argument('-o', '--options', type=str, dest='options',
+                    nargs='+', help='Options for the binary benchmark')
+
 args = parser.parse_args()
 
 # Run a simulation for each specified benchmark program
@@ -27,11 +30,16 @@ for benchmark in args.benchmarks:
         os.makedirs("m5out/" + statFolder)
 
     # Run Golden simulation
-    call(["./build/ALPHA/gem5.opt",
+    cmd = ["./build/ALPHA/gem5.opt",
         "--stats-file", statFolder + "/" +
         "GOLDEN.txt",
         "configs/fault_injector/injector_system.py",
-        "-b", benchmark ])
+        "-b", benchmark ]
+    if args.options != None:
+        cmd.append("--options")
+        cmd.append(args.options)
+
+    call(cmd)
 
     # Read all fault input files
     if args.faultInput == None:
@@ -46,7 +54,7 @@ for benchmark in args.benchmarks:
             print "\n\nRunning " + benchmark + " with fault:\n" + str(fe)
 
             # Run faulted simulation
-            call(["./build/ALPHA/gem5.opt",
+            cmd = ["./build/ALPHA/gem5.opt",
                 "--stats-file", statFolder + "/" +
                 fe.label + ".txt",
                 "configs/fault_injector/injector_system.py",
@@ -58,4 +66,8 @@ for benchmark in args.benchmarks:
                 "-e", fe.entry,
                 "-bp", fe.bitPosition,
                 "-tb", fe.tickBegin,
-                "-te", fe.tickEnd])
+                "-te", fe.tickEnd]
+            if args.options != None:
+                cmd.append("--options")
+                cmd.append(args.options)
+            call(cmd)
