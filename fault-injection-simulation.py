@@ -34,6 +34,9 @@ for benchmark in args.benchmarks:
         "-b", benchmark ])
 
     # Read all fault input files
+    if args.faultInput == None:
+        break
+
     for inputFile in args.faultInput:
         fp = FaultParser(inputFile)
         while fp.hasNext():
