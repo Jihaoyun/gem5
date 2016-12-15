@@ -16,13 +16,16 @@ parser.add_argument('-i', '--fault-input', type=str, dest='faultInput',
                     nargs='+', help='Fault source files')
 
 parser.add_argument('-o', '--options', type=str, dest='options',
-                    nargs='+', help='Options for the binary benchmark')
+                    help='Options for the binary benchmark')
 
 args = parser.parse_args()
 
 # Run a simulation for each specified benchmark program
 for benchmark in args.benchmarks:
     print "\n\nRunning " + benchmark + " GOLDEN\n"
+
+    if args.options != None:
+        benchmark = " ".join([benchmark, args.options])
 
     # Create a folder to store stats releated to the current benchmark
     statFolder = benchmark.split("/")[-1]
@@ -35,9 +38,6 @@ for benchmark in args.benchmarks:
         "GOLDEN.txt",
         "configs/fault_injector/injector_system.py",
         "-b", benchmark ]
-    if args.options != None:
-        cmd.append("--options")
-        cmd.append(args.options)
 
     call(cmd)
 
@@ -67,7 +67,5 @@ for benchmark in args.benchmarks:
                 "-bp", fe.bitPosition,
                 "-tb", fe.tickBegin,
                 "-te", fe.tickEnd]
-            if args.options != None:
-                cmd.append("--options")
-                cmd.append(args.options)
+
             call(cmd)
