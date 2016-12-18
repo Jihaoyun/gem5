@@ -325,7 +325,7 @@ class BPredUnit : public SimObject
     /** Stat for the number of indirect target mispredictions.*/
     Stats::Scalar indirectMispredicted;
 
-        Stats::Vector BTBExcited;
+    Stats::Vector BTBExcited;
 
   protected:
     /** Number of bits to shift instructions by for predictor addresses. */

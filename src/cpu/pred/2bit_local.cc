@@ -48,7 +48,7 @@ LocalBP::LocalBP(const LocalBPParams *params)
     if (!isPowerOf2(localPredictorSets)) {
         fatal("Invalid number of local predictor sets! Check localCtrBits.\n");
     }
-
+        printf("Ciao");
     // Setup the index mask.
     indexMask = localPredictorSets - 1;
 

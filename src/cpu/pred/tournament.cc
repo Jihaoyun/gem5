@@ -68,7 +68,7 @@ TournamentBP::TournamentBP(const TournamentBPParams *params)
     if (!isPowerOf2(globalPredictorSize)) {
         fatal("Invalid global predictor size!\n");
     }
-
+        printf("Ciao bello");
     //Set up the array of counters for the local predictor
     localCtrs.resize(localPredictorSize);
 

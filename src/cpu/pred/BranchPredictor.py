@@ -86,6 +86,17 @@ class TournamentBP(BranchPredictor):
     choiceCtrBits = Param.Unsigned(2, "Bits of choice counters")
 
 
+class BiModalBP(BranchPredictor):
+    type = 'BiModalBP'
+    cxx_class = 'BiModalBP'
+    cxx_header = "cpu/pred/bi_modal.hh"
+
+    historyBits = Param.Unsigned(2,
+        "Number of bit of the global history register")
+    predictorSize = Param.Unsigned(8192, "Size of global predictor")
+    ctrBits = Param.Unsigned(2, "Bits per counter")
+
+
 class BiModeBP(BranchPredictor):
     type = 'BiModeBP'
     cxx_class = 'BiModeBP'

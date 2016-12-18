@@ -85,6 +85,8 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 
+
+
 #run all the simulation
 if args.faultEnabled:
     system.cpu.branchPred.faultEnabled = True

@@ -4,17 +4,27 @@
 int main() {
 
         int i;
-        int vec[1024];
-        int sum = 0;
+                int aa,bb;
+        for ( i = 0; i < 1024; i++ ) {
 
-        for ( i = 0; i < 1024; i++ )
-                vec[i] = 255;
-        for ( i = 0; i < 10; i++ ) {
-                sum += vec[i];
-        }
+                        if ( i % 2 == 0 ) {
+                                aa = 3;
+                                bb = 4;
+                        }
+                        else {
+                                aa = 2;
+                                bb = 2;
+                        }
 
 
-        printf("%d\n",sum);
+                        if ( aa == 2 )
+                                aa = 0;
+                        if ( bb == 2 )
+                                bb = 0;
+                        if ( aa == bb )
+                                printf("Pippo");
+
+                }
 
         return 0;
 }
