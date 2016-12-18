@@ -69,8 +69,12 @@ system.cpu.createThreads()
 root = Root(full_system = False, system = system)
 
 root.registerFault = RegisterFault()
-root.registerFault.startTick = 1439301800
+root.registerFault.startTick = 143930180
 root.registerFault.system = system
+root.registerFault.registerCategory = 0
+root.registerFault.faultRegister = 13
+root.registerFault.bitPosition = 3
+
 
 # instantiate all of the objects we've created above
 m5.instantiate()
