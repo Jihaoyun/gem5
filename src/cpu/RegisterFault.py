@@ -5,3 +5,4 @@ class RegisterFault(SimObject):
     type = 'RegisterFault'
     cxx_header = "cpu/register_fault.hh"
     startTick = Param.Unsigned(0, "Inject fault at this tick")
+    system = Param.System(NULL, "System")

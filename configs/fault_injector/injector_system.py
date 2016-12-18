@@ -76,7 +76,7 @@ system.system_port = system.membus.slave
 process = LiveProcess()
 
 # Set the command
-process.cmd = args.benchmark
+process.cmd = args.benchmark.split()
 
 # Set the cpu to use the process as its workload and create thread contexts
 system.cpu.workload = process
