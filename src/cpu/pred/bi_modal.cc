@@ -31,28 +31,27 @@
 /* @file
  * Implementation of a bi-mode branch predictor
  */
-//#include "base/bitfield.hh"
-//#include "base/intmath.hh"
-//#include "cpu/pred/bi_modal.hh"
+
+#include "cpu/pred/bi_modal.hh"
+
+#include "base/bitfield.hh"
+#include "base/intmath.hh"
 
 BiModalBP::BiModalBP(const BiModalBPParams *params)
     : BPredUnit(params),
       historyRegisters(params->numThreads,0),
       ctrBits(params->ctrBits)
 {
-        int numThreads = params->numThreads;
-        int numberOfTable = pow(2,params->historyBits);
-        int predictorSize = ceilLog2(params->predictorSize);
+    int numThreads = params->numThreads;
+    int numberOfTable = pow(2,params->historyBits);
+    int predictorSize = ceilLog2(params->predictorSize);
 
-
-        historyRegisterMask = 0;
-        for ( int i = 0; i < params->historyBits; i++ )
-                historyRegisterMask = (historyRegisterMask << 1 ) | 1;
-        addressBitMask = 0;
-        for ( int i = 0; i < predictorSize ; i++ )
-                addressBitMask = (addressBitMask << 1 ) | 1;
-
-
+    historyRegisterMask = 0;
+    for ( int i = 0; i < params->historyBits; i++ )
+        historyRegisterMask = (historyRegisterMask << 1 ) | 1;
+    addressBitMask = 0;
+    for ( int i = 0; i < predictorSize ; i++ )
+        addressBitMask = (addressBitMask << 1 ) | 1;
 
     counters.resize(numThreads);
         for ( int i = 0; i < numThreads; i++ ) {
@@ -63,7 +62,6 @@ BiModalBP::BiModalBP(const BiModalBPParams *params)
                                 counters[i][j][k].setBits(ctrBits);
                 }
         }
-
 
 }
 
