@@ -1,7 +1,7 @@
 #ifndef __REGISTER_FAULT_HH__
 #define __REGISTER_FAULT_HH__
 
-#include "arch/arm/intregs.hh"
+//#include "arch/arm/intregs.hh"
 #include "cpu/thread_context.hh"
 #include "debug/RegisterBitFlip.hh"
 #include "params/RegisterFault.hh"
