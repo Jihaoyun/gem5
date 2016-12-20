@@ -201,16 +201,6 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
     // Save off record of branch stuff so the RAS can be fixed
     // up once it's done.
 
-    /*std::cout << injectedFault.enabled << std::endl;
-    std::cout << injectedFault.label << std::endl;
-    std::cout << injectedFault.stuckBit << std::endl;
-    std::cout << injectedFault.field << std::endl;
-    std::cout << injectedFault.entry << std::endl;
-    std::cout << injectedFault.bitPosition << std::endl;
-    std::cout << injectedFault.permanent << std::endl;
-    std::cout << injectedFault.tickBegin << std::endl;
-    std::cout << injectedFault.tickEnd << std::endl;*/
-
     bool pred_taken = false;
     TheISA::PCState target = pc;
 
@@ -276,7 +266,7 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
 
             if (inst->isDirectCtrl() || !useIndirect) {
                 // Check BTB on direct branches
-                                ++BTBExcited[BTB.getIndex(pc.instAddr(),tid)];
+                ++BTBExcited[BTB.getIndex(pc.instAddr(),tid)];
                 if (BTB.valid(pc.instAddr(), tid)) {
                     ++BTBHits;
 
