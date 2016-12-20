@@ -52,7 +52,7 @@ class BranchPredictor(SimObject):
     faultTickBegin = Param.Int64(0, "Fault begin time")
     faultTickEnd = Param.Int64(-1, "Fault end time")
 
-    useIndirect = Param.Bool(True, "Use indirect branch predictor")
+    useIndirect = Param.Bool(False, "Use indirect branch predictor")
     indirectHashGHR = Param.Bool(True, "Hash branch predictor GHR")
     indirectHashTargets = Param.Bool(True, "Hash path history targets")
     indirectSets = Param.Unsigned(256, "Cache sets for indirect predictor")
@@ -106,3 +106,14 @@ class BiModeBP(BranchPredictor):
     globalCtrBits = Param.Unsigned(2, "Bits per counter")
     choicePredictorSize = Param.Unsigned(8192, "Size of choice predictor")
     choiceCtrBits = Param.Unsigned(2, "Bits of choice counters")
+
+class GShareBP(BranchPredictor):
+    type = 'GShareBP'
+    cxx_class = 'GShareBP'
+    cxx_header = "cpu/pred/gshare.hh"
+
+    globalHistoryBits = Param.Unsigned(4,
+        "Number of bit of the global history register")
+    ctrBits = Param.Unsigned(2, "Bits per counter")
+    predictorSets = Param.Unsigned(2048,
+        "Size of global predictor")

@@ -32,31 +32,28 @@
  * Implementation of a bi-mode branch predictor
  */
 
-#include "cpu/pred/bi_modal.hh"
+#include "cpu/pred/gshare.hh"
 
 #include "base/bitfield.hh"
 #include "base/intmath.hh"
 
-BiModalBP::BiModalBP(const BiModalBPParams *params)
+GShareBP::GShareBP(const GShareBPParams *params)
     : BPredUnit(params),
-      historyRegisters(params->numThreads,0),
+      globalHistoryRegs(params->numThreads, 0),
+      globalHistoryBits(params->globalHistoryBits),
+      predictorSets(params->predictorSets),
       ctrBits(params->ctrBits)
 {
-    int numThreads = params->numThreads;
-    int numberOfTable = pow(2,params->historyBits);
-    int predictorBits = ceilLog2(params->predictorSize);
 
-    historyRegisterMask = (1 << params->historyBits) - 1;
-    addressBitMask = (1 << predictorBits) - 1;
+    addressBitMask = predictorSets - 1;
+    historyRegisterMask = (1 << globalHistoryBits) - 1;
 
-    counters.resize(numThreads);
-    for ( int i = 0; i < numThreads; i++ ) {
-        counters[i].resize(numberOfTable);
-        for ( int j = 0; j < numberOfTable; j++ ) {
-            counters[i][j].resize(params->predictorSize);
-            for ( int k = 0; k < params->predictorSize; k++ )
-                counters[i][j][k].setBits(ctrBits);
-        }
+
+    threadCounters.resize(params->numThreads);
+    for ( int i = 0; i < params->numThreads; i++ ) {
+        threadCounters[i].resize(predictorSets);
+        for ( int j = 0; j < predictorSets; j++ )
+            threadCounters[i][j].setBits(ctrBits);
     }
 
 }
@@ -67,20 +64,21 @@ BiModalBP::BiModalBP(const BiModalBPParams *params)
  * chooses the taken array and the taken array predicts taken.
  */
 void
-BiModalBP::uncondBranch(ThreadID tid, Addr pc, void * &bpHistory)
+GShareBP::uncondBranch(ThreadID tid, Addr pc, void * &bpHistory)
 {
     BPHistory *history = new BPHistory;
-    history->historyRegister = historyRegisters[tid];
+    history->globalHistoryReg = globalHistoryRegs[tid];
     history->finalPred = true;
     bpHistory = static_cast<void*>(history);
     updateGlobalHistReg(tid, true);
 }
 
 void
-BiModalBP::squash(ThreadID tid, void *bpHistory)
+GShareBP::squash(ThreadID tid, void *bpHistory)
 {
     BPHistory *history = static_cast<BPHistory*>(bpHistory);
-    historyRegisters[tid] = history->historyRegister;
+    globalHistoryRegs[tid] = history->globalHistoryReg;
+
     delete history;
 }
 
@@ -94,63 +92,54 @@ BiModalBP::squash(ThreadID tid, void *bpHistory)
  * direction predictors for the final branch prediction.
  */
 bool
-BiModalBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
+GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
 {
-    unsigned predictorIdx = ((branchAddr >> instShiftAmt)
-                                & addressBitMask);
-    unsigned historyIdx = historyRegisters[tid] & historyRegisterMask;
+    unsigned index = ((branchAddr >> instShiftAmt)
+                      ^ (globalHistoryRegs[tid] & historyRegisterMask))
+                                & addressBitMask;
 
-    bool finalPrediction =
-        (counters[tid][historyIdx][predictorIdx].read() >> (ctrBits - 1) );
+    bool finalPrediction = threadCounters[tid][index].read() >>
+                                                    (ctrBits-1);
 
     BPHistory *history = new BPHistory;
-    history->historyRegister = historyRegisters[tid];
+    history->globalHistoryReg = globalHistoryRegs[tid];
     history->finalPred = finalPrediction;
-
     bpHistory = static_cast<void*>(history);
-    updateGlobalHistReg(tid, finalPrediction);
 
+    updateGlobalHistReg(tid, finalPrediction);
     return finalPrediction;
 }
 
-/* Set the last bit of the history to zero when an entry was not found
- * into the BTB.
- */
 void
-BiModalBP::btbUpdate(ThreadID tid, Addr branchAddr, void * &bpHistory)
+GShareBP::btbUpdate(ThreadID tid, Addr branchAddr, void * &bpHistory)
 {
-    historyRegisters[tid] &= (historyRegisterMask & ~ULL(1));
+    globalHistoryRegs[tid] &= (historyRegisterMask & ~ULL(1));
 }
 
-/* Only the selected direction predictor will be updated with the final
- * outcome; the status of the unselected one will not be altered. The choice
- * predictor is always updated with the branch outcome, except when the
- * choice is opposite to the branch outcome but the selected counter of
- * the direction predictors makes a correct final prediction.
- */
 void
-BiModalBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
+GShareBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
                  bool squashed)
 {
     if (bpHistory) {
+
         BPHistory *history = static_cast<BPHistory*>(bpHistory);
 
-        unsigned predictorIdx = ((branchAddr >> instShiftAmt)
-                                & addressBitMask);
-        unsigned historyIdx = historyRegisters[tid] & historyRegisterMask;
+        unsigned index = ((branchAddr >> instShiftAmt)
+                      ^ (globalHistoryRegs[tid] & historyRegisterMask))
+                                & addressBitMask;
 
         if ( taken )
-            counters[tid][historyIdx][predictorIdx].increment();
+            threadCounters[tid][index].increment();
         else
-            counters[tid][historyIdx][predictorIdx].decrement();
+            threadCounters[tid][index].decrement();
 
         if (squashed) {
             if (taken) {
-                historyRegisters[tid] = (history->historyRegister << 1) | 1;
+                globalHistoryRegs[tid] = (history->globalHistoryReg << 1) | 1;
             } else {
-                historyRegisters[tid] = (history->historyRegister << 1);
+                globalHistoryRegs[tid] = (history->globalHistoryReg << 1);
             }
-            historyRegisters[tid] &= historyRegisterMask;
+            globalHistoryRegs[tid] &= historyRegisterMask;
         } else {
             delete history;
         }
@@ -158,28 +147,28 @@ BiModalBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
 }
 
 void
-BiModalBP::retireSquashed(ThreadID tid, void *bp_history)
+GShareBP::retireSquashed(ThreadID tid, void *bp_history)
 {
     BPHistory *history = static_cast<BPHistory*>(bp_history);
     delete history;
 }
 
 unsigned
-BiModalBP::getGHR(ThreadID tid, void *bp_history) const
+GShareBP::getGHR(ThreadID tid, void *bp_history) const
 {
-    return static_cast<BPHistory*>(bp_history)->historyRegister;
+    return static_cast<BPHistory*>(bp_history)->globalHistoryReg;
 }
 
 void
-BiModalBP::updateGlobalHistReg(ThreadID tid, bool taken)
+GShareBP::updateGlobalHistReg(ThreadID tid, bool taken)
 {
-    historyRegisters[tid] = taken ? (historyRegisters[tid] << 1) | 1 :
-                               (historyRegisters[tid] << 1);
-    historyRegisters[tid] &= historyRegisterMask;
+    globalHistoryRegs[tid] = taken ? (globalHistoryRegs[tid] << 1) | 1 :
+                               (globalHistoryRegs[tid] << 1);
+    globalHistoryRegs[tid] &= historyRegisterMask;
 }
 
-BiModalBP*
-BiModalBPParams::create()
+GShareBP*
+GShareBPParams::create()
 {
-    return new BiModalBP(this);
+    return new GShareBP(this);
 }
