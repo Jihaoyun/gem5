@@ -3,7 +3,7 @@
 This is a fork of the [gem5](http://gem5.org) simulator.
 The main purpose of this project is to add a fault injection system to the simulation.
 
-Currently onlye these kind of injection are possibile:
+Currently only these kind of injection are possible:
   - Branch Prediction Unit fault injection
   - Register File fault injection
 
@@ -48,7 +48,7 @@ Save the file and reboot the machine
 
 ### Running a simulation
 
-Currently only BTB (Branch Target Buffer) injections are possibile.
+Currently only BTB (Branch Target Buffer) injections are possible.
 We build a python script that firstly runs a simulation without any fault injection (golden) and then a runs a simulation for each faults specified in a file.
 The script is located in the main folder of gem5 and it's called `fault-injection-simulation.py`
 This script has the following parameters:
@@ -64,23 +64,23 @@ For sake of clarity an example is reported below:
 ```
 FAULT0: 1 , 0 , 232 , 5 , 0 , -1
 ```
-In this example it's specified a fault labeled "FAULT0" which will stuck at 1 the 5-th bit of the tag field of the 232-th entry of the BTB.
+In this example it's specified a fault labelled "FAULT0" which will be stuck at 1 the 5-th bit of the tag field of the 232-th entry of the BTB.
 Field value can be the following:
 * 0 : tag field of the BTB
 * 1 : target field of the BTB
-* 2 : validty field ot the BTB
+* 2 : validity field of the BTB
 
 If the start tick is equals to 0 and the end tick is equals to -1 then the fault is permanent.
 
 ### View the results
-After a simulation all the stas files are saved in the folder `m5out\your_testbench`. In particular the generated fieles are the `GOLDEN.txt`, which reports all the statistics related to the golden run, and for each fault specified in the fault-file will be generated a file `FAULT_LABEL.txt`.
+After a simulation all the stats files are saved in the folder `m5out\your_testbench`. In particular the generated files are the `GOLDEN.txt`, which reports all the statistics related to the golden run, and for each fault specified in the fault-file will be generated a file `FAULT_LABEL.txt`.
 
-It's also generated a file containing all the BTB access of the golden run in order to understand which entris must be excited to inject faults in a effectively way.
+It's also generated a file containing all the BTB access of the golden run in order to understand which entries must be excited to inject faults in an effectively way.
 To view graphically this histogram simply execute the following command:
 `./util/btb_histogram.py m5out/btb-access-count.txt`
 
 ## Bus trace
-It has been added also a new functionality to gem5 in order to generate a trace file of a desired bus. To generate this file simply call gem5 with the the new defined debug flag **DataCommMonitor**.
+It has been added also a new functionality to gem5 in order to generate a trace file of a desired bus. To generate this file simply call gem5 with the new defined debug flag **DataCommMonitor**.
 For example, in order to sniff the instruction cache bus of a specific testbench, execute a simulation with the following command:
 ```
 build/ARM/gem5.opt --debug-flag=DataCommMonitor configs/lapo/arm_mem_trace.py tests/test-progs/mem_set/bin/arm/mem_set.o
@@ -89,19 +89,19 @@ In the m5out folder will be generated a `mem_trace.txt` file which has the follo
 * **r/a** to specify if it is a **r**equest or an **a**cknowledgment packet
 * instant of the sample expressed in pico-seconds
 * **r/w** to specify if it is write or a read
-* address expressed in hexademial form
+* address expressed in hexadecimal form
 * data expressed in heaxdecimal form
-For sake of calirty an example is reported:
+For sake of clarity an example is reported:
 ```
 r 1333000ps r 0000000000000664 e1a05003
 a 1388000ps r 0000000000000664 159c3000
 ```
-Notice how after a request an acknowledgment is alsways present with the correct data.
-This file format is already comatible has input for [lapo](https://github.com/cancro7/lapo).
+Notice how after a request an acknowledgment is alsways presen with the correct data.
+This file format is already compatible as input for [lapo](https://github.com/cancro7/lapo).
 
 ## Register File fault injection
-It is possible also inject a bit flip fault in the register fault at a specific time.
-In order to do this operation please edit the file `configs/lapo/reg_fault.py`. At the end of this file is possibile to set the injection parameters.
+It is also possible to inject a bit flip fault in the register file at a specified time.
+In order to do this operation please edit the file `configs/lapo/reg_fault.py`. At the end of this file is possible to set the injection parameters.
 For example this configuration:
 ```
 root.registerFault = RegisterFault()
@@ -111,5 +111,5 @@ root.registerFault.registerCategory = 0
 root.registerFault.faultRegister = 13
 root.registerFault.bitPosition = 4
 ```
-will flip the 4-th bit of the 13-th int register. at the simulation tick 143930180. To undesrtand an appropiate time to inject this fault we recommend to use the gem5 **Exec** debug flag.
-Please refer to `src/***/registers.hh` file to understand which register are avilable for the choosen architecture.
+will flip the 4-th bit of the 13-th int register at the simulation tick 143930180. To understand an appropriate time to inject this fault we recommend to run gem5 with the **Exec** debug flag.
+Please refer to `src/***/registers.hh` file to understand which registers are available for the chosen architecture.
