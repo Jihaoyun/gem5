@@ -37,7 +37,7 @@ class BranchPredictor(SimObject):
     abstract = True
 
     numThreads = Param.Unsigned(1, "Number of threads")
-    BTBEntries = Param.Unsigned(2048, "Number of BTB entries")
+    BTBEntries = Param.Unsigned(4096, "Number of BTB entries")
     BTBTagSize = Param.Unsigned(16, "Size of the BTB tags, in bits")
     RASSize = Param.Unsigned(16, "RAS size")
     instShiftAmt = Param.Unsigned(2, "Number of bits to shift instructions by")
@@ -52,7 +52,7 @@ class BranchPredictor(SimObject):
     faultTickBegin = Param.Int64(0, "Fault begin time")
     faultTickEnd = Param.Int64(-1, "Fault end time")
 
-    useIndirect = Param.Bool(True, "Use indirect branch predictor")
+    useIndirect = Param.Bool(False, "Use indirect branch predictor")
     indirectHashGHR = Param.Bool(True, "Hash branch predictor GHR")
     indirectHashTargets = Param.Bool(True, "Hash path history targets")
     indirectSets = Param.Unsigned(256, "Cache sets for indirect predictor")
@@ -112,7 +112,8 @@ class GShareBP(BranchPredictor):
     cxx_class = 'GShareBP'
     cxx_header = "cpu/pred/gshare.hh"
 
-    historyBits = Param.Unsigned(2,
+    globalHistoryBits = Param.Unsigned(4,
         "Number of bit of the global history register")
-    predictorSize = Param.Unsigned(8192, "Size of global predictor")
     ctrBits = Param.Unsigned(2, "Bits per counter")
+    predictorSets = Param.Unsigned(2048,
+        "Size of global predictor")

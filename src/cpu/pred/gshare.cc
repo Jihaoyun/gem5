@@ -1,3 +1,37 @@
+/*
+ * Copyright (c) 2014 The Regents of The University of Michigan
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met: redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer;
+ * redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution;
+ * neither the name of the copyright holders nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors: Anthony Gutierrez
+ */
+
+/* @file
+ * Implementation of a bi-mode branch predictor
+ */
+
 #include "cpu/pred/gshare.hh"
 
 #include "base/bitfield.hh"
@@ -5,30 +39,23 @@
 
 GShareBP::GShareBP(const GShareBPParams *params)
     : BPredUnit(params),
-      historyRegisters(params->numThreads, 0),
-      historyBits(params->historyBits),
-      ctrBits(params->ctrBits) {
-    int numThreads = params->numThreads;
-    int numberOfTable = pow(2,historyBits);
-    int predictorSize = ceilLog2(params->predictorSize);
+      globalHistoryRegs(params->numThreads, 0),
+      globalHistoryBits(params->globalHistoryBits),
+      predictorSets(params->predictorSets),
+      ctrBits(params->ctrBits)
+{
 
-    historyRegisterMask = 0;
-    for ( int i = 0; i < historyBits; i++ )
-        historyRegisterMask = (historyRegisterMask << 1) | 1;
+    addressBitMask = predictorSets - 1;
+    historyRegisterMask = (1 << globalHistoryBits) - 1;
 
-    addressBitMask = 0;
-    for ( int i = 0; i < predictorSize ; i++ )
-        addressBitMask = (addressBitMask << 1 ) | 1;
 
-    counters.resize(numThreads);
-        for ( int i = 0; i < numThreads; i++ ) {
-                counters[i].resize(numberOfTable);
-                for ( int j = 0; j < numberOfTable; j++ ) {
-                        counters[i][j].resize(params->predictorSize);
-                        for ( int k = 0; k < params->predictorSize; k++ )
-                                counters[i][j][k].setBits(ctrBits);
-                }
-        }
+    threadCounters.resize(params->numThreads);
+    for ( int i = 0; i < params->numThreads; i++ ) {
+        threadCounters[i].resize(predictorSets);
+        for ( int j = 0; j < predictorSets; j++ )
+            threadCounters[i][j].setBits(ctrBits);
+    }
+
 }
 
 /*
@@ -37,80 +64,82 @@ GShareBP::GShareBP(const GShareBPParams *params)
  * chooses the taken array and the taken array predicts taken.
  */
 void
-GShareBP::uncondBranch(ThreadID tid, Addr pc, void * &bpHistory) {
+GShareBP::uncondBranch(ThreadID tid, Addr pc, void * &bpHistory)
+{
     BPHistory *history = new BPHistory;
-    history->historyRegister = historyRegisters[tid];
+    history->globalHistoryReg = globalHistoryRegs[tid];
     history->finalPred = true;
     bpHistory = static_cast<void*>(history);
     updateGlobalHistReg(tid, true);
 }
 
 void
-GShareBP::squash(ThreadID tid, void *bpHistory) {
+GShareBP::squash(ThreadID tid, void *bpHistory)
+{
     BPHistory *history = static_cast<BPHistory*>(bpHistory);
-    historyRegisters[tid] = history->historyRegister;
+    globalHistoryRegs[tid] = history->globalHistoryReg;
+
     delete history;
 }
 
-
+/*
+ * Here we lookup the actual branch prediction. We use the PC to
+ * identify the bias of a particular branch, which is based on the
+ * prediction in the choice array. A hash of the global history
+ * register and a branch's PC is used to index into both the taken
+ * and not-taken predictors, which both present a prediction. The
+ * choice array's prediction is used to select between the two
+ * direction predictors for the final branch prediction.
+ */
 bool
-GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory) {
-    unsigned historyIdx = historyRegisters[tid] & historyRegisterMask;
+GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
+{
+    unsigned index = ((branchAddr >> instShiftAmt)
+                      ^ (globalHistoryRegs[tid] & historyRegisterMask))
+                                & addressBitMask;
 
-
-
-    unsigned predictorIdx = (((branchAddr >> instShiftAmt)
-                                xor historyRegisters[tid])
-                                & addressBitMask);
-
-    bool finalPrediction =
-        (counters[tid][historyIdx][predictorIdx].read() >> (ctrBits - 1) );
+    bool finalPrediction = threadCounters[tid][index].read() >>
+                                                    (ctrBits-1);
 
     BPHistory *history = new BPHistory;
-    history->historyRegister = historyRegisters[tid];
+    history->globalHistoryReg = globalHistoryRegs[tid];
     history->finalPred = finalPrediction;
-
     bpHistory = static_cast<void*>(history);
-    updateGlobalHistReg(tid, finalPrediction);
 
+    updateGlobalHistReg(tid, finalPrediction);
     return finalPrediction;
 }
 
 void
-GShareBP::btbUpdate(ThreadID tid, Addr branchAddr, void * &bpHistory) {
-    historyRegisters[tid] &= (historyRegisterMask & ~ULL(1));
+GShareBP::btbUpdate(ThreadID tid, Addr branchAddr, void * &bpHistory)
+{
+    globalHistoryRegs[tid] &= (historyRegisterMask & ~ULL(1));
 }
 
-/* Only the selected direction predictor will be updated with the final
- * outcome; the status of the unselected one will not be altered. The choice
- * predictor is always updated with the branch outcome, except when the
- * choice is opposite to the branch outcome but the selected counter of
- * the direction predictors makes a correct final prediction.
- */
 void
 GShareBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
                  bool squashed)
 {
     if (bpHistory) {
+
         BPHistory *history = static_cast<BPHistory*>(bpHistory);
 
-        unsigned predictorIdx = (((branchAddr >> instShiftAmt)
-                                xor historyRegisters[tid])
-                                & addressBitMask);
-        unsigned historyIdx = historyRegisters[tid] & historyRegisterMask;
+        unsigned index = ((branchAddr >> instShiftAmt)
+                      ^ (globalHistoryRegs[tid] & historyRegisterMask))
+                                & addressBitMask;
 
         if ( taken )
-                        counters[tid][historyIdx][predictorIdx].increment();
+            threadCounters[tid][index].increment();
         else
-                        counters[tid][historyIdx][predictorIdx].decrement();
+            threadCounters[tid][index].decrement();
 
         if (squashed) {
             if (taken) {
-                historyRegisters[tid] = (history->historyRegister << 1) | 1;
+                globalHistoryRegs[tid] = (history->globalHistoryReg << 1) | 1;
             } else {
-                historyRegisters[tid] = (history->historyRegister << 1);
+                globalHistoryRegs[tid] = (history->globalHistoryReg << 1);
             }
-            historyRegisters[tid] &= historyRegisterMask;
+            globalHistoryRegs[tid] &= historyRegisterMask;
         } else {
             delete history;
         }
@@ -127,15 +156,15 @@ GShareBP::retireSquashed(ThreadID tid, void *bp_history)
 unsigned
 GShareBP::getGHR(ThreadID tid, void *bp_history) const
 {
-    return static_cast<BPHistory*>(bp_history)->historyRegister;
+    return static_cast<BPHistory*>(bp_history)->globalHistoryReg;
 }
 
 void
 GShareBP::updateGlobalHistReg(ThreadID tid, bool taken)
 {
-    historyRegisters[tid] = taken ? (historyRegisters[tid] << 1) | 1 :
-                               (historyRegisters[tid] << 1);
-    historyRegisters[tid] &= historyRegisterMask;
+    globalHistoryRegs[tid] = taken ? (globalHistoryRegs[tid] << 1) | 1 :
+                               (globalHistoryRegs[tid] << 1);
+    globalHistoryRegs[tid] &= historyRegisterMask;
 }
 
 GShareBP*

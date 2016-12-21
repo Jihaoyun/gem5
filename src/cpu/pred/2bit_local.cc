@@ -80,8 +80,9 @@ LocalBP::reset()
 void
 LocalBP::btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
-// Place holder for a function that is called to update predictor history when
-// a BTB entry is invalid or not found.
+
+    update(tid,branch_addr,false,bp_history,true);
+
 }
 
 

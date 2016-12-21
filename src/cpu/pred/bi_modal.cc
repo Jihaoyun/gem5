@@ -44,24 +44,20 @@ BiModalBP::BiModalBP(const BiModalBPParams *params)
 {
     int numThreads = params->numThreads;
     int numberOfTable = pow(2,params->historyBits);
-    int predictorSize = ceilLog2(params->predictorSize);
+    int predictorBits = ceilLog2(params->predictorSize);
 
-    historyRegisterMask = 0;
-    for ( int i = 0; i < params->historyBits; i++ )
-        historyRegisterMask = (historyRegisterMask << 1 ) | 1;
-    addressBitMask = 0;
-    for ( int i = 0; i < predictorSize ; i++ )
-        addressBitMask = (addressBitMask << 1 ) | 1;
+    historyRegisterMask = (1 << params->historyBits) - 1;
+    addressBitMask = (1 << predictorBits) - 1;
 
     counters.resize(numThreads);
-        for ( int i = 0; i < numThreads; i++ ) {
-                counters[i].resize(numberOfTable);
-                for ( int j = 0; j < numberOfTable; j++ ) {
-                        counters[i][j].resize(params->predictorSize);
-                        for ( int k = 0; k < params->predictorSize; k++ )
-                                counters[i][j][k].setBits(ctrBits);
-                }
+    for ( int i = 0; i < numThreads; i++ ) {
+        counters[i].resize(numberOfTable);
+        for ( int j = 0; j < numberOfTable; j++ ) {
+            counters[i][j].resize(params->predictorSize);
+            for ( int k = 0; k < params->predictorSize; k++ )
+                counters[i][j][k].setBits(ctrBits);
         }
+    }
 
 }
 
@@ -117,6 +113,9 @@ BiModalBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
     return finalPrediction;
 }
 
+/* Set the last bit of the history to zero when an entry was not found
+ * into the BTB.
+ */
 void
 BiModalBP::btbUpdate(ThreadID tid, Addr branchAddr, void * &bpHistory)
 {
@@ -141,9 +140,9 @@ BiModalBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
         unsigned historyIdx = historyRegisters[tid] & historyRegisterMask;
 
         if ( taken )
-                        counters[tid][historyIdx][predictorIdx].increment();
+            counters[tid][historyIdx][predictorIdx].increment();
         else
-                        counters[tid][historyIdx][predictorIdx].decrement();
+            counters[tid][historyIdx][predictorIdx].decrement();
 
         if (squashed) {
             if (taken) {
