@@ -86,8 +86,9 @@ For example, in order to sniff the instruction cache bus of a specific testbench
 build/ARM/gem5.opt --debug-flag=DataCommMonitor configs/lapo/arm_mem_trace.py tests/test-progs/mem_set/bin/arm/mem_set.o
 ```
 In the m5out folder will be generated a `mem_trace.txt` file which has the following structure:
-* r/a To specify if it is a **r**equest or an **a**cknowledgment packet
+* **r/a** to specify if it is a **r**equest or an **a**cknowledgment packet
 * instant of the sample expressed in pico-seconds
+* **r/w** to specify if it is write or a read
 * address expressed in hexademial form
 * data expressed in heaxdecimal form
 For sake of calirty an example is reported:
