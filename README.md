@@ -9,25 +9,25 @@ Currently onlye these kind of injection are possibile:
 
 ## Installation
 
-1. Clone the project:
+##### 1. Clone the project:
 ```
 git clone https://github.com/cancro7/gem5.git
 cd gem5
 ```
-2. Install the dependencies:
+##### 2. Install the dependencies:
 ```
 sudo apt-get update; sudo apt-get upgrade
 sudo apt-get install scons swig gcc m4 python python-dev libgoogle-perftools-dev g++ protobuf-compiler protobuf-c-compiler zlib1g-dev libprotobuf-dev
 ```
 A more detailed guide is available [here](http://gem5.org/Dependencies)
 
-3. Build the system:
+##### 3. Build the system:
 `scons build/ALPHA/gem5.opt -j4`
 
-4. Run a simulation test to verify that everything is ok:
+##### 4. Run a simulation test to verify that everything is ok:
 `build/ALPHA/gem5.opt configs/example/se.py -c tests/test-progs/hello/bin/arm/linux/hello`
 
-5. Install ALPHA cross-compiler:
+##### 5. Install ALPHA cross-compiler:
 ```
 cd /opt
 sudo wget http://www.m5sim.org/dist/current/alphaev67-unknown-linux-gnu.tar.bz2
@@ -40,7 +40,7 @@ Add the following path to the PATH variable:
 
 Save the file and reboot the machine
 
-6. Install the ARM cross-compiler
+##### 6. Install the ARM cross-compiler
 `sudo apt-get install gcc-arm-linux-gnueabi`
 
 
