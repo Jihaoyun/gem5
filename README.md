@@ -45,6 +45,9 @@ Save the file and reboot the machine
 
 
 ## Branch Prediction Unit fault injection
+
+### Running a simulation
+
 Currently only BTB (Branch Target Buffer) injections are possibile.
 We build a python script that firstly runs a simulation without any fault injection (golden) and then a runs a simulation for each faults specified in a file.
 The script is located in the main folder of gem5 and it's called `fault-injection-simulation.py`
@@ -67,4 +70,11 @@ Field value can be the following:
 * 1 : target field of the BTB
 * 2 : validty field ot the BTB
 
+If the start tick is equals to 0 and the end tick is equals to -1 then the fault is permanent.
 
+### View the results
+After a simulation all the stas files are saved in the folder `m5out\your_testbench`. In particular the generated fieles are the `GOLDEN.txt`, which reports all the statistics related to the golden run, and for each fault specified in the fault-file will be generated a file `FAULT_LABEL.txt`.
+
+It's also generated a file containing all the BTB access of the golden run in order to understand which entris must be excited to inject faults in a effectively way.
+To view graphically this histogram simply execute the following command:
+`./util/btb_histogram.py m5out/btb-access-count.txt`
