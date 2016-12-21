@@ -78,3 +78,37 @@ After a simulation all the stas files are saved in the folder `m5out\your_testbe
 It's also generated a file containing all the BTB access of the golden run in order to understand which entris must be excited to inject faults in a effectively way.
 To view graphically this histogram simply execute the following command:
 `./util/btb_histogram.py m5out/btb-access-count.txt`
+
+## Bus trace
+It has been added also a new functionality to gem5 in order to generate a trace file of a desired bus. To generate this file simply call gem5 with the the new defined debug flag **DataCommMonitor**.
+For example, in order to sniff the instruction cache bus of a specific testbench, execute a simulation with the following command:
+```
+build/ARM/gem5.opt --debug-flag=DataCommMonitor configs/lapo/arm_mem_trace.py tests/test-progs/mem_set/bin/arm/mem_set.o
+```
+In the m5out folder will be generated a `mem_trace.txt` file which has the following structure:
+* r/a To specify if it is a **r**equest or an **a**cknowledgment packet
+* instant of the sample expressed in pico-seconds
+* address expressed in hexademial form
+* data expressed in heaxdecimal form
+For sake of calirty an example is reported:
+```
+r 1333000ps r 0000000000000664 e1a05003
+a 1388000ps r 0000000000000664 159c3000
+```
+Notice how after a request an acknowledgment is alsways present with the correct data.
+This file format is already comatible has input for [lapo](https://github.com/cancro7/lapo).
+
+## Register File fault injection
+It is possible also inject a bit flip fault in the register fault at a specific time.
+In order to do this operation please edit the file `configs/lapo/reg_fault.py`. At the end of this file is possibile to set the injection parameters.
+For example this configuration:
+```
+root.registerFault = RegisterFault()
+root.registerFault.startTick = 143930180
+root.registerFault.system = system
+root.registerFault.registerCategory = 0
+root.registerFault.faultRegister = 13
+root.registerFault.bitPosition = 4
+```
+will flip the 4-th bit of the 13-th int register. at the simulation tick 143930180. To undesrtand an appropiate time to inject this fault we recommend to use the gem5 **Exec** debug flag.
+Please refer to `src/***/registers.hh` file to understand which register are avilable for the choosen architecture.
