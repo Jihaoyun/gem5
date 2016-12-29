@@ -25,7 +25,7 @@ A more detailed guide is available [here](http://gem5.org/Dependencies)
 `scons build/ALPHA/gem5.opt -j4`
 
 ##### 4. Run a simulation test to verify that everything is ok:
-`build/ALPHA/gem5.opt configs/example/se.py -c tests/test-progs/hello/bin/arm/linux/hello`
+`build/ALPHA/gem5.opt configs/example/se.py -c tests/test-progs/hello/bin/alpha/linux/hello`
 
 ##### 5. Install ALPHA cross-compiler:
 ```
