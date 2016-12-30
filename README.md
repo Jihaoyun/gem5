@@ -79,6 +79,17 @@ It's also generated a file containing all the BTB access of the golden run in or
 To view graphically this histogram simply execute the following command:
 `./util/btb_histogram.py m5out/btb-access-count.txt`
 
+#### Plotting
+After a simulation it is possible to plot a barchart to display some given statistics by simply executing the `stats.py` script. Here is reported an execution command example which will plot two different barcharts (one for each specified statistic) for the test `Hello World` program:
+```
+python stats.py -d m5out/hello -s system.cpu.branchPred.condPredicted sim_seconds -g
+```
+
+The `stats.py` script requires an additional dependency which can be installed with the following command:
+```
+sudo apt-get install python-matplotlib
+```
+
 ## Bus trace
 It has been added also a new functionality to gem5 in order to generate a trace file of a desired bus. To generate this file simply call gem5 with the new defined debug flag **DataCommMonitor**.
 For example, in order to sniff the instruction cache bus of a specific testbench, execute a simulation with the following command:
