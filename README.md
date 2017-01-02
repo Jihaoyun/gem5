@@ -1,4 +1,4 @@
-#GEM5 with fault injection
+# GEM5 with fault injection
 
 This is a fork of the [gem5](http://gem5.org) simulator.
 The main purpose of this project is to add a fault injection system to the simulation.
