@@ -51,7 +51,8 @@ system.system_port = system.membus.slave
 process = LiveProcess()
 # Set the command
 # cmd is a list which begins with the executable (like argv)
-process.cmd = sys.argv[1]
+sys.argv.pop(0)
+process.cmd = sys.argv
 
 # Set the cpu to use the process as its workload and create thread contexts
 system.cpu.workload = process
@@ -59,15 +60,6 @@ system.cpu.createThreads()
 
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
-
-root.registerFault = RegisterFault()
-root.registerFault.startTick = 143930180
-root.registerFault.system = system
-root.registerFault.registerCategory = 0
-root.registerFault.faultRegister = 13
-root.registerFault.bitPosition = 4
-
-
 # instantiate all of the objects we've created above
 m5.instantiate()
 

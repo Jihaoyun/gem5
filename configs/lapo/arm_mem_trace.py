@@ -1,11 +1,3 @@
-""" This file creates a barebones system and executes 'hello', a simple Hello
-World application.
-
-This config file assumes that the x86 ISA was built.
-See gem5/configs/learning_gem5/part1/simple.py for a general script.
-
-"""
-
 # import the m5 (gem5) library created when gem5 is built
 import m5
 # import all of the SimObjects
