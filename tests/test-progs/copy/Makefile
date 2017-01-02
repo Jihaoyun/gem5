@@ -1,4 +1,4 @@
-ALPHA_CC = ~/alphaev67-unknown-linux-gnu/bin/alphaev67-unknown-linux-gnu-gcc
+ALPHA_CC =  alphaev67-unknown-linux-gnu-gcc
 ALPHA_CXX = alphaev67-unknown-linux-gnu-g++
 
 ARM_CC = arm-linux-gnueabi-gcc
