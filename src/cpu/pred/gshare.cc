@@ -48,7 +48,8 @@ GShareBP::GShareBP(const GShareBPParams *params)
     addressBitMask = predictorSets - 1;
     historyRegisterMask = (1 << globalHistoryBits) - 1;
 
-
+    DPRINTF(BPUinfo,"Used GShareBP with:\n");
+    DPRINTF(BPUinfo,"ctrBits = %d\n");
     threadCounters.resize(params->numThreads);
     for ( int i = 0; i < params->numThreads; i++ ) {
         threadCounters[i].resize(predictorSets);

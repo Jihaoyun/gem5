@@ -85,7 +85,7 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 
-
+system.cpu.branchPred = GShareBP();
 
 #run all the simulation
 if args.faultEnabled:

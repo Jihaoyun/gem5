@@ -8,7 +8,7 @@ int main()
   printf("BEFORE\n");
 
   for (i=0; i<1024; i++)
-    v[i] = 0xFF;
+    printf("i=%d\n",i);
 
   printf("AFTER\n");
 

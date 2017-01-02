@@ -37,6 +37,7 @@
 
 #include "cpu/pred/bpred_unit.hh"
 #include "cpu/pred/sat_counter.hh"
+#include "debug/BPUinfo.hh"
 #include "params/GShareBP.hh"
 
 class GShareBP : public BPredUnit

@@ -33,7 +33,7 @@ for benchmark in args.benchmarks:
         os.makedirs("m5out/" + statFolder)
 
     # Run Golden simulation
-    cmd = ["./build/ALPHA/gem5.opt",
+    cmd = ["./build/ALPHA/gem5.opt", "--debug-flag=BPUinfo",
         "--stats-file", statFolder + "/" +
         "GOLDEN.txt",
         "configs/fault_injector/injector_system.py",
