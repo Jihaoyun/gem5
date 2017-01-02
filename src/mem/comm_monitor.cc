@@ -164,8 +164,8 @@ CommMonitor::print(PacketPtr pkt, bool is_req)
       ptr++;
     }
 
-    mem_trace_fout<<std::setfill('0')<<std::setw(8)<<std::hex
-      <<(0x00000000FFFFFFFF & int_data)<<std::endl;
+    mem_trace_fout<<std::setfill('0')<<std::setw(16)<<std::hex
+                  <<int_data<<std::endl;
 }
 
 
