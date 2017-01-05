@@ -2,6 +2,8 @@
 #include <stdlib.h>
 
 void check_malloc(void *p);
+void mul(int** A, int** B, int** C,
+unsigned int m, unsigned int p, unsigned int n);
 
 int main(int argc, char **argv)
 {
@@ -67,17 +69,7 @@ int main(int argc, char **argv)
   }
 
   //Product matrix computation
-  for (i=0; i<m; i++)
-  {
-    for (j=0; j<p; j++)
-    {
-      C[i][j] = 0;
-      for (k=0; k<n; k++)
-      {
-        C[i][j] += A[i][k]*B[k][j];
-      }
-    }
-  }
+  mul(A,B,C,m,p,n);
 
   if ((fp = fopen(argv[2], "w")) == NULL)
   {
@@ -109,6 +101,21 @@ int main(int argc, char **argv)
     free(B[i]);
   free(B);
   return 0;
+}
+
+
+void mul(int** A, int** B, int** C,
+unsigned int m, unsigned int p, unsigned int n) {
+
+    int i,j,k;
+    for (i=0; i<m; i++) {
+        for (j=0; j<p; j++) {
+            C[i][j] = 0;
+            for (k=0; k<n; k++) {
+                C[i][j] += A[i][k]*B[k][j];
+            }
+        }
+    }
 }
 
 void check_malloc(void *p)

@@ -100,3 +100,4 @@ class CommMonitor(MemObject):
     read_addr_mask = Param.Addr(MaxAddr, "Address mask for read address")
     write_addr_mask = Param.Addr(MaxAddr, "Address mask for write address")
     disable_addr_dists = Param.Bool(True, "Disable address distributions")
+    #name = Param.String("mem_trace","Label to identify the monitor")

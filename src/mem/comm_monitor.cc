@@ -58,7 +58,7 @@ CommMonitor::CommMonitor(Params* params)
             "Created monitor %s with sample period %d ticks (%f ms)\n",
             name(), samplePeriodTicks, samplePeriod * 1E3);
     if (Debug::DataCommMonitor){
-        mem_trace_fout.open("m5out/mem_trace.txt");
+        mem_trace_fout.open("m5out/"+name()+"_mem_trace.txt");
     }
 }
 

@@ -19,7 +19,10 @@ system.mem_ranges = [AddrRange('512MB')] # Create an address range
 # Create a simple CPU
 system.cpu = TimingSimpleCPU()
 
-system.cpu.monitor = CommMonitor()
+system.cpu.imonitor = CommMonitor()
+#system.cpu.monitor.name = "instruction"
+system.cpu.dmonitor = CommMonitor()
+#system.cpu.monitor2.name = "data"
 #system.cpu.monitor.trace = MemTraceProbe(trace_file="my_trace.trc.gz")
 
 # Create a memory bus, a coherent crossbar, in this case
@@ -27,9 +30,16 @@ system.membus = SystemXBar()
 
 # Hook the CPU ports up to the membus
 #system.cpu.icache_port = system.membus.slave
-system.cpu.dcache_port = system.membus.slave
-system.cpu.icache_port = system.cpu.monitor.slave
-system.cpu.monitor.master = system.membus.slave
+#system.cpu.dcache_port = system.membus.slave
+system.cpu.dcache_port = system.cpu.dmonitor.slave
+system.cpu.dmonitor.master = system.membus.slave
+
+system.cpu.icache_port = system.cpu.imonitor.slave
+system.cpu.imonitor.master = system.membus.slave
+
+
+
+
 
 
 
@@ -61,6 +71,20 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 # instantiate all of the objects we've created above
+
+if True:
+   root.registerFault = RegisterFault()
+   root.registerFault.startTick =  18000
+   root.registerFault.system = system
+   root.registerFault.registerCategory = 0
+   root.registerFault.faultRegister = 0
+   root.registerFault.bitPosition = 25
+
+
+
+
+
+
 m5.instantiate()
 
 print "Beginning simulation!"

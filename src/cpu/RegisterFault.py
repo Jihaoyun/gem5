@@ -4,7 +4,7 @@ from m5.SimObject import SimObject
 class RegisterFault(SimObject):
     type = 'RegisterFault'
     cxx_header = "cpu/register_fault.hh"
-    startTick = Param.Unsigned(0, "Inject fault at this tick")
+    startTick = Param.UInt64(0, "Inject fault at this tick")
     system = Param.System(NULL, "System")
     registerCategory = Param.Unsigned(0,
     "The group of registers to which the register belong")
