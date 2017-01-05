@@ -1,0 +1,104 @@
+case 0
+    Inject a bit flip in the register used as accumulator for the scalar product in the first iteration
+    it's possible to see how the resulting matrix is equal.
+    This case is useful because the sniffer located on the instruction bus cannot find any error, instead
+    the sniffer located on the data bus can spot the error when the accumulator is stored in memory
+    at the location pointed by C[0][0]
+
+    startTick = 11988671000
+    registerCategory = 0
+    faultRegister = 2 (R2 integer register)
+    bitPosition = 3
+
+case 1
+    Inject a bit flip in the register used to initialize the i variable of the main cycle. In this way
+    when is performed the first check to see if i is less then the number of row of the A matrix
+    the comparison fails and the program return from the function to write the "non-computed" matrix
+    into the output file.
+
+    startTick = 11982674000
+    registerCategory = 0
+    faultRegister = 3 (R3 integer register)
+    bitPosition = 9 
+
+-----------------------FROM NOW ON THE BIT FLIP FAULTS TO INJECT ARE RANDOMICALLY GENERATED------------------------------
+-----------------------ONLY THE TIME WHEN TO INJECT AND THE POSSIBLE REGISTERS ARE RESTRICTED----------------------------
+-----------------------WITHIN THE MAIN FUNCTION OF THE TESTBENCH PROGRAM = MATMUL----------------------------------------
+case 2:
+    The injected bit flip causes an error within the computed matrix at line5 see out_case2.txt and out_golden.txt for further details
+
+    startTick = 14014380719
+    registerCategory = 0
+    faultRegister = 2
+    bitPosition = 19
+
+case 3:
+    The bit flip causes the crash of the program due to a violation in access in memory. The register r3 is used
+    as pointer to same memory portion and than changing a bit cause an illegal access.
+    the bit flip is located before the execution of mul+112.
+    panic: Page table fault when accessing virtual address 0x76
+    The crash happen at tick 14220249000.
+
+    startTick = 14217037788
+    registerCategory = 0
+    faultRegister = 3
+    bitPosition = 6
+
+case4:
+    The bit flip cause an access in memory on an address different from the golden case. nevertheless the output is still correct
+    due to the fact that also the wrong access memory part contain the same data.
+    See exec_diff_case4_golden.txt for further details
+    
+    startTick = 12259990433
+    registerCategory = 0
+    faultRegister = 0
+    bitPosition = 2
+
+case5:
+    The bit flip happens in a tick such that after a while the register faulted R2 is written with a value loaded from memory
+    so the faulted is masked
+    
+    startTick = 13569114183 
+    registerCategory = 0
+    faultRegister = 2
+    bitPosition = 21
+case6:
+    The bit flip causes a wrong computed element into the result matrix
+
+    startTick = 12289280319
+    registerCategory = 0
+    faultRegister = 1
+    bitPosition = 31
+case7:
+    the bit flip has not effect because is masked due to a successive load in the same register
+
+    startTick = 14234124035
+    registerCategory = 0
+    faultRegister = 0
+    bitPosition = 11
+case8:
+    the bit flip has not effect because is masked due to a successive load in the same register
+
+    startTick = 13309071965
+    registerCategory = 0
+    faultRegister = 2
+    bitPosition = 18
+case9:
+    the bit flip causes a wrong computed matrix 
+
+    startTick = 12596721446
+    registerCategory = 0
+    faultRegister = 1
+    bitPosition = 25
+case10:
+    the bit flip causes a page fault when accessing virtual address 0x2000000 @tick 21369723000 
+    the register faulted is saved in memory after the bit flip 
+    This is an important case because the error is reveled in the system after a long time from the
+    injection of the fault.
+    The output is still valid.
+
+
+    startTick = 18000
+    registerCategory = 0
+    faultRegister = 0
+    bitPosition = 25
