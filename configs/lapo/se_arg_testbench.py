@@ -74,11 +74,11 @@ root = Root(full_system = False, system = system)
 
 if True:
    root.registerFault = RegisterFault()
-   root.registerFault.startTick =  18000
+   root.registerFault.startTick =  12020332000
    root.registerFault.system = system
    root.registerFault.registerCategory = 0
-   root.registerFault.faultRegister = 0
-   root.registerFault.bitPosition = 25
+   root.registerFault.faultRegister = 2
+   root.registerFault.bitPosition = 3
 
 
 
