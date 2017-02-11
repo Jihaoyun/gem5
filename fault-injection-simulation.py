@@ -16,7 +16,7 @@ parser.add_argument('-b', '--benchmarks', type=str, dest='benchmarks',
 parser.add_argument('-i', '--fault-input', type=str, dest='faultInput',
                     required=True, nargs='+', help='Fault source files')
 
-parser.add_argument('-o', '--options', type=str, dest='options', required=True,
+parser.add_argument('-o', '--options', type=str, dest='options',
                     help='Options for the binary benchmark')
 
 args = parser.parse_args()
