@@ -5,6 +5,7 @@
 #include "cpu/thread_context.hh"
 #include "debug/BpuTransientFault.hh"
 #include "params/BpuTransientFault.hh"
+#include "pred/bpred_unit.hh"
 #include "sim/eventq.hh"
 #include "sim/sim_object.hh"
 #include "sim/system.hh"
@@ -12,8 +13,9 @@
 class BpuTransientFault : public SimObject
 {
   private:
-    System* sys;
+    BPredUnit* bpu;
     uint64_t tick;
+    std::string faultLabel;
     uint32_t faultField;
     uint32_t faultEntry;
     uint32_t faultBitPosition;

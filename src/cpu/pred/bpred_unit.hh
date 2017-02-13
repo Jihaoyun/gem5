@@ -208,6 +208,9 @@ class BPredUnit : public SimObject
 
     void dump();
 
+    void injectFault(std::string label, uint64_t tick, uint32_t field,
+      uint32_t entry, uint32_t bit_position, uint32_t stuck_bit);
+
   private:
     struct PredictorHistory {
         /**

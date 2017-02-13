@@ -2,8 +2,9 @@
 
 BpuTransientFault::BpuTransientFault(BpuTransientFaultParams *params):
     SimObject(params),
-    sys(params->system),
+    bpu(params->bpu),
     tick(params->tick),
+    faultLabel(params->faultLabel),
     faultField(params->faultField),
     faultEntry(params->faultEntry),
     faultBitPosition(params->faultBitPosition),
