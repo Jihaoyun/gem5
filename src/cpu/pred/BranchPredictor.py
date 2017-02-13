@@ -48,7 +48,6 @@ class BranchPredictor(SimObject):
     faultField = Param.Unsigned(0, "0 = Tag, 1 = Target, 2 = Valid")
     faultEntry = Param.Unsigned(0, "The entry where inject the fault")
     faultBitPosition = Param.Unsigned(0, "The bit target of the fault")
-    faultPermanent = Param.Bool(True, "Whether the fault is permanent or not")
     faultTickBegin = Param.Int64(0, "Fault begin time")
     faultTickEnd = Param.Int64(-1, "Fault end time")
 

@@ -63,7 +63,6 @@ BPredUnit::BPredUnit(const Params *params)
             params->faultField,
             params->faultEntry,
             params->faultBitPosition,
-            params->faultPermanent,
             params->faultTickBegin,
             params->faultTickEnd),
       BTB(params->BTBEntries,

@@ -18,9 +18,6 @@ struct injFault {
         unsigned entry;
         /** The bit target of the fault */
         unsigned bitPosition;
-        /** Whether the fault is permantent or not.
-            If it is permanent we ignore tickBegin and tickEnd */
-        bool permanent;
         /** Fault begin time */
         int64_t tickBegin;
         /** Fault end time */
@@ -28,7 +25,7 @@ struct injFault {
 
         injFault(bool _enabled, std::string _label, unsigned
                 _stuckBit, unsigned _field, unsigned _entry,
-                unsigned _bitPosition, bool _permanent,
+                unsigned _bitPosition,
                 unsigned _tickBegin, unsigned _tickEnd) :
             enabled(_enabled),
             label(_label),
@@ -36,7 +33,6 @@ struct injFault {
             field(_field),
             entry(_entry),
             bitPosition(_bitPosition),
-            permanent(_permanent),
             tickBegin(_tickBegin),
             tickEnd(_tickEnd)
              {}

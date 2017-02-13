@@ -108,8 +108,6 @@ if args.faultEnabled:
         system.cpu.branchPred.faultField = args.field
         system.cpu.branchPred.faultEntry = args.entry
         system.cpu.branchPred.faultBitPosition = args.bitPosition
-        system.cpu.branchPred.faultPermanent = \
-                (args.tickBegin == 0 and args.tickEnd == -1)
         system.cpu.branchPred.faultTickBegin = args.tickBegin
         system.cpu.branchPred.faultTickEnd = args.tickEnd
     else:
