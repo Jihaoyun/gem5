@@ -115,20 +115,24 @@ if args.faultEnabled:
 
         # We need to shedule both the event triggering the fault
         # and the event triggering the status restoration
-        root.bpuTransientFault = BpuTransientFault();
+        root.bpuTransientFault = BpuTransientFault()
+        root.bpuTransientFault.faultLabel = args.label
         root.bpuTransientFault.tick = args.tickBegin
         root.bpuTransientFault.faultField = args.field
         root.bpuTransientFault.faultEntry = args.entry
         root.bpuTransientFault.faultBitPosition = args.bitPosition
         root.bpuTransientFault.faultStuckBit = args.faultStuckBit
+        root.bpuTransientFault.bpu = system.cpu.branchPred
 
-        root.bpuTransientFault = BpuTransientFault();
+        root.bpuTransientFault = BpuTransientFault()
+        root.bpuTransientFault.faultLabel = args.label
         root.bpuTransientFault.tick = args.tickEnd
         root.bpuTransientFault.faultField = args.field
         root.bpuTransientFault.faultEntry = args.entry
         root.bpuTransientFault.faultBitPosition = args.bitPosition
         flippedStuckBit = 1 if args.faultStuckBit == 0 else 0
         root.bpuTransientFault.faultStuckBit = flippedStuckBit
+        root.bpuTransientFault.bpu = system.cpu.branchPred
 else:
     system.cpu.branchPred.faultEnabled = False
 
