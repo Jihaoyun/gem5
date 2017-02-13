@@ -2,8 +2,15 @@
 import m5
 # import all of the SimObjects
 from m5.objects import *
+from m5.util import addToPath
 from FaultParser import *
 import argparse
+
+import os
+
+# Add configs/common to execution path in order to import Caches classes
+addToPath(os.path.join('..', 'common'))
+from Caches import *
 
 #parse and save the arguments
 parser = argparse.ArgumentParser(description='Gem5')
@@ -52,14 +59,16 @@ system.mem_mode = 'timing'               # Use timing accesses
 system.mem_ranges = [AddrRange('512MB')] # Create an address range
 
 # Create a simple CPU
-system.cpu = MinorCPU()
+system.cpu = DerivO3CPU()
+
+# Caches
+icache = L1_ICache(size="4MB")
+dcache = L1_DCache(size="4MB")
+
+system.cpu.addPrivateSplitL1Caches(icache, dcache, None, None)
 
 # Create a memory bus, a coherent crossbar, in this case
 system.membus = SystemXBar()
-
-# Hook the CPU ports up to the membus
-system.cpu.icache_port = system.membus.slave
-system.cpu.dcache_port = system.membus.slave
 
 # create the interrupt controller for the CPU and connect to the membus
 system.cpu.createInterruptController()
@@ -71,6 +80,8 @@ system.mem_ctrl.port = system.membus.master
 
 # Connect the system up to the membus
 system.system_port = system.membus.slave
+
+system.cpu.connectAllPorts(system.membus)
 
 # Create a process for a simple "Hello World" application
 process = LiveProcess()
