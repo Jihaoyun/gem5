@@ -100,16 +100,37 @@ system.cpu.branchPred = GShareBP();
 
 #run all the simulation
 if args.faultEnabled:
-    system.cpu.branchPred.faultEnabled = True
-    system.cpu.branchPred.faultLabel = args.label
-    system.cpu.branchPred.faultStuckBit = args.stuckBit
-    system.cpu.branchPred.faultField = args.field
-    system.cpu.branchPred.faultEntry = args.entry
-    system.cpu.branchPred.faultBitPosition = args.bitPosition
-    system.cpu.branchPred.faultPermanent = \
-            (args.tickBegin == 0 and args.tickEnd == -1)
-    system.cpu.branchPred.faultTickBegin = args.tickBegin
-    system.cpu.branchPred.faultTickEnd = args.tickEnd
+    if args.tickBegin == 0 and args.tickEnd == -1:
+        # If the fault is permanent
+        system.cpu.branchPred.faultEnabled = True
+        system.cpu.branchPred.faultLabel = args.label
+        system.cpu.branchPred.faultStuckBit = args.stuckBit
+        system.cpu.branchPred.faultField = args.field
+        system.cpu.branchPred.faultEntry = args.entry
+        system.cpu.branchPred.faultBitPosition = args.bitPosition
+        system.cpu.branchPred.faultPermanent = \
+                (args.tickBegin == 0 and args.tickEnd == -1)
+        system.cpu.branchPred.faultTickBegin = args.tickBegin
+        system.cpu.branchPred.faultTickEnd = args.tickEnd
+    else:
+        # If the fault is transient
+
+        # We need to shedule both the event triggering the fault
+        # and the event triggering the status restoration
+        root.bpuTransientFault = BpuTransientFault();
+        root.bpuTransientFault.tick = args.tickBegin
+        root.bpuTransientFault.faultField = args.field
+        root.bpuTransientFault.faultEntry = args.entry
+        root.bpuTransientFault.faultBitPosition = args.bitPosition
+        root.bpuTransientFault.faultStuckBit = args.faultStuckBit
+
+        root.bpuTransientFault = BpuTransientFault();
+        root.bpuTransientFault.tick = args.tickEnd
+        root.bpuTransientFault.faultField = args.field
+        root.bpuTransientFault.faultEntry = args.entry
+        root.bpuTransientFault.faultBitPosition = args.bitPosition
+        root.bpuTransientFault.faultStuckBit =
+            1 if args.faultStuckBit == 0 else 0
 else:
     system.cpu.branchPred.faultEnabled = False
 
