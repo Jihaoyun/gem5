@@ -38,6 +38,9 @@ parser.add_argument('-e', '--entry', type=int, dest='entry',
 parser.add_argument('-bp', '--bit-position', type=int, dest='bitPosition',
                     help='Bit position of the field where to inject the fault')
 
+parser.add_argument('-fsb', '--fault-stuck-bit', type=int,
+                    dest='faultStuckBit', help='Faulted stucked bit')
+
 parser.add_argument('-tb', '--tick-begin', type=int, dest='tickBegin',
                     help='Inject fault at this tick')
 
@@ -115,25 +118,25 @@ if args.faultEnabled:
 
         # We need to shedule both the event triggering the fault
         # and the event triggering the status restoration
-        root.bpuTransientFault = BpuTransientFault()
-        root.bpuTransientFault.faultLabel = args.label
-        root.bpuTransientFault.tick = args.tickBegin
-        root.bpuTransientFault.faultField = args.field
-        root.bpuTransientFault.faultEntry = args.entry
-        root.bpuTransientFault.faultBitPosition = args.bitPosition
-        root.bpuTransientFault.faultStuckBit = args.faultStuckBit
-        root.bpuTransientFault.bpu = system.cpu.branchPred
-        root.bpuTransientFault.faultEnd = False
+        root.bpuTransientFaultStart = BpuTransientFault()
+        root.bpuTransientFaultStart.faultLabel = args.label
+        root.bpuTransientFaultStart.tick = args.tickBegin
+        root.bpuTransientFaultStart.faultField = args.field
+        root.bpuTransientFaultStart.faultEntry = args.entry
+        root.bpuTransientFaultStart.faultBitPosition = args.bitPosition
+        root.bpuTransientFaultStart.faultStuckBit = args.faultStuckBit
+        root.bpuTransientFaultStart.bpu = system.cpu.branchPred
+        root.bpuTransientFaultStart.faultEnd = False
 
-        root.bpuTransientFault = BpuTransientFault()
-        root.bpuTransientFault.faultLabel = args.label
-        root.bpuTransientFault.tick = args.tickEnd
-        root.bpuTransientFault.faultField = args.field
-        root.bpuTransientFault.faultEntry = args.entry
-        root.bpuTransientFault.faultBitPosition = args.bitPosition
-        root.bpuTransientFault.faultEnd = True
-        root.bpuTransientFault.faultStuckBit = 1
-        root.bpuTransientFault.bpu = system.cpu.branchPred
+        root.bpuTransientFaultEnd = BpuTransientFault()
+        root.bpuTransientFaultEnd.faultLabel = args.label
+        root.bpuTransientFaultEnd.tick = args.tickEnd
+        root.bpuTransientFaultEnd.faultField = args.field
+        root.bpuTransientFaultEnd.faultEntry = args.entry
+        root.bpuTransientFaultEnd.faultBitPosition = args.bitPosition
+        root.bpuTransientFaultEnd.faultEnd = True
+        root.bpuTransientFaultEnd.faultStuckBit = 1
+        root.bpuTransientFaultEnd.bpu = system.cpu.branchPred
 else:
     system.cpu.branchPred.faultEnabled = False
 

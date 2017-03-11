@@ -66,6 +66,7 @@ if __name__ == '__main__':
                     "-sb", fe.stuckBit,
                     "-f", fe.field,
                     "-e", fe.entry,
+                    "-fsb", fe.stuckBit,
                     "-bp", fe.bitPosition,
                     "-tb", fe.tickBegin,
                     "-te", fe.tickEnd]
