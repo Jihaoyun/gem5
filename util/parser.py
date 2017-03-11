@@ -14,6 +14,7 @@ class Parser:
 
     def clean(self, string):
         string = string.replace(" ", "")
+        string = string.replace("\n", "")
         strList = list(string)
         if(strList[0] == '('):
                 strList[0] = ' '
@@ -101,19 +102,19 @@ class Parser:
 
     def visit(self, n):
         self.nodeString += str(n.id) + " " + n.nodeType + " " + \
-                n.nodeValue + "\n"
+                n.nodeValue + " "
 
         if n.left is not None:
             self.edgeCount += 1
             self.nodeCount += 1
             n.left.id = self.nodeCount
-            self.edgeString += str(n.id) + " " + str(n.left.id) + "\n"
+            self.edgeString += str(n.id) + " " + str(n.left.id) + " "
             self.visit(n.left)
         if n.right is not None:
             self.edgeCount += 1
             self.nodeCount += 1
             n.right.id = self.nodeCount
-            self.edgeString += str(n.id) + " " + str(n.right.id) + "\n"
+            self.edgeString += str(n.id) + " " + str(n.right.id) + " "
             self.visit(n.right)
 
 
@@ -128,8 +129,8 @@ class Parser:
         self.visit(rootNode)
         self.nodeCount += 1
 
-        return str(self.nodeCount) + " " + str(self.edgeCount) + "\n\n" \
-                + self.nodeString + "\n" + self.edgeString
+        return str(self.nodeCount) + " " + str(self.edgeCount) + " " \
+                + self.nodeString + " " + self.edgeString
 
 
     def parseActionString(self, string):
@@ -143,23 +144,28 @@ class Parser:
         self.visit(rootNode)
         self.nodeCount += 1
 
-        return str(self.nodeCount) + " " + str(self.edgeCount) + "\n\n" \
-                + self.nodeString + "\n" + self.edgeString
+        return str(self.nodeCount) + " " + str(self.edgeCount) + " " \
+                + self.nodeString + " " + self.edgeString
 
 
+    def parseFile(self, path):
+        with open(path) as fp:
+            self.triggerString = self.parseTriggerString(fp.readline())
+            self.actionString = self.parseActionString(fp.readline())
 
-    #TODO
-    def parseFile(self):
-        with open(self.source) as inputFile:
-            self.source = inputFile.read().replace('\n', '')
-        return self.parseString()
 
+    def getTrigger(self):
+        return self.triggerString
+
+    def getAction(self):
+        return self.actionString
 
 #Examples
+#p = Parser()
+#p.parseFile("inp.txt")
+#print p.getTrigger()
+#print p.getAction()
 
-#p = Parser("inp.txt")
-#print p.parseFile()
 
-p = Parser()
 #print p.parseTriggerString("!((index & 0x01) | (index & 0x80))")
 #print p.parseActionString("(index ^ 0x01) << 2")
