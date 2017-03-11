@@ -22,7 +22,10 @@ class Node
         node_index left;
         node_index right;
 
-        Node(){}
+        Node(){
+          left = -1;
+          right = -1;
+        }
 
         Node(NodeType p_type, string p_value):
             type(p_type),
