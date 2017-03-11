@@ -28,7 +28,8 @@ ControlFaultEvaluator::ControlFaultEvaluator(string trigger,string action){
 
         string value;
         trigger_stream >> value;
-        triggerNodes[number] = Node(n_type,value);
+        triggerNodes[number].type= n_type;
+        triggerNodes[number].value = value;
     }
     for ( int i = 0; i < n_edges; i++ ) {
         int father;
