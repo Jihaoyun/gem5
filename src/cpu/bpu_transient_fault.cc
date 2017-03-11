@@ -28,6 +28,7 @@ BpuTransientFault::fault()
         faultBitPosition,
         tick,
         tick);
+    std::cout << "I'm scheduling" << faultEnd << " " << tick << std::endl;
     bpu->insertFault(parameters,faultEnd);
 
 }
