@@ -31,9 +31,9 @@ class Parser:
         #Check if final case
         if re.match(r".*[&|><!=].*", string) is None:
             if string == "index":
-                return Node("index", string)
+                return Node("i", string)
             else:
-                return Node("const", str(int(string, 16)))
+                return Node("c", str(int(string, 16)))
 
         #Find most extern operator
         counter = 0;
@@ -43,9 +43,9 @@ class Parser:
                 op = string[i]
 
                 if(op == '!'):
-                    tmpNode = Node("op", op)
+                    tmpNode = Node("o", op)
                     tmpNode.right = \
-                    self.parse(self.clean(string[(i+1):]))
+                        self.parse(self.clean(string[(i+1):]))
                 else:
                     if(string[i+1] == '='):
                         i+=1
@@ -53,12 +53,12 @@ class Parser:
                         leftString = string[:(i-1)]
                     else:
                         leftString = string[:(i)]
-                    rightString = string[(i+1):]
+                        rightString = string[(i+1):]
 
-                    tmpNode = Node("op", op)
+                    tmpNode = Node("o", op)
                     tmpNode.left = self.parse(self.clean(leftString))
                     tmpNode.right = self.parse(self.clean(rightString))
-                    return tmpNode
+                return tmpNode
             else:
                 if(string[i] == '('):
                     counter += 1
@@ -67,7 +67,8 @@ class Parser:
 
 
     def visit(self, n):
-        self.nodeString += str(n.id) + " " + n.nodeValue + "\n"
+        self.nodeString += str(n.id) + " " + n.nodeType + " " + \
+                n.nodeValue + "\n"
 
         if n.left is not None:
             self.edgeCount += 1
@@ -103,5 +104,5 @@ class Parser:
 #p = Parser("inp.txt")
 #print p.parseFile()
 
-p = Parser("index == 0x1234")
-print p.parseString()
+#p = Parser("!((index & 0x01) | (index & 0x80))")
+#print p.parseString()
