@@ -7,6 +7,7 @@ import os, sys
 sys.path.append(os.getcwd() + "/configs/fault_injector")
 
 from FaultParser import *
+from ControlFaultParser import *
 
 parser = argparse.ArgumentParser(description='Gem5')
 parser.add_argument('-b', '--benchmarks', type=str, dest='benchmarks',
@@ -14,7 +15,11 @@ parser.add_argument('-b', '--benchmarks', type=str, dest='benchmarks',
                     help='Benchmark set for the simulation')
 
 parser.add_argument('-i', '--fault-input', type=str, dest='faultInput',
-                    required=True, nargs='+', help='Fault source files')
+                    nargs='+', help='Fault source files')
+
+parser.add_argument('-ci', '--control-fault-input', type=str,
+                    dest='controlFaultInput', nargs='+',
+                    help='Control fault source files')
 
 parser.add_argument('-o', '--options', type=str, dest='options',
                     help='Options for the binary benchmark')
@@ -44,31 +49,51 @@ if __name__ == '__main__':
         call(cmd)
 
         # Read all fault input files
-        if args.faultInput == None:
-            break
+        if args.faultInput != None:
+            for inputFile in args.faultInput:
+                fp = FaultParser(inputFile)
+                while fp.hasNext():
+                    # Load the next fault entry
+                    fe = fp.next()
 
-        for inputFile in args.faultInput:
-            fp = FaultParser(inputFile)
-            while fp.hasNext():
-                # Load the next fault entry
-                fe = fp.next()
+                    print "\n\nRunning " + benchmark + " with fault:\n" + \
+                        str(fe)
 
-                print "\n\nRunning " + benchmark + " with fault:\n" + str(fe)
+                    # Run faulted simulation
+                    cmd = ["./build/ALPHA/gem5.opt",
+                        "--stats-file", statFolder + "/" +
+                        fe.label + ".txt",
+                        "configs/fault_injector/injector_system.py",
+                        "-fe",
+                        "-b", benchmark,
+                        "-l", fe.label,
+                        "-sb", fe.stuckBit,
+                        "-f", fe.field,
+                        "-e", fe.entry,
+                        "-fsb", fe.stuckBit,
+                        "-bp", fe.bitPosition,
+                        "-tb", fe.tickBegin,
+                        "-te", fe.tickEnd]
+
+                    call(cmd)
+
+        if args.controlFaultInput != None:
+            for inputFile in args.controlFaultInput:
+                parser = ControlFaultParser()
+                parser.parseFile(inputFile)
+
+                print "\n\nRunning " + benchmark + " with fault:\n" + \
+                    "control-fault@" + str(inputFile)
 
                 # Run faulted simulation
                 cmd = ["./build/ALPHA/gem5.opt",
                     "--stats-file", statFolder + "/" +
-                    fe.label + ".txt",
+                    inputFile + ".txt",
                     "configs/fault_injector/injector_system.py",
                     "-fe",
                     "-b", benchmark,
-                    "-l", fe.label,
-                    "-sb", fe.stuckBit,
-                    "-f", fe.field,
-                    "-e", fe.entry,
-                    "-fsb", fe.stuckBit,
-                    "-bp", fe.bitPosition,
-                    "-tb", fe.tickBegin,
-                    "-te", fe.tickEnd]
+                    "-l", "control-fault@" + inputFile,
+                    "-cft", parser.getTrigger(),
+                    "-cfa", parser.getAction() ]
 
                 call(cmd)

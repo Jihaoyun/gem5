@@ -10,7 +10,7 @@ class Node:
         self.nodeType = nodeType
         self.nodeValue = nodeValue
 
-class Parser:
+class ControlFaultParser:
 
     def clean(self, string):
         string = string.replace(" ", "")
@@ -48,7 +48,7 @@ class Parser:
                         leftString = string[:(i-1)]
                     else:
                         leftString = string[:(i)]
-                        rightString = string[(i+1):]
+                    rightString = string[(i+1):]
 
                     tmpNode = Node("o", op)
                     tmpNode.left = self.parseTrigger(self.clean(leftString))
@@ -161,11 +161,8 @@ class Parser:
         return self.actionString
 
 #Examples
-#p = Parser()
-#p.parseFile("inp.txt")
-#print p.getTrigger()
-#print p.getAction()
-
-
-#print p.parseTriggerString("!((index & 0x01) | (index & 0x80))")
-#print p.parseActionString("(index ^ 0x01) << 2")
+if __name__ == "__main__":
+    p = ControlFaultParser()
+    p.parseFile("inp.txt")
+    print p.getTrigger()
+    print p.getAction()

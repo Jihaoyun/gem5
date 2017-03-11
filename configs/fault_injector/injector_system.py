@@ -47,6 +47,14 @@ parser.add_argument('-tb', '--tick-begin', type=int, dest='tickBegin',
 parser.add_argument('-te', '--tick-end', type=int, dest='tickEnd',
                     help='Remove fault at this tick')
 
+parser.add_argument('-cft', '--control-fault-trigger', type=str,
+                    dest='controlFaultTrigger',
+                    help='Control fault trigger descriptor')
+
+parser.add_argument('-cfa', '--control-fault-action', type=str,
+                    dest='controlFaultAction',
+                    help='Control fault action descriptor')
+
 args = parser.parse_args()
 
 # create the system we are going to simulate
@@ -103,40 +111,49 @@ system.cpu.branchPred = BiModalBP();
 
 #run all the simulation
 if args.faultEnabled:
-    if args.tickBegin == 0 and args.tickEnd == -1:
-        # If the fault is permanent
+    if args.controlFaultTrigger != None and args.controlFaultAction != None:
+        # Fault control logic
         system.cpu.branchPred.faultEnabled = True
-        system.cpu.branchPred.faultLabel = args.label
-        system.cpu.branchPred.faultStuckBit = args.stuckBit
-        system.cpu.branchPred.faultField = args.field
-        system.cpu.branchPred.faultEntry = args.entry
-        system.cpu.branchPred.faultBitPosition = args.bitPosition
-        system.cpu.branchPred.faultTickBegin = args.tickBegin
-        system.cpu.branchPred.faultTickEnd = args.tickEnd
+        system.cpu.branchPred.controlFaultTriggerDescriptor = \
+            controlFaultTrigger
+        system.cpu.branchPred.controlFaultActionDescriptor = \
+            controlFaultAction
     else:
-        # If the fault is transient
+        # Fault BPU entry
+        if args.tickBegin == 0 and args.tickEnd == -1:
+            # If the fault is permanent
+            system.cpu.branchPred.faultEnabled = True
+            system.cpu.branchPred.faultLabel = args.label
+            system.cpu.branchPred.faultStuckBit = args.stuckBit
+            system.cpu.branchPred.faultField = args.field
+            system.cpu.branchPred.faultEntry = args.entry
+            system.cpu.branchPred.faultBitPosition = args.bitPosition
+            system.cpu.branchPred.faultTickBegin = args.tickBegin
+            system.cpu.branchPred.faultTickEnd = args.tickEnd
+        else:
+            # If the fault is transient
 
-        # We need to shedule both the event triggering the fault
-        # and the event triggering the status restoration
-        root.bpuTransientFaultStart = BpuTransientFault()
-        root.bpuTransientFaultStart.faultLabel = args.label
-        root.bpuTransientFaultStart.tick = args.tickBegin
-        root.bpuTransientFaultStart.faultField = args.field
-        root.bpuTransientFaultStart.faultEntry = args.entry
-        root.bpuTransientFaultStart.faultBitPosition = args.bitPosition
-        root.bpuTransientFaultStart.faultStuckBit = args.faultStuckBit
-        root.bpuTransientFaultStart.bpu = system.cpu.branchPred
-        root.bpuTransientFaultStart.faultEnd = False
+            # We need to shedule both the event triggering the fault
+            # and the event triggering the status restoration
+            root.bpuTransientFaultStart = BpuTransientFault()
+            root.bpuTransientFaultStart.faultLabel = args.label
+            root.bpuTransientFaultStart.tick = args.tickBegin
+            root.bpuTransientFaultStart.faultField = args.field
+            root.bpuTransientFaultStart.faultEntry = args.entry
+            root.bpuTransientFaultStart.faultBitPosition = args.bitPosition
+            root.bpuTransientFaultStart.faultStuckBit = args.faultStuckBit
+            root.bpuTransientFaultStart.bpu = system.cpu.branchPred
+            root.bpuTransientFaultStart.faultEnd = False
 
-        root.bpuTransientFaultEnd = BpuTransientFault()
-        root.bpuTransientFaultEnd.faultLabel = args.label
-        root.bpuTransientFaultEnd.tick = args.tickEnd
-        root.bpuTransientFaultEnd.faultField = args.field
-        root.bpuTransientFaultEnd.faultEntry = args.entry
-        root.bpuTransientFaultEnd.faultBitPosition = args.bitPosition
-        root.bpuTransientFaultEnd.faultEnd = True
-        root.bpuTransientFaultEnd.faultStuckBit = 1
-        root.bpuTransientFaultEnd.bpu = system.cpu.branchPred
+            root.bpuTransientFaultEnd = BpuTransientFault()
+            root.bpuTransientFaultEnd.faultLabel = args.label
+            root.bpuTransientFaultEnd.tick = args.tickEnd
+            root.bpuTransientFaultEnd.faultField = args.field
+            root.bpuTransientFaultEnd.faultEntry = args.entry
+            root.bpuTransientFaultEnd.faultBitPosition = args.bitPosition
+            root.bpuTransientFaultEnd.faultEnd = True
+            root.bpuTransientFaultEnd.faultStuckBit = 1
+            root.bpuTransientFaultEnd.bpu = system.cpu.branchPred
 else:
     system.cpu.branchPred.faultEnabled = False
 
