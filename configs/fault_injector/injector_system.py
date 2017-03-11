@@ -111,13 +111,14 @@ system.cpu.branchPred = BiModalBP();
 
 #run all the simulation
 if args.faultEnabled:
-    if args.controlFaultTrigger != None and args.controlFaultAction != None:
+    if args.controlFaultTrigger is not None \
+            and args.controlFaultAction is not None:
         # Fault control logic
         system.cpu.branchPred.faultEnabled = True
         system.cpu.branchPred.controlFaultTriggerDescriptor = \
-            controlFaultTrigger
+            args.controlFaultTrigger
         system.cpu.branchPred.controlFaultActionDescriptor = \
-            controlFaultAction
+            args.controlFaultAction
     else:
         # Fault BPU entry
         if args.tickBegin == 0 and args.tickEnd == -1:

@@ -153,7 +153,6 @@ class ControlFaultParser:
             self.triggerString = self.parseTriggerString(fp.readline())
             self.actionString = self.parseActionString(fp.readline())
 
-
     def getTrigger(self):
         return self.triggerString
 

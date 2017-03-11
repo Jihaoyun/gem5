@@ -53,9 +53,10 @@ class Node
 class ControlFaultEvaluator
 {
     public:
-        ControlFaultEvaluator(string trigger, string action);
+        ControlFaultEvaluator(string trigger, string action, bool isEnabled);
         Addr evaluate(Addr original_address);
     private:
+        bool isEnabled;
         vector<Node> triggerNodes;
         vector<Node> actionNodes;
         bool evaluateTrigger(Addr original_address, node_index actual_node);

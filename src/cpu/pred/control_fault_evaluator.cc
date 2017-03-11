@@ -3,7 +3,13 @@
 using namespace Evaluator;
 using namespace std;
 
-ControlFaultEvaluator::ControlFaultEvaluator(string trigger,string action){
+ControlFaultEvaluator::ControlFaultEvaluator(string trigger,string action,
+  bool _isEnabled) :
+  isEnabled(_isEnabled)
+  {
+
+    if (!isEnabled)
+      return;
 
     int n_nodes, n_edges;
     stringstream trigger_stream(trigger);
@@ -251,11 +257,13 @@ Addr ControlFaultEvaluator::evaluateAction(Addr original_address,
               .extractValue(original_address));
     }
   }
-  else
-    return actionNodes[actual_node].extractValue(original_address);
+  return actionNodes[actual_node].extractValue(original_address);
 }
 
 Addr ControlFaultEvaluator::evaluate(Addr original_address) {
+  if (!isEnabled)
+    return original_address;
+
   if (!evaluateTrigger(original_address, 0))
     return original_address;
 

@@ -49,7 +49,7 @@ if __name__ == '__main__':
         call(cmd)
 
         # Read all fault input files
-        if args.faultInput != None:
+        if args.faultInput is not None:
             for inputFile in args.faultInput:
                 fp = FaultParser(inputFile)
                 while fp.hasNext():
@@ -77,8 +77,10 @@ if __name__ == '__main__':
 
                     call(cmd)
 
-        if args.controlFaultInput != None:
+        if args.controlFaultInput is not None:
             for inputFile in args.controlFaultInput:
+                fname = inputFile.split("/")[-1]
+
                 parser = ControlFaultParser()
                 parser.parseFile(inputFile)
 
@@ -88,12 +90,12 @@ if __name__ == '__main__':
                 # Run faulted simulation
                 cmd = ["./build/ALPHA/gem5.opt",
                     "--stats-file", statFolder + "/" +
-                    inputFile + ".txt",
+                    fname,
                     "configs/fault_injector/injector_system.py",
                     "-fe",
                     "-b", benchmark,
-                    "-l", "control-fault@" + inputFile,
-                    "-cft", parser.getTrigger(),
-                    "-cfa", parser.getAction() ]
+                    "-l", "control-fault_" + fname,
+                    "-cft", parser.getTrigger().strip(),
+                    "-cfa", parser.getAction().strip() ]
 
                 call(cmd)
