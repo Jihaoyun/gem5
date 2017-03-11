@@ -197,8 +197,7 @@ BPredUnit::insertFault(
         struct FaultBPU::injFault faultParameters, bool faultEnd)
 {
     if ( faultParameters.field <= 2 ) { // which field??
-        if ( faultEnd )
-            BTB.setFault(faultParameters, faultEnd);
+        BTB.setFault(faultParameters, faultEnd);
     }
     //else if ( faultParameters.field >= 0 ) {
     //    setFault(akjhduiawhd);
