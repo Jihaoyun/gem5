@@ -70,6 +70,8 @@ BPredUnit::BPredUnit(const Params *params)
             params->instShiftAmt,
             params->numThreads,
             injectedFault),
+      controlFaultEvaluator(params->controlFaultTriggerDescriptor,
+            params->controlFaultActionDescriptor),
       RAS(numThreads),
       useIndirect(params->useIndirect),
       iPred(params->indirectHashGHR,
@@ -163,7 +165,6 @@ BPredUnit::regStats()
         .name(name() + "indirectMispredicted")
         .desc("Number of mispredicted indirect branches.")
         ;
-
 }
 
 ProbePoints::PMUUPtr
@@ -229,7 +230,10 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
         uncondBranch(tid, pc.instAddr(), bp_history);
     } else {
         ++condPredicted;
-        pred_taken = lookup(tid, pc.instAddr(), bp_history);
+        // Control fault injection
+        Addr addr = pc.instAddr();
+        controlFaultEvaluator.evaluate(addr >> 2);
+        pred_taken = lookup(tid, addr, bp_history);
 
         DPRINTF(Branch, "[tid:%i]: [sn:%i] Branch predictor"
                 " predicted %i for PC %s\n", tid, seqNum,  pred_taken, pc);
@@ -284,7 +288,10 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
                     ++BTBHits;
 
                     // If it's not a return, use the BTB to get target addr.
-                    target = BTB.lookup(pc.instAddr(), tid);
+                    // Control fault injection
+                    Addr addr = pc.instAddr();
+                    controlFaultEvaluator.evaluate(addr >> 2);
+                    target = BTB.lookup(addr, tid);
 
                     DPRINTF(Branch, "[tid:%i]: Instruction %s predicted"
                             " target is %s.\n", tid, pc, target);
@@ -310,7 +317,10 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
                 predict_record.wasIndirect = true;
                 ++indirectLookups;
                 //Consult indirect predictor on indirect control
-                if (iPred.lookup(pc.instAddr(), getGHR(tid, bp_history),
+                // Control fault injection
+                Addr addr = pc.instAddr();
+                controlFaultEvaluator.evaluate(addr >> 2);
+                if (iPred.lookup(addr, getGHR(tid, bp_history),
                         target, tid)) {
                     // Indirect predictor hit
                     ++indirectHits;
@@ -453,7 +463,6 @@ BPredUnit::squash(const InstSeqNum &squashed_sn,
             assert(pred_hist.front().seqNum == squashed_sn);
         }
 
-
         if ((*hist_it).usedRAS) {
             ++RASIncorrect;
             DPRINTF(Branch, "[tid:%i]: Incorrect RAS [sn:%i]\n",
@@ -463,7 +472,10 @@ BPredUnit::squash(const InstSeqNum &squashed_sn,
         // Have to get GHR here because the update deletes bpHistory
         unsigned ghr = getGHR(tid, hist_it->bpHistory);
 
-        update(tid, (*hist_it).pc, actually_taken,
+        // Control fault injection
+        Addr addr = (*hist_it).pc;
+        controlFaultEvaluator.evaluate(addr >> 2);
+        update(tid, addr, actually_taken,
                pred_hist.front().bpHistory, true);
         hist_it->wasSquashed = true;
 
@@ -482,7 +494,10 @@ BPredUnit::squash(const InstSeqNum &squashed_sn,
                 DPRINTF(Branch,"[tid: %i] BTB Update called for [sn:%i]"
                         " PC: %s\n", tid,hist_it->seqNum, hist_it->pc);
 
-                BTB.update((*hist_it).pc, corrTarget, tid);
+                // Control fault injection
+                Addr addr = (*hist_it).pc;
+                controlFaultEvaluator.evaluate(addr >> 2);
+                BTB.update(addr, corrTarget, tid);
             }
         } else {
            //Actually not Taken

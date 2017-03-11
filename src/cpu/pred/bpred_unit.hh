@@ -48,9 +48,11 @@
 #define __CPU_PRED_BPRED_UNIT_HH__
 
 #include <deque>
+#include <string>
 
 #include "base/statistics.hh"
 #include "base/types.hh"
+#include "control_fault_evaluator.hh"
 #include "cpu/inst_seq.hh"
 #include "cpu/pred/btb.hh"
 #include "cpu/pred/faultInjected.hh"
@@ -290,6 +292,9 @@ class BPredUnit : public SimObject
 
     /** The eventual injected fault */
     FaultBPU::injFault injectedFault;
+
+    /** Control fault evaluator */
+    Evaluator::ControlFaultEvaluator controlFaultEvaluator;
 
     /** The BTB. */
     DefaultBTB BTB;
