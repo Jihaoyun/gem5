@@ -9,6 +9,7 @@ BpuTransientFault::BpuTransientFault(BpuTransientFaultParams *params):
     faultEntry(params->faultEntry),
     faultBitPosition(params->faultBitPosition),
     faultStuckBit(params->faultStuckBit),
+    faultEnd(params->faultEnd),
     faultEvent(this, false)
 {
   schedule(faultEvent, params->tick);
@@ -18,6 +19,9 @@ void
 BpuTransientFault::fault()
 {
   // TODO
+    // costruire inject fault
+    // Bpred.insertfault(struct, faultEnd);
+
 }
 
 BpuTransientFault*

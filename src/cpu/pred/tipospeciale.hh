@@ -11,6 +11,9 @@ class Tipospeciale : public Tipo
         public:
 
         Tipospeciale(uint64_t numBit, char value);
+        Tipospeciale(uint64_t numBit,char value,
+        uint64_t initial_value);
+
 
         virtual uint64_t getData();
 

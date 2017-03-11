@@ -1,5 +1,18 @@
 #include "tipoTargetspeciale.hh"
 
+TipoTargetSpeciale::TipoTargetSpeciale(uint64_t numBit,char value,
+        TheISA::PCState initial)
+:TipoTarget(initial)  {
+        mask = 1 << numBit;
+
+        faultValue = value;
+
+        if ( value == 0 ) {
+                mask = ~mask;
+        }
+
+}
+
 TipoTargetSpeciale::TipoTargetSpeciale(uint64_t numBit,char value)
 :TipoTarget()  {
         mask = 1 << numBit;

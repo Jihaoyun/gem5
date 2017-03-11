@@ -11,4 +11,5 @@ class BpuTransientFault(SimObject):
     faultBitPosition = Param.UInt32(0,
         "BTB entry's bit position where to inject the fault")
     faultStuckBit = Param.UInt32(0, "BTB value changes to faultStuckBit")
+    faultEnd = Param.Bool(False,"Is true when the fault has to be removed")
     bpu = Param.BranchPredictor(NULL, "BPredUnit")

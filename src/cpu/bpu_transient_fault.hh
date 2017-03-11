@@ -20,6 +20,7 @@ class BpuTransientFault : public SimObject
     uint32_t faultEntry;
     uint32_t faultBitPosition;
     uint32_t faultStuckBit;
+    bool faultEnd;
 
   public:
     BpuTransientFault(BpuTransientFaultParams *p);

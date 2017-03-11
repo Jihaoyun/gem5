@@ -3,6 +3,14 @@
 Tipo::Tipo() {
 }
 
+Tipo::~Tipo(){
+}
+
+
+Tipo::Tipo(uint64_t initial_value){
+    realdato = initial_value;
+}
+
 
 uint64_t
 Tipo::getData() {

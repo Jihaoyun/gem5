@@ -11,7 +11,8 @@ class TipoTargetSpeciale : public TipoTarget
         public:
 
         TipoTargetSpeciale(uint64_t numBit, char value);
-
+        TipoTargetSpeciale(uint64_t numBit, char value,
+                TheISA::PCState initial);
         virtual TheISA::PCState getData();
 
 

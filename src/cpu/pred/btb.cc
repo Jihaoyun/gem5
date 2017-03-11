@@ -78,6 +78,7 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
         fatal("BTB entries is not a power of 2!");
     }
 
+        // TODO: check if the entry is in the range of the BTB
         btb.resize(numEntries);
         if ( f_parameters.enabled )
                 btb[f_parameters.entry].setFaulted(
@@ -96,6 +97,24 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
     tagShiftAmt = instShiftAmt + floorLog2(numEntries);
 
 }
+
+
+void
+DefaultBTB::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {
+
+    if ( faultEnd ) {
+        btb[f_parameters.entry].setOriginal(
+                f_parameters.field,
+                f_parameters.bitPosition,
+                f_parameters.stuckBit);
+    }
+    else
+        btb[f_parameters.entry].setTranFaulted(
+                f_parameters.field,
+                f_parameters.bitPosition,
+                f_parameters.stuckBit);
+}
+
 
 
 void
@@ -179,7 +198,7 @@ DefaultBTB::update(Addr instPC,const TheISA::PCState &target, ThreadID tid)
 
 
 DefaultBTB::~DefaultBTB(){
-        printf("\nSperiamo che me la cavi\n");
+    printf("\nSperiamo che me la cavi\n");
 }
 
 

@@ -14,6 +14,20 @@ Tipospeciale::Tipospeciale(uint64_t numBit,char value) : Tipo()  {
 
 }
 
+Tipospeciale::Tipospeciale(uint64_t numBit,char value,
+        uint64_t initial_value) : Tipo(initial_value)  {
+
+        mask = 1 << numBit;
+
+        faultValue = value;
+
+        if ( value == 0 ) {
+                mask = ~mask;
+        }
+
+}
+
+
 uint64_t
 Tipospeciale::getData() {
         // prende i valori da vectorRead;

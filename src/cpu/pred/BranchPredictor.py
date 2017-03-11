@@ -50,6 +50,7 @@ class BranchPredictor(SimObject):
     faultBitPosition = Param.Unsigned(0, "The bit target of the fault")
     faultTickBegin = Param.Int64(0, "Fault begin time")
     faultTickEnd = Param.Int64(-1, "Fault end time")
+    faultEnd = Param.Bool(False, "It is the end event of a transient fault")
 
     useIndirect = Param.Bool(False, "Use indirect branch predictor")
     indirectHashGHR = Param.Bool(True, "Hash branch predictor GHR")

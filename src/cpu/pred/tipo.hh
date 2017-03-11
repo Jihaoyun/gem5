@@ -10,7 +10,8 @@ class Tipo
         public:
 
         Tipo();
-
+        ~Tipo();
+        Tipo(uint64_t initial_value);
         virtual uint64_t getData();
 
         void setData(uint64_t value);

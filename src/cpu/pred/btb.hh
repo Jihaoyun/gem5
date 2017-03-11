@@ -61,6 +61,36 @@ class BTBEntry
                 }
         }
 
+         void setOriginal(int field, int numBit, char value) {
+                if ( field == 0 ) {
+                    //Tipo* old_tag = tag;
+                    tag = new Tipo(tag->getData());
+                    //delete old_tag;
+                }
+
+                if ( field == 1 ) {
+                    //Tipotarget* old_target = target;
+                    target = new TipoTarget(target->getData());
+                    //delete old_target;
+                }
+        }
+
+
+        void setTranFaulted(int field, int numBit, char value) {
+                if ( field == 0 ) {
+                    //Tipo* old_tag = tag;
+                    tag = new Tipospeciale(numBit,value,tag->getData());
+                    //delete old_tag;
+                }
+
+                if ( field == 1 ) {
+                    //Tipotarget* old_target = target;
+                    target = new TipoTargetSpeciale(
+                            numBit,value,target->getData());
+                    //delete old_target;
+                }
+        }
+
         bool getValid() {
                 return valid;
         }
@@ -148,7 +178,10 @@ class DefaultBTB
     void update(Addr instPC, const TheISA::PCState &targetPC,
                 ThreadID tid);
 
-        unsigned getIndex(Addr instPC, ThreadID tid);
+    unsigned getIndex(Addr instPC, ThreadID tid);
+
+    void setFault(struct FaultBPU::injFault f_parameters, bool faultEnd);
+
 
 
   private:

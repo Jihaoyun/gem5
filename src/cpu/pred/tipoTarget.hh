@@ -15,14 +15,15 @@ class TipoTarget
         public:
 
         TipoTarget();
-
+        ~TipoTarget();
+        TipoTarget(TheISA::PCState initial);
         virtual TheISA::PCState getData();
 
         void setData(TheISA::PCState value);
 
         private:
 
-        TheISA::PCState target ;
+        TheISA::PCState target;
 
 };
 

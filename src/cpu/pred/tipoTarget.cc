@@ -4,6 +4,14 @@ TipoTarget::TipoTarget():
 target(0) {
 }
 
+TipoTarget::~TipoTarget(){
+}
+
+TipoTarget::TipoTarget(TheISA::PCState initial):
+target(initial) {
+}
+
+
 
 TheISA::PCState
 TipoTarget::getData() {

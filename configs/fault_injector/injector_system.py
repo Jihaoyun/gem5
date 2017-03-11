@@ -123,6 +123,7 @@ if args.faultEnabled:
         root.bpuTransientFault.faultBitPosition = args.bitPosition
         root.bpuTransientFault.faultStuckBit = args.faultStuckBit
         root.bpuTransientFault.bpu = system.cpu.branchPred
+        root.bpuTransientFault.faultEnd = False
 
         root.bpuTransientFault = BpuTransientFault()
         root.bpuTransientFault.faultLabel = args.label
@@ -130,8 +131,8 @@ if args.faultEnabled:
         root.bpuTransientFault.faultField = args.field
         root.bpuTransientFault.faultEntry = args.entry
         root.bpuTransientFault.faultBitPosition = args.bitPosition
-        flippedStuckBit = 1 if args.faultStuckBit == 0 else 0
-        root.bpuTransientFault.faultStuckBit = flippedStuckBit
+        root.bpuTransientFault.faultEnd = True
+        root.bpuTransientFault.faultStuckBit = 1
         root.bpuTransientFault.bpu = system.cpu.branchPred
 else:
     system.cpu.branchPred.faultEnabled = False
