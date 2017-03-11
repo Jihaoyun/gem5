@@ -1,4 +1,5 @@
 #include "bpu_transient_fault.hh"
+#include "cpu/pred/faultInjected.hh"
 
 BpuTransientFault::BpuTransientFault(BpuTransientFaultParams *params):
     SimObject(params),
@@ -18,9 +19,16 @@ BpuTransientFault::BpuTransientFault(BpuTransientFaultParams *params):
 void
 BpuTransientFault::fault()
 {
-  // TODO
-    // costruire inject fault
-    // Bpred.insertfault(struct, faultEnd);
+    struct FaultBPU::injFault parameters(
+        true,
+        faultLabel,
+        faultStuckBit,
+        faultField,
+        faultEntry,
+        faultBitPosition,
+        tick,
+        tick);
+    bpu->insertFault(parameters,faultEnd);
 
 }
 
