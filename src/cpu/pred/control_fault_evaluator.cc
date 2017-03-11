@@ -87,7 +87,7 @@ bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
             evaluateTrigger(original_address,triggerNodes[actual_node].left)
             : triggerNodes[triggerNodes[actual_node].left]
             .extractValue(original_address))
-        &&
+        &
         (triggerNodes[triggerNodes[actual_node].right].isOp() ?
             evaluateTrigger(original_address,triggerNodes[actual_node].right)
           : triggerNodes[triggerNodes[actual_node].right]
@@ -100,7 +100,7 @@ bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           :
           triggerNodes[triggerNodes[actual_node].left]
             .extractValue(original_address))
-        ||
+        |
         (triggerNodes[triggerNodes[actual_node].right].isOp() ?
             evaluateTrigger(original_address,triggerNodes[actual_node].right)
           : triggerNodes[triggerNodes[actual_node].right]
@@ -160,7 +160,7 @@ bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
             evaluateTrigger(original_address,triggerNodes[actual_node].left)
             : triggerNodes[triggerNodes[actual_node].left]
               .extractValue(original_address))
-        &&
+        ==
         (triggerNodes[triggerNodes[actual_node].right].isOp() ?
             evaluateTrigger(original_address,triggerNodes[actual_node].right)
           : triggerNodes[triggerNodes[actual_node].right]
