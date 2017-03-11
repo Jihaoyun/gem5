@@ -52,6 +52,7 @@ class ControlFaultEvaluator
     private:
         vector<Node> nodes;
         bool evaluateTrigger(Addr original_address, node_index actual_node);
+        Addr evaluateAction(Addr original_address, node_index actual_node);
 };
 
 
