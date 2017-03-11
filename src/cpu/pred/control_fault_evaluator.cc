@@ -1,6 +1,80 @@
 #include "cpu/pred/control_fault_evaluator.hh"
 
 using namespace Evaluator;
+using namespace std;
+
+ControlFaultEvaluator::ControlFaultEvaluator(string trigger,string action){
+
+    int n_nodes, n_edges;
+    stringstream trigger_stream(trigger);
+    stringstream action_stream(action);
+
+    trigger_stream >> n_nodes;
+    trigger_stream >> n_edges;
+
+    triggerNodes.resize(n_nodes);
+    for ( int i = 0; i < n_nodes; i++ ) {
+        int number;
+        trigger_stream >> number;
+        char type;
+        NodeType n_type;
+        trigger_stream >> type;
+        if ( type == 'i' )
+            n_type = NodeType::index;
+        else if ( type == 'c' )
+            n_type = NodeType::constant;
+        else
+            n_type = NodeType::op;
+
+        string value;
+        trigger_stream >> value;
+        triggerNodes[number] = Node(n_type,value);
+    }
+    for ( int i = 0; i < n_edges; i++ ) {
+        int father;
+        int child;
+        trigger_stream >> father;
+        trigger_stream >> child;
+        if ( triggerNodes[father].left == -1 )
+            triggerNodes[father].left = child;
+        else
+            triggerNodes[father].right = child;
+    }
+
+    action_stream >> n_nodes;
+    action_stream >> n_edges;
+
+    actionNodes.resize(n_nodes);
+    for ( int i = 0; i < n_nodes; i++ ) {
+        int number;
+        action_stream >> number;
+        char type;
+        NodeType n_type;
+        action_stream >> type;
+        if ( type == 'i' )
+            n_type = NodeType::index;
+        else if ( type == 'c' )
+            n_type = NodeType::constant;
+        else
+            n_type = NodeType::op;
+
+        string value;
+        action_stream >> value;
+        actionNodes[number] = Node(n_type,value);
+    }
+    for ( int i = 0; i < n_edges; i++ ) {
+        int father;
+        int child;
+        action_stream >> father;
+        action_stream >> child;
+        if ( actionNodes[father].left == -1 )
+            actionNodes[father].left = child;
+        else
+            actionNodes[father].right = child;
+    }
+
+}
+
 
 bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
     node_index actual_node) {
@@ -176,8 +250,8 @@ Addr ControlFaultEvaluator::evaluateAction(Addr original_address,
               .extractValue(original_address));
     }
   }
-
-  return false;
+  else
+    return actionNodes[actual_node].extractValue(original_address);
 }
 
 Addr ControlFaultEvaluator::evaluate(Addr original_address) {

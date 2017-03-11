@@ -2,6 +2,7 @@
 #define __CPU_PRED_CONTROL_FAULT_EVALUATOR_HH__
 
 
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -20,6 +21,8 @@ class Node
         string value;
         node_index left;
         node_index right;
+
+        Node(){}
 
         Node(NodeType p_type, string p_value):
             type(p_type),
