@@ -50,7 +50,8 @@ class ControlFaultEvaluator
         ControlFaultEvaluator(string trigger, string action);
         Addr evaluate(Addr original_address);
     private:
-        vector<Node> nodes;
+        vector<Node> triggerNodes;
+        vector<Node> actionNodes;
         bool evaluateTrigger(Addr original_address, node_index actual_node);
         Addr evaluateAction(Addr original_address, node_index actual_node);
 };

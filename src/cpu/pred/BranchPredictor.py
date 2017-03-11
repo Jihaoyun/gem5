@@ -52,6 +52,9 @@ class BranchPredictor(SimObject):
     faultTickEnd = Param.Int64(-1, "Fault end time")
     faultEnd = Param.Bool(False, "It is the end event of a transient fault")
 
+    controlFault = Param.String(None,
+        "Description of the injected control fault")
+
     useIndirect = Param.Bool(False, "Use indirect branch predictor")
     indirectHashGHR = Param.Bool(True, "Hash branch predictor GHR")
     indirectHashTargets = Param.Bool(True, "Hash path history targets")

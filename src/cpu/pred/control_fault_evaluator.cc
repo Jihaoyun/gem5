@@ -5,91 +5,98 @@ using namespace Evaluator;
 bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
     node_index actual_node) {
 
-  if ( nodes[actual_node].isOp() ) {
-    if ( nodes[actual_node].value.compare("&") == 0 ) {
+  if ( triggerNodes[actual_node].isOp() ) {
+    if ( triggerNodes[actual_node].value.compare("&") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left]
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].left)
+            : triggerNodes[triggerNodes[actual_node].left]
             .extractValue(original_address))
         &&
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].right)
+          : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("|") == 0 ) {
+    else if ( triggerNodes[actual_node].value.compare("|") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-          evaluateTrigger(original_address,nodes[actual_node].left)
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
           :
-          nodes[nodes[actual_node].left].extractValue(original_address))
+          triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address))
         ||
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].right)
+          : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare(">") == 0 ) {
+    else if ( triggerNodes[actual_node].value.compare(">") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].left)
+            : triggerNodes[triggerNodes[actual_node].left]
+              .extractValue(original_address))
         >
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].right)
+          : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("<") == 0 ) {
+    else if ( triggerNodes[actual_node].value.compare("<") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].left)
+            : triggerNodes[triggerNodes[actual_node].left]
+              .extractValue(original_address))
         <
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].right)
+          : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare(">=") == 0 ) {
+    else if ( triggerNodes[actual_node].value.compare(">=") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].left)
+            : triggerNodes[triggerNodes[actual_node].left]
+              .extractValue(original_address))
         >=
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].right)
+          : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("<=") == 0 ) {
+    else if ( triggerNodes[actual_node].value.compare("<=") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].left)
+            : triggerNodes[triggerNodes[actual_node].left]
+              .extractValue(original_address))
         <=
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].right)
+          : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("==") == 0 ) {
+    else if ( triggerNodes[actual_node].value.compare("==") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].left)
+            : triggerNodes[triggerNodes[actual_node].left]
+              .extractValue(original_address))
         &&
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,triggerNodes[actual_node].right)
+          : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("!") == 0 ) {
+    else if ( triggerNodes[actual_node].value.compare("!") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            !evaluateTrigger(original_address,nodes[actual_node].left)
-            : !nodes[nodes[actual_node].left].extractValue(original_address));
+        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+            !evaluateTrigger(original_address,triggerNodes[actual_node].left)
+            : !triggerNodes[triggerNodes[actual_node].left]
+              .extractValue(original_address));
     }
   }
 
@@ -99,69 +106,74 @@ bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
 Addr ControlFaultEvaluator::evaluateAction(Addr original_address,
   node_index actual_node) {
 
-  if ( nodes[actual_node].isOp() ) {
-    if ( nodes[actual_node].value.compare("&") == 0 ) {
+  if ( actionNodes[actual_node].isOp() ) {
+    if ( actionNodes[actual_node].value.compare("&") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left]
+        (actionNodes[actionNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            : actionNodes[actionNodes[actual_node].left]
             .extractValue(original_address))
         &
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (actionNodes[actionNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].right)
+          : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("|") == 0 ) {
+    else if ( actionNodes[actual_node].value.compare("|") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-          evaluateTrigger(original_address,nodes[actual_node].left)
+        (actionNodes[actionNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,actionNodes[actual_node].left)
           :
-          nodes[nodes[actual_node].left].extractValue(original_address))
+          actionNodes[actionNodes[actual_node].left]
+            .extractValue(original_address))
         |
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (actionNodes[actionNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].right)
+          : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare(">>") == 0 ) {
+    else if ( actionNodes[actual_node].value.compare(">>") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (actionNodes[actionNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            : actionNodes[actionNodes[actual_node].left]
+              .extractValue(original_address))
         >>
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (actionNodes[actionNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].right)
+          : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("<<") == 0 ) {
+    else if ( actionNodes[actual_node].value.compare("<<") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (actionNodes[actionNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            : actionNodes[actionNodes[actual_node].left]
+              .extractValue(original_address))
         <<
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (actionNodes[actionNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].right)
+          : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("^") == 0 ) {
+    else if ( actionNodes[actual_node].value.compare("^") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].left)
-            : nodes[nodes[actual_node].left].extractValue(original_address))
+        (actionNodes[actionNodes[actual_node].left].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            : actionNodes[actionNodes[actual_node].left]
+              .extractValue(original_address))
         ^
-        (nodes[nodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,nodes[actual_node].right)
-          : nodes[nodes[actual_node].right]
+        (actionNodes[actionNodes[actual_node].right].isOp() ?
+            evaluateTrigger(original_address,actionNodes[actual_node].right)
+          : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
-    else if ( nodes[actual_node].value.compare("~") == 0 ) {
+    else if ( actionNodes[actual_node].value.compare("~") == 0 ) {
       return
-        (nodes[nodes[actual_node].left].isOp() ?
-            ~ evaluateTrigger(original_address,nodes[actual_node].left)
-            : ~ nodes[nodes[actual_node].left].extractValue(original_address));
+        (actionNodes[actionNodes[actual_node].left].isOp() ?
+            ~ evaluateTrigger(original_address,actionNodes[actual_node].left)
+            : ~ actionNodes[actionNodes[actual_node].left]
+              .extractValue(original_address));
     }
   }
 
