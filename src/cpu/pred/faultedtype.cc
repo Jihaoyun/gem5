@@ -39,8 +39,7 @@ FaultedType::getData() {
         else
                 value =  (Type::getData() | mask);
 
-        if ( Debug::FaultedType )
-          printf("FT: old value %d, actual value %d", Type::getData(),value);
+        printf("FT: old value %ld, actual value %ld", Type::getData(),value);
 
         return value;
 

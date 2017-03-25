@@ -63,8 +63,8 @@ LocalBP::LocalBP(const LocalBPParams *params)
           params->faultField == 3 &&
           params->faultTickEnd == -1) {
         if ( params->faultEntry >= localPredictorSets )
-          fatal("BP: FaultEntry exceeds
-              dimension of the saturating counter array");
+          fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
         localCtrs[params->faultEntry].setFaulted(
             params->faultBitPosition,params->faultStuckBit);
     }

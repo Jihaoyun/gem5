@@ -33,7 +33,7 @@
 
 #include "base/misc.hh"
 #include "base/types.hh"
-#include "cpu/pre/faultedtype.hh"
+#include "cpu/pred/faultedtype.hh"
 #include "cpu/pred/type.hh"
 
 /**
@@ -71,7 +71,7 @@ class SatCounter
      * @param initial_val Starting value for each counter.
      */
     SatCounter(unsigned bits, uint8_t initial_val)
-        : initialVal(initial_val), maxVal((1 << bits) - 1),
+        : initialVal(initial_val), maxVal((1 << bits) - 1)
     {
         // Check to make sure initial value doesn't exceed the max
         // counter value.
@@ -93,11 +93,11 @@ class SatCounter
      */
     void increment()
     {
-        uint8_t counter_value = counter.getData();
+        uint8_t counter_value = (*counter).getData();
         if ( counter_value < maxVal) {
             ++counter_value;
         }
-        counter.setData(counter_value);
+        (*counter).setData(counter_value);
     }
 
     /**
@@ -105,30 +105,30 @@ class SatCounter
      */
     void decrement()
     {
-        uint8_t counter_value = counter.getData();
+        uint8_t counter_value = (*counter).getData();
         if ( counter_value > 0) {
             --counter_value;
         }
-        counter.setData(counter_value);
+        (*counter).setData(counter_value);
     }
 
     /**
      * Read the counter's value.
      */
     uint8_t read() const
-    { return (uint8_t) counter.getData(); }
+    { return (uint8_t) (*counter).getData(); }
 
     void setFaulted(uint8_t numBit, uint8_t value)
     {
         Type* actual_ptr = counter;
-        counter = new FaultedType(numBit,value,counter.getData());
+        counter = new FaultedType(numBit,value,(*counter).getData());
         free(actual_ptr);
     }
 
     void setOriginal()
     {
         Type* actual_ptr = counter;
-        counter = new Type(numBit,value,counter.getData());
+        counter = new Type((*counter).getData());
         free(actual_ptr);
     }
 
