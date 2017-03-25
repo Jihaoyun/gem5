@@ -85,9 +85,6 @@ ControlFaultEvaluator::ControlFaultEvaluator(string trigger,string action,
 
 bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
     node_index actual_node) {
-
-  original_address = original_address % 4096;
-
   if ( triggerNodes[actual_node].isOp() ) {
     if ( triggerNodes[actual_node].value.compare("&") == 0 ) {
       return

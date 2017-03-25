@@ -50,8 +50,11 @@ Source('faultedtargettype.cc')
 Source('bi_modal.cc')
 Source('gshare.cc')
 Source('control_fault_evaluator.cc')
-DebugFlag('FaultedType')
 DebugFlag('FreeList')
 DebugFlag('Branch')
 DebugFlag('LTage')
 DebugFlag('BPUinfo')
+
+DebugFlag("MyFaultedType")
+
+

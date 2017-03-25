@@ -117,6 +117,9 @@ class TournamentBP : public BPredUnit
 
     unsigned getGHR(ThreadID tid, void *bp_history) const;
 
+
+    void setFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {}
+
   private:
     /**
      * Returns if the branch should be taken or not, given a counter

@@ -136,6 +136,11 @@ class BPredUnit : public SimObject
                 const TheISA::PCState &corr_target,
                 bool actually_taken, ThreadID tid);
 
+
+
+    virtual void setFault(
+        struct FaultBPU::injFault f_parameters,bool faultEnd) = 0;
+
     /**
      * @param bp_history Pointer to the history object.  The predictor
      * will need to update any state and delete the object.

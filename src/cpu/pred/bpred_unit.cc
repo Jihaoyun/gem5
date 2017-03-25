@@ -201,9 +201,7 @@ BPredUnit::insertFault(
     if ( faultParameters.field <= 2 ) { // which field??
         BTB.setFault(faultParameters, faultEnd);
     }
-    //else if ( faultParameters.field >= 0 ) {
-    //    setFault(akjhduiawhd);
-    //}
+        setFault(faultParameters,faultEnd);
 }
 
 

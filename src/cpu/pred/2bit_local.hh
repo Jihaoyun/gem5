@@ -66,6 +66,8 @@ class LocalBP : public BPredUnit
      */
     LocalBP(const LocalBPParams *params);
 
+    void setFault(struct FaultBPU::injFault f_parameters,bool faultEnd);
+
     virtual void uncondBranch(ThreadID tid, Addr pc, void * &bp_history);
 
     /**
