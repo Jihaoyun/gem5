@@ -17,9 +17,8 @@ class ControlFaultParser:
         string = string.replace(" ", "")
         string = string.replace("\n", "")
         strList = list(string)
-        if(strList[0] == '('):
+        if(strList[0] == '(' and strList[len(string)-1] == ')'):
                 strList[0] = ' '
-        if(strList[len(string)-1] == ')'):
                 strList[len(string)-1] = ' '
         return ''.join(strList).replace(" ", "")
 
