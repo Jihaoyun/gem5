@@ -80,11 +80,14 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
 
         // TODO: check if the entry is in the range of the BTB
         btb.resize(numEntries);
-        if ( f_parameters.enabled )
+        if ( f_parameters.enabled && f_parameters.tickEnd == -1 ) {
+                if (f_parameters.entry >= numEntries)
+                        fatal("BP: FaultEntry exceeds dimension of the BTB");
                 btb[f_parameters.entry].setFaulted(
                                 f_parameters.field,
                 f_parameters.bitPosition,
                 f_parameters.stuckBit);
+        }
 
     for (unsigned i = 0; i < numEntries; ++i) {
         btb[i].setValid(false);
