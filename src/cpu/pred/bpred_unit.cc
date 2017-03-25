@@ -67,7 +67,7 @@ BPredUnit::BPredUnit(const Params *params)
             params->faultTickEnd),
       controlFaultEvaluator(params->controlFaultTriggerDescriptor,
             params->controlFaultActionDescriptor,
-            params->faultEnabled),
+            params->controlFaultEnabled),
       BTB(params->BTBEntries,
             params->BTBTagSize,
             params->instShiftAmt,
