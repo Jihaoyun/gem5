@@ -1,8 +1,8 @@
 #include <iostream>       // std::cout
 
-#include "tipospeciale.hh"
+#include "faultedtype.hh"
 
-Tipospeciale::Tipospeciale(uint64_t numBit,char value) : Tipo()  {
+FaultedType::FaultedType(uint64_t numBit,char value) : Type()  {
 
         mask = 1 << numBit;
 
@@ -14,8 +14,8 @@ Tipospeciale::Tipospeciale(uint64_t numBit,char value) : Tipo()  {
 
 }
 
-Tipospeciale::Tipospeciale(uint64_t numBit,char value,
-        uint64_t initial_value) : Tipo(initial_value)  {
+FaultedType::FaultedType(uint64_t numBit,char value,
+        uint64_t initial_value) : Type(initial_value)  {
 
         mask = 1 << numBit;
 
@@ -29,14 +29,14 @@ Tipospeciale::Tipospeciale(uint64_t numBit,char value,
 
 
 uint64_t
-Tipospeciale::getData() {
+FaultedType::getData() {
         // prende i valori da vectorRead;
         uint64_t value;
 
         if ( faultValue == 0 )
-                value =  (Tipo::getData() & mask);
+                value =  (Type::getData() & mask);
         else
-                value =  (Tipo::getData() | mask);
+                value =  (Type::getData() | mask);
 
 
         return value;
@@ -45,9 +45,9 @@ Tipospeciale::getData() {
 }
 
 void
-Tipospeciale::setData(uint64_t value) {
+FaultedType::setData(uint64_t value) {
 
-        Tipo::setData(value);
+        Type::setData(value);
 }
 
 

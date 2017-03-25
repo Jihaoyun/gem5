@@ -1,17 +1,17 @@
-#ifndef __CPU_PRED_TIPOSPECIALE_HH__
-#define __CPU_PRED_TIPOSPECIALE_HH__
+#ifndef __CPU_PRED_FAULTEDTYPE_HH__
+#define __CPU_PRED_FAULTEDTYPE_HH__
 
 
 #include <stdint.h>
 
-#include "tipo.hh"
+#include "type.hh"
 
-class Tipospeciale : public Tipo
+class FaultedType : public Type
 {
         public:
 
-        Tipospeciale(uint64_t numBit, char value);
-        Tipospeciale(uint64_t numBit,char value,
+        FaultedType(uint64_t numBit, char value);
+        FaultedType(uint64_t numBit,char value,
         uint64_t initial_value);
 
 

@@ -1,5 +1,5 @@
-#ifndef __CPU_PRED_TIPOTARGET_HH__
-#define __CPU_PRED_TIPOTARGET_HH__
+#ifndef __CPU_PRED_TARGETTIPE_HH__
+#define __CPU_PRED_TARGETTIPE_HH__
 
 
 
@@ -10,13 +10,13 @@
 #include "base/types.hh"
 #include "config/the_isa.hh"
 
-class TipoTarget
+class TargetType
 {
         public:
 
-        TipoTarget();
-        ~TipoTarget();
-        TipoTarget(TheISA::PCState initial);
+        TargetType();
+        ~TargetType();
+        TargetType(TheISA::PCState initial);
         virtual TheISA::PCState getData();
 
         void setData(TheISA::PCState value);

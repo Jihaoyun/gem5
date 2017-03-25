@@ -37,9 +37,9 @@
 #include "base/types.hh"
 #include "config/the_isa.hh"
 #include "cpu/pred/faultInjected.hh"
+#include "faultedtargettype.hh"
+#include "faultedtype.hh"
 #include "sim/sim_object.hh"
-#include "tipoTargetspeciale.hh"
-#include "tipospeciale.hh"
 
 class BTBEntry
 {
@@ -48,29 +48,29 @@ class BTBEntry
         BTBEntry():
                 valid(false)
         {
-                tag = new Tipo();
-                target = new TipoTarget();
+                tag = new Type();
+                target = new TargetType();
         }
 
         void setFaulted(int field, int numBit, char value) {
                 if ( field == 0 ) {
-                        tag = new Tipospeciale(numBit,value);
+                        tag = new FaultedType(numBit,value);
                 }
                 if ( field == 1 ) {
-                        target = new TipoTargetSpeciale(numBit,value);
+                        target = new FaultedTargetType(numBit,value);
                 }
         }
 
          void setOriginal(int field, int numBit, char value) {
                 if ( field == 0 ) {
-                    //Tipo* old_tag = tag;
-                    tag = new Tipo(tag->getData());
+                    //Type* old_tag = tag;
+                    tag = new Type(tag->getData());
                     //delete old_tag;
                 }
 
                 if ( field == 1 ) {
-                    //Tipotarget* old_target = target;
-                    target = new TipoTarget(target->getData());
+                    //TargetType* old_target = target;
+                    target = new TargetType(target->getData());
                     //delete old_target;
                 }
         }
@@ -78,14 +78,14 @@ class BTBEntry
 
         void setTranFaulted(int field, int numBit, char value) {
                 if ( field == 0 ) {
-                    //Tipo* old_tag = tag;
-                    tag = new Tipospeciale(numBit,value,tag->getData());
+                    //Type* old_tag = tag;
+                    tag = new FaultedType(numBit,value,tag->getData());
                     //delete old_tag;
                 }
 
                 if ( field == 1 ) {
-                    //Tipotarget* old_target = target;
-                    target = new TipoTargetSpeciale(
+                    //TargetType* old_target = target;
+                    target = new FaultedTargetType(
                             numBit,value,target->getData());
                     //delete old_target;
                 }
@@ -124,8 +124,8 @@ class BTBEntry
         }
 
         private:
-        Tipo* tag;
-        TipoTarget* target;
+        Type* tag;
+        TargetType* target;
         bool valid; // TO DO modify this in order to allow injection also here
         ThreadID tid;
 
