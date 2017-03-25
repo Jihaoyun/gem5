@@ -233,7 +233,7 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
         ++condPredicted;
         // Control fault injection
         Addr addr = pc.instAddr();
-        controlFaultEvaluator.evaluate(addr >> 2);
+        //addr = controlFaultEvaluator.evaluate(addr >> 2) << 2;
         pred_taken = lookup(tid, addr, bp_history);
 
         DPRINTF(Branch, "[tid:%i]: [sn:%i] Branch predictor"
@@ -284,14 +284,14 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
 
             if (inst->isDirectCtrl() || !useIndirect) {
                 // Check BTB on direct branches
-                ++BTBExcited[BTB.getIndex(pc.instAddr(),tid)];
-                if (BTB.valid(pc.instAddr(), tid)) {
+                Addr addr = pc.instAddr();
+                addr = controlFaultEvaluator.evaluate(addr >> 2) << 2;
+                ++BTBExcited[BTB.getIndex(addr,tid)];
+                if (BTB.valid(addr, tid)) {
                     ++BTBHits;
 
                     // If it's not a return, use the BTB to get target addr.
                     // Control fault injection
-                    Addr addr = pc.instAddr();
-                    controlFaultEvaluator.evaluate(addr >> 2);
                     target = BTB.lookup(addr, tid);
 
                     DPRINTF(Branch, "[tid:%i]: Instruction %s predicted"
@@ -305,7 +305,7 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
                     // because the BTB did not have an entry
                     // The predictor needs to be updated accordingly
                     if (!inst->isCall() && !inst->isReturn()) {
-                        btbUpdate(tid, pc.instAddr(), bp_history);
+                        btbUpdate(tid, addr, bp_history);
                         DPRINTF(Branch, "[tid:%i]:[sn:%i] btbUpdate"
                                 " called for %s\n", tid, seqNum, pc);
                     } else if (inst->isCall() && !inst->isUncondCtrl()) {
@@ -320,7 +320,7 @@ BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,
                 //Consult indirect predictor on indirect control
                 // Control fault injection
                 Addr addr = pc.instAddr();
-                controlFaultEvaluator.evaluate(addr >> 2);
+                //addr = controlFaultEvaluator.evaluate(addr >> 2) << 2;
                 if (iPred.lookup(addr, getGHR(tid, bp_history),
                         target, tid)) {
                     // Indirect predictor hit
@@ -475,7 +475,7 @@ BPredUnit::squash(const InstSeqNum &squashed_sn,
 
         // Control fault injection
         Addr addr = (*hist_it).pc;
-        controlFaultEvaluator.evaluate(addr >> 2);
+        //addr = controlFaultEvaluator.evaluate(addr >> 2) << 2;
         update(tid, addr, actually_taken,
                pred_hist.front().bpHistory, true);
         hist_it->wasSquashed = true;
@@ -497,7 +497,7 @@ BPredUnit::squash(const InstSeqNum &squashed_sn,
 
                 // Control fault injection
                 Addr addr = (*hist_it).pc;
-                controlFaultEvaluator.evaluate(addr >> 2);
+                addr = controlFaultEvaluator.evaluate(addr >> 2) << 2;
                 BTB.update(addr, corrTarget, tid);
             }
         } else {
