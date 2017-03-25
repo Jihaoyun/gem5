@@ -114,7 +114,7 @@ if args.faultEnabled:
     if args.controlFaultTrigger is not None \
             and args.controlFaultAction is not None:
         # Fault control logic
-        system.cpu.branchPred.faultEnabled = True
+        system.cpu.branchPred.controlFaultEnabled = True
         system.cpu.branchPred.controlFaultTriggerDescriptor = \
             args.controlFaultTrigger
         system.cpu.branchPred.controlFaultActionDescriptor = \
