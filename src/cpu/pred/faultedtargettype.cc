@@ -1,8 +1,8 @@
-#include "tipoTargetspeciale.hh"
+#include "faultedtargettype.hh"
 
-TipoTargetSpeciale::TipoTargetSpeciale(uint64_t numBit,char value,
+FaultedTargetType::FaultedTargetType(uint64_t numBit,char value,
         TheISA::PCState initial)
-:TipoTarget(initial)  {
+:TargetType(initial)  {
         mask = 1 << numBit;
 
         faultValue = value;
@@ -13,8 +13,8 @@ TipoTargetSpeciale::TipoTargetSpeciale(uint64_t numBit,char value,
 
 }
 
-TipoTargetSpeciale::TipoTargetSpeciale(uint64_t numBit,char value)
-:TipoTarget()  {
+FaultedTargetType::FaultedTargetType(uint64_t numBit,char value)
+:TargetType()  {
         mask = 1 << numBit;
 
         faultValue = value;
@@ -26,11 +26,11 @@ TipoTargetSpeciale::TipoTargetSpeciale(uint64_t numBit,char value)
 }
 
 TheISA::PCState
-TipoTargetSpeciale::getData() {
+FaultedTargetType::getData() {
 
         TheISA::PCState faultedPC;
 
-        faultedPC = TipoTarget::getData();
+        faultedPC = TargetType::getData();
 
         faultedPC.set(
                         faultValue ? faultedPC.instAddr() | mask
@@ -41,9 +41,9 @@ TipoTargetSpeciale::getData() {
 }
 
 void
-TipoTargetSpeciale::setData(TheISA::PCState value) {
+FaultedTargetType::setData(TheISA::PCState value) {
 
-        TipoTarget::setData(value);
+        TargetType::setData(value);
 
 }
 
