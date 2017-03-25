@@ -83,8 +83,11 @@ ControlFaultEvaluator::ControlFaultEvaluator(string trigger,string action,
 }
 
 
-bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
+Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
     node_index actual_node) {
+
+  //original_address %= 128;
+
   if ( triggerNodes[actual_node].isOp() ) {
     if ( triggerNodes[actual_node].value.compare("&") == 0 ) {
       return
@@ -112,64 +115,74 @@ bool ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           .extractValue(original_address));
     }
     else if ( triggerNodes[actual_node].value.compare(">") == 0 ) {
-      return
-        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].left)
-            : triggerNodes[triggerNodes[actual_node].left]
-              .extractValue(original_address))
-        >
-        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].right)
-          : triggerNodes[triggerNodes[actual_node].right]
-          .extractValue(original_address));
+      long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
+          : triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address));
+      long int op2 = (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].right)
+        : triggerNodes[triggerNodes[actual_node].right]
+        .extractValue(original_address));
+      if (op1 > op2)
+        return 1;
+      else
+        return 0;
     }
     else if ( triggerNodes[actual_node].value.compare("<") == 0 ) {
-      return
-        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].left)
-            : triggerNodes[triggerNodes[actual_node].left]
-              .extractValue(original_address))
-        <
-        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].right)
-          : triggerNodes[triggerNodes[actual_node].right]
-          .extractValue(original_address));
+      long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
+          : triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address));
+      long int op2 = (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].right)
+        : triggerNodes[triggerNodes[actual_node].right]
+        .extractValue(original_address));
+      if (op1 < op2)
+        return 1;
+      else
+        return 0;
     }
     else if ( triggerNodes[actual_node].value.compare(">=") == 0 ) {
-      return
-        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].left)
-            : triggerNodes[triggerNodes[actual_node].left]
-              .extractValue(original_address))
-        >=
-        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].right)
-          : triggerNodes[triggerNodes[actual_node].right]
-          .extractValue(original_address));
+      long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
+          : triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address));
+      long int op2 = (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].right)
+        : triggerNodes[triggerNodes[actual_node].right]
+        .extractValue(original_address));
+      if (op1 >= op2)
+        return 1;
+      else
+        return 0;
     }
     else if ( triggerNodes[actual_node].value.compare("<=") == 0 ) {
-      return
-        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].left)
-            : triggerNodes[triggerNodes[actual_node].left]
-              .extractValue(original_address))
-        <=
-        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].right)
-          : triggerNodes[triggerNodes[actual_node].right]
-          .extractValue(original_address));
+      long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
+          : triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address));
+      long int op2 = (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].right)
+        : triggerNodes[triggerNodes[actual_node].right]
+        .extractValue(original_address));
+      if (op1 <= op2)
+        return 1;
+      else
+        return 0;
     }
     else if ( triggerNodes[actual_node].value.compare("==") == 0 ) {
-      return
-        (triggerNodes[triggerNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].left)
-            : triggerNodes[triggerNodes[actual_node].left]
-              .extractValue(original_address))
-        ==
-        (triggerNodes[triggerNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,triggerNodes[actual_node].right)
-          : triggerNodes[triggerNodes[actual_node].right]
-          .extractValue(original_address));
+      long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
+          : triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address));
+      long int op2 = (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].right)
+        : triggerNodes[triggerNodes[actual_node].right]
+        .extractValue(original_address));
+      if (op1 == op2)
+        return 1;
+      else
+        return 0;
     }
     else if ( triggerNodes[actual_node].value.compare("!") == 0 ) {
       return

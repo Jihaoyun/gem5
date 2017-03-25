@@ -59,7 +59,7 @@ class ControlFaultEvaluator
         bool isEnabled;
         vector<Node> triggerNodes;
         vector<Node> actionNodes;
-        bool evaluateTrigger(Addr original_address, node_index actual_node);
+        Addr evaluateTrigger(Addr original_address, node_index actual_node);
         Addr evaluateAction(Addr original_address, node_index actual_node);
 };
 
