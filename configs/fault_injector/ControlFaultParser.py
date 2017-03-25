@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re
+import sys
 
 class Node:
     def __init__(self, nodeType, nodeValue):
@@ -23,6 +24,7 @@ class ControlFaultParser:
         return ''.join(strList).replace(" ", "")
 
     def parseTrigger(self, string):
+        string = self.clean(string)
         #Check if final case
         if re.match(r".*[&|><!=].*", string) is None:
             if string == "index":
@@ -38,6 +40,8 @@ class ControlFaultParser:
                 op = string[i]
 
                 if(op == '!'):
+                    if string[i+1] != '(':
+                        sys.exit("Missing '(' After '!'")
                     tmpNode = Node("o", op)
                     tmpNode.right = \
                         self.parseTrigger(self.clean(string[(i+1):]))
@@ -77,6 +81,8 @@ class ControlFaultParser:
                 op = string[i]
 
                 if(op == '~'):
+                    if string[i+1] != '(':
+                        sys.exit("Missing '(' After '~'")
                     tmpNode = Node("o", op)
                     tmpNode.right = \
                         self.parseAction(self.clean(string[(i+1):]))
@@ -162,6 +168,6 @@ class ControlFaultParser:
 #Examples
 if __name__ == "__main__":
     p = ControlFaultParser()
-    p.parseFile("inp.txt")
+    p.parseFile("control_fault.txt")
     print p.getTrigger()
     print p.getAction()
