@@ -33,6 +33,8 @@
 
 #include "base/misc.hh"
 #include "base/types.hh"
+#include "cpu/pre/faultedtype.hh"
+#include "cpu/pred/type.hh"
 
 /**
  * Private counter class for the internal saturating counters.
@@ -48,16 +50,20 @@ class SatCounter
      * Constructor for the counter.
      */
     SatCounter()
-        : initialVal(0), counter(0)
-    { }
+        : initialVal(0)
+    {
+      counter = new Type(0);
+    }
 
     /**
      * Constructor for the counter.
      * @param bits How many bits the counter will have.
      */
     SatCounter(unsigned bits)
-        : initialVal(0), maxVal((1 << bits) - 1), counter(0)
-    { }
+        : initialVal(0), maxVal((1 << bits) - 1)
+    {
+      counter = new Type(0);
+    }
 
     /**
      * Constructor for the counter.
@@ -66,13 +72,13 @@ class SatCounter
      */
     SatCounter(unsigned bits, uint8_t initial_val)
         : initialVal(initial_val), maxVal((1 << bits) - 1),
-          counter(initial_val)
     {
         // Check to make sure initial value doesn't exceed the max
         // counter value.
         if (initial_val > maxVal) {
             fatal("BP: Initial counter value exceeds max size.");
         }
+        counter = new Type(initial_val);
     }
 
     /**
@@ -80,16 +86,18 @@ class SatCounter
      */
     void setBits(unsigned bits) { maxVal = (1 << bits) - 1; }
 
-    void reset() { counter = initialVal; }
+    void reset() { counter->setData(initialVal); }
 
     /**
      * Increments the counter's current value.
      */
     void increment()
     {
-        if (counter < maxVal) {
-            ++counter;
+        uint8_t counter_value = counter.getData();
+        if ( counter_value < maxVal) {
+            ++counter_value;
         }
+        counter.setData(counter_value);
     }
 
     /**
@@ -97,21 +105,37 @@ class SatCounter
      */
     void decrement()
     {
-        if (counter > 0) {
-            --counter;
+        uint8_t counter_value = counter.getData();
+        if ( counter_value > 0) {
+            --counter_value;
         }
+        counter.setData(counter_value);
     }
 
     /**
      * Read the counter's value.
      */
     uint8_t read() const
-    { return counter; }
+    { return (uint8_t) counter.getData(); }
+
+    void setFaulted(uint8_t numBit, uint8_t value)
+    {
+        Type* actual_ptr = counter;
+        counter = new FaultedType(numBit,value,counter.getData());
+        free(actual_ptr);
+    }
+
+    void setOriginal()
+    {
+        Type* actual_ptr = counter;
+        counter = new Type(numBit,value,counter.getData());
+        free(actual_ptr);
+    }
 
   private:
     uint8_t initialVal;
     uint8_t maxVal;
-    uint8_t counter;
+    Type* counter;
 };
 
 #endif // __CPU_PRED_SAT_COUNTER_HH__

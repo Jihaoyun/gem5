@@ -48,7 +48,6 @@ LocalBP::LocalBP(const LocalBPParams *params)
     if (!isPowerOf2(localPredictorSets)) {
         fatal("Invalid number of local predictor sets! Check localCtrBits.\n");
     }
-        printf("Ciao");
     // Setup the index mask.
     indexMask = localPredictorSets - 1;
 
@@ -59,6 +58,17 @@ LocalBP::LocalBP(const LocalBPParams *params)
 
     for (unsigned i = 0; i < localPredictorSets; ++i)
         localCtrs[i].setBits(localCtrBits);
+
+    if (  params->faultEnabled &&
+          params->faultField == 3 &&
+          params->faultTickEnd == -1) {
+        if ( params->faultEntry >= localPredictorSets )
+          fatal("BP: FaultEntry exceeds
+              dimension of the saturating counter array");
+        localCtrs[params->faultEntry].setFaulted(
+            params->faultBitPosition,params->faultStuckBit);
+    }
+
 
     DPRINTF(Fetch, "local predictor size: %i\n",
             localPredictorSize);
