@@ -40,11 +40,11 @@
 BiModalBP::BiModalBP(const BiModalBPParams *params)
     : BPredUnit(params),
       historyRegisters(params->numThreads,0),
-      ctrBits(params->ctrBits)
+      ctrBits(params->ctrBits),
+      predictorSize(params->predictorSize)
 {
-    int numThreads = params->numThreads;
-    int numberOfTable = pow(2,params->historyBits);
-    int predictorBits = ceilLog2(params->predictorSize);
+    numberOfTable = pow(2,params->historyBits);
+    predictorBits = ceilLog2(params->predictorSize);
 
     historyRegisterMask = (1 << params->historyBits) - 1;
     addressBitMask = (1 << predictorBits) - 1;
@@ -59,7 +59,47 @@ BiModalBP::BiModalBP(const BiModalBPParams *params)
         }
     }
 
+    if (  params->faultEnabled &&
+          params->faultField == 3 &&
+          params->faultTickEnd == -1) {
+        if ( params->faultEntry >= numberOfTable*(params->predictorSize) )
+          fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
+        int inTableIndex = params->faultEntry & predictorBits;
+        int tableIndex = params->faultEntry >> predictorBits;
+        for ( int i = 0; i < numThreads; i++ )
+          counters[i][tableIndex][inTableIndex].setFaulted(
+            params->faultBitPosition,params->faultStuckBit);
+    }
 }
+
+void
+BiModalBP::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd)
+{
+
+    if (  f_parameters.field != 3 )
+        return;
+    if ( f_parameters.entry >= numberOfTable*(predictorSize) )
+        fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
+
+    int inTableIndex = f_parameters.entry & predictorBits;
+    int tableIndex = f_parameters.entry >> predictorBits;
+
+
+    if ( faultEnd )
+        for ( int i = 0; i < numThreads; i++ )
+            counters[i][tableIndex][inTableIndex].setOriginal();
+    else
+        for (int i = 0; i < numThreads; i++ )
+            counters[i][tableIndex][inTableIndex].setFaulted(
+              f_parameters.bitPosition,f_parameters.stuckBit);
+
+
+}
+
+
+
 
 /*
  * For an unconditional branch we set its history such that

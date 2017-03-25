@@ -57,6 +57,18 @@ GShareBP::GShareBP(const GShareBPParams *params)
             threadCounters[i][j].setBits(ctrBits);
     }
 
+    if (  params->faultEnabled &&
+          params->faultField == 3 &&
+          params->faultTickEnd == -1) {
+        if ( params->faultEntry >= predictorSets )
+          fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
+        for ( int i = 0; i < params->numThreads; i++ )
+          threadCounters[i][params->faultEntry].setFaulted(
+            params->faultBitPosition,params->faultStuckBit);
+    }
+
+
 }
 
 /*
@@ -95,9 +107,14 @@ GShareBP::squash(ThreadID tid, void *bpHistory)
 bool
 GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
 {
-    unsigned index = ((branchAddr >> instShiftAmt)
-                      ^ (globalHistoryRegs[tid] & historyRegisterMask))
-                                & addressBitMask;
+
+    unsigned index = branchAddr >> instShiftAmt;
+
+    for ( int i = 0; i < sizeof(Addr)/globalHistoryBits; i++)
+        index ^= (globalHistoryRegs[tid] & historyRegisterMask)
+          << i*globalHistoryBits;
+
+    index &= addressBitMask;
 
     bool finalPrediction = threadCounters[tid][index].read() >>
                                                     (ctrBits-1);

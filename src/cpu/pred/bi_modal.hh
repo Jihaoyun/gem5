@@ -66,6 +66,7 @@ class BiModalBP : public BPredUnit
                 bool squashed);
     void retireSquashed(ThreadID tid, void *bp_history);
     unsigned getGHR(ThreadID tid, void *bp_history) const;
+    void setFault(struct FaultBPU::injFault f_parameters,bool faultEnd);
 
   private:
     void updateGlobalHistReg(ThreadID tid, bool taken);
@@ -85,7 +86,10 @@ class BiModalBP : public BPredUnit
     unsigned addressBitMask;
         // Number of bit of each saturating counter
         unsigned ctrBits;
-
+    unsigned predictorBits;
+    unsigned predictorSize;
+    unsigned numberOfTable;
+    unsigned numThreads;
 };
 
 #endif // __CPU_PRED_BI_MODAL_PRED_HH__

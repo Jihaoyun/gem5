@@ -53,6 +53,7 @@ class GShareBP : public BPredUnit
     void retireSquashed(ThreadID tid, void *bp_history);
     unsigned getGHR(ThreadID tid, void *bp_history) const;
 
+    void setFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {}
   private:
     void updateGlobalHistReg(ThreadID tid, bool taken);
 
