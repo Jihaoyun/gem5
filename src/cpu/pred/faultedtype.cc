@@ -1,5 +1,6 @@
 #include <iostream>       // std::cout
 
+#include "debug/FaultedType.hh"
 #include "faultedtype.hh"
 
 FaultedType::FaultedType(uint64_t numBit,char value) : Type()  {
@@ -38,6 +39,8 @@ FaultedType::getData() {
         else
                 value =  (Type::getData() | mask);
 
+        if ( Debug::FaultedType )
+          printf("FT: old value %d, actual value %d", Type::getData(),value);
 
         return value;
 
