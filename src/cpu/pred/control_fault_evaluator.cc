@@ -86,8 +86,6 @@ ControlFaultEvaluator::ControlFaultEvaluator(string trigger,string action,
 Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
     node_index actual_node) {
 
-  //original_address %= 128;
-
   if ( triggerNodes[actual_node].isOp() ) {
     if ( triggerNodes[actual_node].value.compare("&") == 0 ) {
       return
@@ -110,10 +108,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           evaluateTrigger(original_address,triggerNodes[actual_node].right)
         : triggerNodes[triggerNodes[actual_node].right]
         .extractValue(original_address));
-      if (op1 && op2)
-        return 1;
-      else
-        return 0;
+      return op1 && op2;
     }
     else if ( triggerNodes[actual_node].value.compare("|") == 0 ) {
       return
@@ -137,10 +132,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           evaluateTrigger(original_address,triggerNodes[actual_node].right)
         : triggerNodes[triggerNodes[actual_node].right]
         .extractValue(original_address));
-      if (op1 || op2)
-        return 1;
-      else
-        return 0;
+      return op1 || op2;
     }
     else if ( triggerNodes[actual_node].value.compare(">") == 0 ) {
       long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
@@ -151,10 +143,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           evaluateTrigger(original_address,triggerNodes[actual_node].right)
         : triggerNodes[triggerNodes[actual_node].right]
         .extractValue(original_address));
-      if (op1 > op2)
-        return 1;
-      else
-        return 0;
+      return op1 > op2;
     }
     else if ( triggerNodes[actual_node].value.compare("<") == 0 ) {
       long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
@@ -165,10 +154,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           evaluateTrigger(original_address,triggerNodes[actual_node].right)
         : triggerNodes[triggerNodes[actual_node].right]
         .extractValue(original_address));
-      if (op1 < op2)
-        return 1;
-      else
-        return 0;
+      return op1 < op2;
     }
     else if ( triggerNodes[actual_node].value.compare(">=") == 0 ) {
       long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
@@ -179,10 +165,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           evaluateTrigger(original_address,triggerNodes[actual_node].right)
         : triggerNodes[triggerNodes[actual_node].right]
         .extractValue(original_address));
-      if (op1 >= op2)
-        return 1;
-      else
-        return 0;
+      return op1 >= op2;
     }
     else if ( triggerNodes[actual_node].value.compare("<=") == 0 ) {
       long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
@@ -193,10 +176,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           evaluateTrigger(original_address,triggerNodes[actual_node].right)
         : triggerNodes[triggerNodes[actual_node].right]
         .extractValue(original_address));
-      if (op1 <= op2)
-        return 1;
-      else
-        return 0;
+      return op1 <= op2;
     }
     else if ( triggerNodes[actual_node].value.compare("==") == 0 ) {
       long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
@@ -207,10 +187,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           evaluateTrigger(original_address,triggerNodes[actual_node].right)
         : triggerNodes[triggerNodes[actual_node].right]
         .extractValue(original_address));
-      if (op1 == op2)
-        return 1;
-      else
-        return 0;
+      return op1 == op2;
     }
     else if ( triggerNodes[actual_node].value.compare("!") == 0 ) {
       return
@@ -221,7 +198,7 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
     }
   }
 
-  return false;
+  return triggerNodes[actual_node].extractValue(original_address);
 }
 
 Addr ControlFaultEvaluator::evaluateAction(Addr original_address,
@@ -231,68 +208,68 @@ Addr ControlFaultEvaluator::evaluateAction(Addr original_address,
     if ( actionNodes[actual_node].value.compare("&") == 0 ) {
       return
         (actionNodes[actionNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            evaluateAction(original_address,actionNodes[actual_node].left)
             : actionNodes[actionNodes[actual_node].left]
             .extractValue(original_address))
         &
         (actionNodes[actionNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].right)
+            evaluateAction(original_address,actionNodes[actual_node].right)
           : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
     else if ( actionNodes[actual_node].value.compare("|") == 0 ) {
       return
         (actionNodes[actionNodes[actual_node].left].isOp() ?
-          evaluateTrigger(original_address,actionNodes[actual_node].left)
+          evaluateAction(original_address,actionNodes[actual_node].left)
           :
           actionNodes[actionNodes[actual_node].left]
             .extractValue(original_address))
         |
         (actionNodes[actionNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].right)
+            evaluateAction(original_address,actionNodes[actual_node].right)
           : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
     else if ( actionNodes[actual_node].value.compare(">>") == 0 ) {
       return
         (actionNodes[actionNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            evaluateAction(original_address,actionNodes[actual_node].left)
             : actionNodes[actionNodes[actual_node].left]
               .extractValue(original_address))
         >>
         (actionNodes[actionNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].right)
+            evaluateAction(original_address,actionNodes[actual_node].right)
           : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
     else if ( actionNodes[actual_node].value.compare("<<") == 0 ) {
       return
         (actionNodes[actionNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            evaluateAction(original_address,actionNodes[actual_node].left)
             : actionNodes[actionNodes[actual_node].left]
               .extractValue(original_address))
         <<
         (actionNodes[actionNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].right)
+            evaluateAction(original_address,actionNodes[actual_node].right)
           : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
     else if ( actionNodes[actual_node].value.compare("^") == 0 ) {
       return
         (actionNodes[actionNodes[actual_node].left].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].left)
+            evaluateAction(original_address,actionNodes[actual_node].left)
             : actionNodes[actionNodes[actual_node].left]
               .extractValue(original_address))
         ^
         (actionNodes[actionNodes[actual_node].right].isOp() ?
-            evaluateTrigger(original_address,actionNodes[actual_node].right)
+            evaluateAction(original_address,actionNodes[actual_node].right)
           : actionNodes[actionNodes[actual_node].right]
           .extractValue(original_address));
     }
     else if ( actionNodes[actual_node].value.compare("~") == 0 ) {
       return
         (actionNodes[actionNodes[actual_node].left].isOp() ?
-            ~ evaluateTrigger(original_address,actionNodes[actual_node].left)
+            ~ evaluateAction(original_address,actionNodes[actual_node].left)
             : ~ actionNodes[actionNodes[actual_node].left]
               .extractValue(original_address));
     }
