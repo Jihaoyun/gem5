@@ -101,6 +101,20 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
           : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
     }
+    else if ( triggerNodes[actual_node].value.compare("&&") == 0 ) {
+      long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
+          : triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address));
+      long int op2 = (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].right)
+        : triggerNodes[triggerNodes[actual_node].right]
+        .extractValue(original_address));
+      if (op1 && op2)
+        return 1;
+      else
+        return 0;
+    }
     else if ( triggerNodes[actual_node].value.compare("|") == 0 ) {
       return
         (triggerNodes[triggerNodes[actual_node].left].isOp() ?
@@ -113,6 +127,20 @@ Addr ControlFaultEvaluator::evaluateTrigger(Addr original_address,
             evaluateTrigger(original_address,triggerNodes[actual_node].right)
           : triggerNodes[triggerNodes[actual_node].right]
           .extractValue(original_address));
+    }
+    else if ( triggerNodes[actual_node].value.compare("||") == 0 ) {
+      long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].left)
+          : triggerNodes[triggerNodes[actual_node].left]
+            .extractValue(original_address));
+      long int op2 = (triggerNodes[triggerNodes[actual_node].right].isOp() ?
+          evaluateTrigger(original_address,triggerNodes[actual_node].right)
+        : triggerNodes[triggerNodes[actual_node].right]
+        .extractValue(original_address));
+      if (op1 || op2)
+        return 1;
+      else
+        return 0;
     }
     else if ( triggerNodes[actual_node].value.compare(">") == 0 ) {
       long int op1 = (triggerNodes[triggerNodes[actual_node].left].isOp() ?
