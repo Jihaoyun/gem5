@@ -24,8 +24,11 @@ class ControlFaultParser:
 
     def parseTrigger(self, string):
         string = self.clean(string)
+
+        opsre = r".*(&|\||\<|\>|\<=|\>=|=).*"
+
         #Check if final case
-        if re.match(r".*[&|><!=].*", string) is None:
+        if re.match(opsre, string) is None:
             if string == "index":
                 return Node("i", string)
             else:
@@ -34,10 +37,9 @@ class ControlFaultParser:
         #Find most extern operator
         counter = 0;
         for i in range(len(string)):
-            if re.match(r".*[&|><!=].*", string[i]) is not None \
+            if re.match(opsre, string[i]) is not None \
                 and counter == 0:
                 op = string[i]
-
                 if(op == '!'):
                     if string[i+1] != '(':
                         sys.exit("Missing '(' After '!'")
@@ -45,9 +47,11 @@ class ControlFaultParser:
                     tmpNode.right = \
                         self.parseTrigger(self.clean(string[(i+1):]))
                 else:
-                    if(string[i+1] == '='):
+                    if(string[i+1] == '=' or \
+                            string[i+1] == '&' or \
+                            string[i+1] == '|'):
                         i+=1
-                        op += '='
+                        op += string[i]
                         leftString = string[:(i-1)]
                     else:
                         leftString = string[:(i)]
