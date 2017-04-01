@@ -104,9 +104,9 @@ GShareBP::squash(ThreadID tid, void *bpHistory)
  * choice array's prediction is used to select between the two
  * direction predictors for the final branch prediction.
  */
-bool
-GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
-{
+
+unsigned
+GShareBP::indexCompute(ThreadID tid, Addr branchAddr){
 
     unsigned index = branchAddr >> instShiftAmt;
 
@@ -114,7 +114,14 @@ GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
         index ^= (globalHistoryRegs[tid] & historyRegisterMask)
           << i*globalHistoryBits;
 
-    index &= addressBitMask;
+    return index & addressBitMask;
+}
+
+bool
+GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
+{
+
+    unsigned index = indexCompute(tid,branchAddr);
 
     bool finalPrediction = threadCounters[tid][index].read() >>
                                                     (ctrBits-1);
@@ -142,9 +149,7 @@ GShareBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
 
         BPHistory *history = static_cast<BPHistory*>(bpHistory);
 
-        unsigned index = ((branchAddr >> instShiftAmt)
-                      ^ (globalHistoryRegs[tid] & historyRegisterMask))
-                                & addressBitMask;
+        unsigned index = indexCompute(tid,branchAddr);
 
         if ( taken )
             threadCounters[tid][index].increment();
