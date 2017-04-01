@@ -107,7 +107,7 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 
-system.cpu.branchPred = LocalBP()
+system.cpu.branchPred = BiModalBP()
 system.cpu.branchPred.BTBEntries = 128
 
 #run all the simulation
