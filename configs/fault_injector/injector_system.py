@@ -107,8 +107,8 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 
-system.cpu.branchPred = BiModalBP()
-system.cpu.branchPred.BTBEntries = 128
+system.cpu.branchPred = TournamentBP()
+system.cpu.branchPred.BTBEntries = 32
 
 #run all the simulation
 if args.faultEnabled:
