@@ -75,7 +75,7 @@ class LocalBP(BranchPredictor):
     cxx_class = 'LocalBP'
     cxx_header = "cpu/pred/2bit_local.hh"
 
-    localPredictorSize = Param.Unsigned(2048, "Size of local predictor")
+    localPredictorSize = Param.Unsigned(128, "Size of local predictor")
     localCtrBits = Param.Unsigned(2, "Bits per counter")
 
 
@@ -100,7 +100,7 @@ class BiModalBP(BranchPredictor):
 
     historyBits = Param.Unsigned(2,
         "Number of bit of the global history register")
-    predictorSize = Param.Unsigned(8192, "Size of global predictor")
+    predictorSize = Param.Unsigned(512, "Size of global predictor")
     ctrBits = Param.Unsigned(2, "Bits per counter")
 
 

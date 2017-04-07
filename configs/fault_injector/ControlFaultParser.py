@@ -25,7 +25,7 @@ class ControlFaultParser:
     def parseTrigger(self, string):
         string = self.clean(string)
 
-        opsre = r".*(&|\||\<|\>|\<=|\>=|=).*"
+        opsre = r".*(&|\||\<|\>|=|\!).*"
 
         #Check if final case
         if re.match(opsre, string) is None:

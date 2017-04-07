@@ -45,10 +45,9 @@ BiModalBP::BiModalBP(const BiModalBPParams *params)
 {
     numberOfTable = pow(2,params->historyBits);
     predictorBits = ceilLog2(params->predictorSize);
-
+    numThreads = params->numThreads;
     historyRegisterMask = (1 << params->historyBits) - 1;
     addressBitMask = (1 << predictorBits) - 1;
-
     counters.resize(numThreads);
     for ( int i = 0; i < numThreads; i++ ) {
         counters[i].resize(numberOfTable);

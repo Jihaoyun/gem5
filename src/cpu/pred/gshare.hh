@@ -55,7 +55,9 @@ class GShareBP : public BPredUnit
 
     void setFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {}
   private:
+
     void updateGlobalHistReg(ThreadID tid, bool taken);
+    unsigned indexCompute(ThreadID tid,Addr branchAddr);
 
     struct BPHistory {
         unsigned globalHistoryReg;

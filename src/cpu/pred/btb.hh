@@ -76,19 +76,14 @@ class BTBEntry
         }
 
 
-        void setTranFaulted(int field, int numBit, char value) {
-                if ( field == 0 ) {
-                    //Type* old_tag = tag;
-                    tag = new FaultedType(numBit,value,tag->getData());
-                    //delete old_tag;
-                }
-
-                if ( field == 1 ) {
-                    //TargetType* old_target = target;
-                    target = new FaultedTargetType(
-                            numBit,value,target->getData());
-                    //delete old_target;
-                }
+        void setTranFaulted(int field, int numBit) {
+            uint64_t mask = 1 << numBit;
+            if ( field == 0 ) {
+              tag->setData(tag->getData() ^ mask );
+            }
+            if ( field == 1 ) {
+              target->setData(target->getData() ^ mask);
+            }
         }
 
         bool getValid() {
