@@ -73,7 +73,7 @@ BiModalBP::BiModalBP(const BiModalBPParams *params)
 }
 
 void
-BiModalBP::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd)
+BiModalBP::setFault(struct FaultBPU::injFault f_parameters, bool faultEnd)
 {
 
     if (  f_parameters.field != 3 )
@@ -85,16 +85,9 @@ BiModalBP::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd)
     int inTableIndex = f_parameters.entry & predictorBits;
     int tableIndex = f_parameters.entry >> predictorBits;
 
-
-    if ( faultEnd )
-        for ( int i = 0; i < numThreads; i++ )
-            counters[i][tableIndex][inTableIndex].setOriginal();
-    else
-        for (int i = 0; i < numThreads; i++ )
-            counters[i][tableIndex][inTableIndex].setFaulted(
-              f_parameters.bitPosition,f_parameters.stuckBit);
-
-
+    for (int i = 0; i < numThreads; i++ )
+        counters[i][tableIndex][inTableIndex].setTranFaulted(
+          f_parameters.bitPosition);
 }
 
 
