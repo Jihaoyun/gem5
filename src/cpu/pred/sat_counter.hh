@@ -125,6 +125,12 @@ class SatCounter
         free(actual_ptr);
     }
 
+
+    void setTranFaulted(uint8_t numBit) {
+      uint64_t mask = 1 << numBit;
+      counter->setData(counter->getdata() ^ mask);
+    }
+
     void setOriginal()
     {
         Type* actual_ptr = counter;

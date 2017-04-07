@@ -105,17 +105,9 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
 void
 DefaultBTB::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {
 
-    if ( faultEnd ) {
-        btb[f_parameters.entry].setOriginal(
-                f_parameters.field,
-                f_parameters.bitPosition,
-                f_parameters.stuckBit);
-    }
-    else
-        btb[f_parameters.entry].setTranFaulted(
-                f_parameters.field,
-                f_parameters.bitPosition,
-                f_parameters.stuckBit);
+  btb[f_parameters.entry].setTranFaulted(
+          f_parameters.field,
+          f_parameters.bitPosition);
 }
 
 

@@ -88,13 +88,8 @@ LocalBP::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd)
     if ( f_parameters.entry >= localPredictorSets )
         fatal("BP: FaultEntry exceeds"
               "dimension of the saturating counter array");
-    if ( faultEnd ) {
-        localCtrs[f_parameters.entry].setOriginal();
-    }
-    else
-        localCtrs[f_parameters.entry].setFaulted(
-            f_parameters.bitPosition,
-            f_parameters.stuckBit);
+        localCtrs[f_parameters.entry].setTranFaulted(
+            f_parameters.bitPosition);
 
 }
 
