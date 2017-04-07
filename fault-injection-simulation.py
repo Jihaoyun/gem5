@@ -30,12 +30,25 @@ parser.add_argument('-df', '--debug-flags', type=str,
 parser.add_argument('-o', '--options', type=str, dest='options',
                     help='Options for the binary benchmark')
 
+parser.add_argument('-out', '--output', type=str, dest='outputFile',
+                    help='Benchmark produced output file name')
+
 parser.add_argument('-mt', '--multithread', dest='multithread',
                     action='store_true',
                     help='Set it to enable multithreaded simulation')
 parser.set_defaults(multithread=False)
 
 args = parser.parse_args()
+
+# This function moves the output file produced by the benchmark to
+# a producing instance specific location
+def moveoutput(instance):
+    if not os.path.isfile(args.outputFile):
+        return
+
+    fname = "/".join([os.path.dirname(args.outputFile),
+        "_".join([instance, os.path.basename(args.outputFile)])])
+    os.rename(args.outputFile, fname)
 
 def startBPUFaultedSim(benchmark, fault):
     cmd = ["./build/ALPHA/gem5.opt",
@@ -58,7 +71,11 @@ def startBPUFaultedSim(benchmark, fault):
 
     call(cmd)
 
-def startBPUControlFaultedSim(statFolder, fname, benchmark, cft, cfa):
+    # Move the output file to the proper file name
+    if args.outputFile is not None:
+        moveoutput(fe.label)
+
+def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
     cmd = ["./build/ALPHA/gem5.opt",
         "--stats-file", statFolder + "/" +
         fname,
@@ -66,10 +83,16 @@ def startBPUControlFaultedSim(statFolder, fname, benchmark, cft, cfa):
         "-fe",
         "-b", benchmark,
         "-l", "control-fault_" + fname,
-        "-cft", cft,
-        "-cfa", cfa ]
+        "-cft", trigger,
+        "-cfa", action ]
+
+    if args.debugFlags is not None:
+        cmd.insert(1, "--debug-flags=" + args.debugFlags)
 
     call(cmd)
+
+    if args.out is not None:
+        moveoutput("control_fault")
 
 if __name__ == '__main__':
     # Run a simulation for each specified benchmark program
@@ -91,7 +114,14 @@ if __name__ == '__main__':
             "configs/fault_injector/injector_system.py",
             "-b", benchmark ]
 
+        if args.debugFlags is not None:
+            cmd.insert(1, "--debug-flags=" + args.debugFlags)
+
         call(cmd)
+
+        # Move the output file to the proper file name
+        if args.outputFile is not None:
+            moveoutput("GOLDEN")
 
         # Read all fault input files
         if args.faultInput is not None:
@@ -132,15 +162,20 @@ if __name__ == '__main__':
                 print "\n\nRunning " + benchmark + " with fault:\n" + \
                     "control-fault@" + str(inputFile)
 
-                # Run faulted simulation
-                cmd = ["./build/ALPHA/gem5.opt",
-                    "--stats-file", statFolder + "/" +
-                    fname,
-                    "configs/fault_injector/injector_system.py",
-                    "-fe",
-                    "-b", benchmark,
-                    "-l", "control-fault_" + fname,
-                    "-cft", parser.getTrigger().strip(),
-                    "-cfa", parser.getAction().strip() ]
+                if args.multithread:
+                    # Run faulted simulation on an indipendent thread
+                    t = Thread(target=startBPUControlFaultedSim,
+                        args=(statFolder, fname, benchmark,
+                            parser.getTrigger().strip(),
+                            parser.getAction().strip()))
+                    tpool.append(t)
+                    t.start()
+                else:
+                    startBPUControlFaultedSim(statFolder, fname, benchmark,
+                        parser.getTrigger().strip(),
+                        parser.getAction().strip())
 
-                call(cmd)
+            # Join on the generated thread pool
+            if args.multithread:
+                for t in tpool:
+                    t.join()

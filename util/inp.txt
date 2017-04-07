@@ -1,0 +1,2 @@
+!( (index & 0x01) | (index & 0x80) )
+(index ^ 0x01) << 2
