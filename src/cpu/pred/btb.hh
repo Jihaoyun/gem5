@@ -82,7 +82,7 @@ class BTBEntry
               tag->setData(tag->getData() ^ mask );
             }
             if ( field == 1 ) {
-              target->setData(target->getData() ^ mask);
+              target->getData().set(target->getData().pc() ^ mask);
             }
         }
 
