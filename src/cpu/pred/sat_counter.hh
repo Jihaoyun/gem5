@@ -98,6 +98,7 @@ class SatCounter
             ++counter_value;
         }
         (*counter).setData(counter_value);
+        //cout << (*counter).getData();
     }
 
     /**
@@ -116,7 +117,7 @@ class SatCounter
      * Read the counter's value.
      */
     uint8_t read() const
-    { return (uint8_t) (*counter).getData(); }
+    { return (*counter).getData(); }
 
     void setFaulted(uint8_t numBit, uint8_t value)
     {

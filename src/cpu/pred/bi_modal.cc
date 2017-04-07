@@ -36,6 +36,7 @@
 
 #include "base/bitfield.hh"
 #include "base/intmath.hh"
+#include "debug/Fetch.hh"
 
 BiModalBP::BiModalBP(const BiModalBPParams *params)
     : BPredUnit(params),
@@ -49,6 +50,7 @@ BiModalBP::BiModalBP(const BiModalBPParams *params)
     historyRegisterMask = (1 << params->historyBits) - 1;
     addressBitMask = (1 << predictorBits) - 1;
     counters.resize(numThreads);
+    DPRINTF(Fetch,"Nuumber of table: %ud\n", numberOfTable);
     for ( int i = 0; i < numThreads; i++ ) {
         counters[i].resize(numberOfTable);
         for ( int j = 0; j < numberOfTable; j++ ) {
@@ -132,15 +134,19 @@ BiModalBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
                                 & addressBitMask);
     unsigned historyIdx = historyRegisters[tid] & historyRegisterMask;
 
+
     bool finalPrediction =
         (counters[tid][historyIdx][predictorIdx].read() >> (ctrBits - 1) );
-
+    //cout << mamma << endl;
     BPHistory *history = new BPHistory;
     history->historyRegister = historyRegisters[tid];
     history->finalPred = finalPrediction;
 
     bpHistory = static_cast<void*>(history);
     updateGlobalHistReg(tid, finalPrediction);
+
+    DPRINTF(Fetch,"Ciao: %u %u predicted %d\n",
+        predictorIdx, historyIdx, finalPrediction);
 
     return finalPrediction;
 }
@@ -165,16 +171,13 @@ BiModalBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
                  bool squashed)
 {
     if (bpHistory) {
-        BPHistory *history = static_cast<BPHistory*>(bpHistory);
 
+        BPHistory *history = static_cast<BPHistory*>(bpHistory);
         unsigned predictorIdx = ((branchAddr >> instShiftAmt)
                                 & addressBitMask);
-        unsigned historyIdx = historyRegisters[tid] & historyRegisterMask;
 
-        if ( taken )
-            counters[tid][historyIdx][predictorIdx].increment();
-        else
-            counters[tid][historyIdx][predictorIdx].decrement();
+
+        unsigned historyIdx = history->historyRegister & historyRegisterMask;
 
         if (squashed) {
             if (taken) {
@@ -186,6 +189,14 @@ BiModalBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
         } else {
             delete history;
         }
+
+        if ( taken )
+            counters[tid][historyIdx][predictorIdx].increment();
+        else
+            counters[tid][historyIdx][predictorIdx].decrement();
+
+        DPRINTF(Fetch,"Updated: %d %d %#x %d\n",taken,
+            tid, historyIdx, predictorIdx);
     }
 }
 
