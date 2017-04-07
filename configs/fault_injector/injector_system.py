@@ -146,16 +146,7 @@ if args.faultEnabled:
             root.bpuTransientFaultStart.faultStuckBit = args.faultStuckBit
             root.bpuTransientFaultStart.bpu = system.cpu.branchPred
             root.bpuTransientFaultStart.faultEnd = False
-
-            root.bpuTransientFaultEnd = BpuTransientFault()
-            root.bpuTransientFaultEnd.faultLabel = args.label
-            root.bpuTransientFaultEnd.tick = args.tickEnd
-            root.bpuTransientFaultEnd.faultField = args.field
-            root.bpuTransientFaultEnd.faultEntry = args.entry
-            root.bpuTransientFaultEnd.faultBitPosition = args.bitPosition
-            root.bpuTransientFaultEnd.faultEnd = True
-            root.bpuTransientFaultEnd.faultStuckBit = 1
-            root.bpuTransientFaultEnd.bpu = system.cpu.branchPred
+            # TODO: delete the parameter faultEnd
 else:
     system.cpu.branchPred.faultEnabled = False
 
