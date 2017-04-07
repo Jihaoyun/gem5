@@ -58,7 +58,7 @@ def startBPUFaultedSim(benchmark, fault):
 
     call(cmd)
 
-def startBPUControlFaultedSim(statFolder, fname, benchmark, cft, cfa):
+def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
     cmd = ["./build/ALPHA/gem5.opt",
         "--stats-file", statFolder + "/" +
         fname,
@@ -66,8 +66,11 @@ def startBPUControlFaultedSim(statFolder, fname, benchmark, cft, cfa):
         "-fe",
         "-b", benchmark,
         "-l", "control-fault_" + fname,
-        "-cft", cft,
-        "-cfa", cfa ]
+        "-cft", trigger,
+        "-cfa", action ]
+
+    if args.debugFlags is not None:
+        cmd.insert(1, "--debug-flags=" + args.debugFlags)
 
     call(cmd)
 
@@ -132,15 +135,20 @@ if __name__ == '__main__':
                 print "\n\nRunning " + benchmark + " with fault:\n" + \
                     "control-fault@" + str(inputFile)
 
-                # Run faulted simulation
-                cmd = ["./build/ALPHA/gem5.opt",
-                    "--stats-file", statFolder + "/" +
-                    fname,
-                    "configs/fault_injector/injector_system.py",
-                    "-fe",
-                    "-b", benchmark,
-                    "-l", "control-fault_" + fname,
-                    "-cft", parser.getTrigger().strip(),
-                    "-cfa", parser.getAction().strip() ]
+                if args.multithread:
+                    # Run faulted simulation on an indipendent thread
+                    t = Thread(target=startBPUControlFaultedSim,
+                        args=(statFolder, fname, benchmark,
+                            parser.getTrigger().strip(),
+                            parser.getAction().strip()))
+                    tpool.append(t)
+                    t.start()
+                else:
+                    startBPUControlFaultedSim(statFolder, fname, benchmark,
+                        parser.getTrigger().strip(),
+                        parser.getAction().strip())
 
-                call(cmd)
+            # Join on the generated thread pool
+            if args.multithread:
+                for t in tpool:
+                    t.join()
