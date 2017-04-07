@@ -19,15 +19,20 @@ GOLDEN = 'GOLDEN.txt'
 # Command line arguments
 parser = argparse.ArgumentParser(description='Gem5 Stats')
 parser.add_argument('-d', '--dir', type=str, dest='directory', required=True,
-                    help='The root directory of the stats files to be parsed')
+    help='The root directory of the stats files to be parsed')
 
 parser.add_argument('-g', '--graphical', dest='graphicalStats',
-                    action='store_true',
-                    help='It is true if we want to display graphical stats')
+    action='store_true',
+    help='It is true if we want to display graphical stats')
 parser.set_defaults(graphicalStats=False)
 
 parser.add_argument('-s', '--stats', type=str, dest='stats', required=True,
-                    nargs='+', help='The statistics we want to display')
+    nargs='+', help='The statistics we want to display')
+
+parser.add_argument('-c', '--csv', dest='csvStats',
+    action='store_true',
+    help='If true a CSV file will be generated for the given statistics')
+parser.set_defaults(csvStats=False)
 
 args = parser.parse_args()
 
@@ -70,6 +75,23 @@ def showgraph(stats, props):
         ax.set_xticks(np.arange(len(labels)) + 0.3 / 2)
         autolabel(rects, ax)
         plt.show()
+
+# Create a CSV file containing one row per instance and the requested stats
+def createcsv(stats, props):
+    with open('stats.csv', 'w') as csvfile:
+        swriter = csv.writer(csvfile,
+            delimiter=",",quotechar="|",quoting=csv.QUOTE_MINIMAL)
+        # Iterate over all instances
+        for inst in stats:
+            row = []
+            row.append(inst) # Instance name should be the first entry
+
+            # Iterate all the requested stats
+            for p in props:
+                row.append(stats[inst].get(p, 0))
+
+            # Write the CSV entry
+            swriter.writerow(row)
 
 # Attach a text label above each bar displaying its height
 def autolabel(rects, ax):
@@ -124,3 +146,11 @@ if __name__ == "__main__":
 
         # Plot stats
         showgraph(statInstances, args.stats)
+
+    # Create the CSV stat file if required
+    if args.csvStats:
+        # Import the requested library
+        import csv
+
+        # Generate CSV file
+        createcsv(statInstances, args.stats);

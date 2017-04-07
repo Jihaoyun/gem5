@@ -15,3 +15,4 @@ m5out
 /util/m5/m5
 a.out
 test
+*.csv
