@@ -1,5 +1,6 @@
 susan: susan.c Makefile
-	alphaev67-unknown-linux-gnu-gcc -static -O4 -o susan susan.c -lm
-	#gcc -static -O4 -o susan.x86 susan.c -lm
+	mkdir -p bin
+	alphaev67-unknown-linux-gnu-gcc -static -O4 -o bin/susan susan.c -lm
+	gcc -static -O4 -o bin/susan.x86 susan.c -lm
 clean:
-	rm -rf susan output*
+	rm -rf bin
