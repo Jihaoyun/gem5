@@ -23,6 +23,10 @@ parser.add_argument('-ci', '--control-fault-input', type=str,
                     dest='controlFaultInput', nargs='+',
                     help='Control fault source files')
 
+parser.add_argument('-df', '--debug-flags', type=str,
+                    dest='debugFlags',
+                    help='Gem5 debug flags for debugging purpose')
+
 parser.add_argument('-o', '--options', type=str, dest='options',
                     help='Options for the binary benchmark')
 
@@ -49,12 +53,28 @@ def startBPUFaultedSim(benchmark, fault):
         "-tb", fault.tickBegin,
         "-te", fault.tickEnd]
 
+    if args.debugFlags is not None:
+        cmd.insert(1, "--debug-flags=" + args.debugFlags)
+
+    call(cmd)
+
+def startBPUControlFaultedSim(statFolder, fname, benchmark, cft, cfa):
+    cmd = ["./build/ALPHA/gem5.opt",
+        "--stats-file", statFolder + "/" +
+        fname,
+        "configs/fault_injector/injector_system.py",
+        "-fe",
+        "-b", benchmark,
+        "-l", "control-fault_" + fname,
+        "-cft", cft,
+        "-cfa", cfa ]
+
     call(cmd)
 
 if __name__ == '__main__':
     # Run a simulation for each specified benchmark program
     for benchmark in args.benchmarks:
-        print "\n\nRunning " + benchmark + " GOLDEN\n
+        print "\n\nRunning " + benchmark + " GOLDEN\n"
 
         # Create a folder to store stats releated to the current benchmark
         statFolder = benchmark.split("/")[-1]
