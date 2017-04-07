@@ -94,6 +94,9 @@ if __name__ == '__main__':
             "configs/fault_injector/injector_system.py",
             "-b", benchmark ]
 
+        if args.debugFlags is not None:
+            cmd.insert(1, "--debug-flags=" + args.debugFlags)
+
         call(cmd)
 
         # Read all fault input files
