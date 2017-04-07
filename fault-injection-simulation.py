@@ -30,12 +30,25 @@ parser.add_argument('-df', '--debug-flags', type=str,
 parser.add_argument('-o', '--options', type=str, dest='options',
                     help='Options for the binary benchmark')
 
+parser.add_argument('-out', '--output', type=str, dest='outputFile',
+                    help='Benchmark produced output file name')
+
 parser.add_argument('-mt', '--multithread', dest='multithread',
                     action='store_true',
                     help='Set it to enable multithreaded simulation')
 parser.set_defaults(multithread=False)
 
 args = parser.parse_args()
+
+# This function moves the output file produced by the benchmark to
+# a producing instance specific location
+def moveoutput(instance):
+    if not os.path.isfile(args.outputFile):
+        return
+
+    fname = "/".join([os.path.dirname(args.outputFile),
+        "_".join([instance, os.path.basename(args.outputFile)])])
+    os.rename(args.outputFile, fname)
 
 def startBPUFaultedSim(benchmark, fault):
     cmd = ["./build/ALPHA/gem5.opt",
@@ -58,6 +71,10 @@ def startBPUFaultedSim(benchmark, fault):
 
     call(cmd)
 
+    # Move the output file to the proper file name
+    if args.outputFile is not None:
+        moveoutput(fe.label)
+
 def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
     cmd = ["./build/ALPHA/gem5.opt",
         "--stats-file", statFolder + "/" +
@@ -73,6 +90,9 @@ def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
         cmd.insert(1, "--debug-flags=" + args.debugFlags)
 
     call(cmd)
+
+    if args.out is not None:
+        moveoutput("control_fault")
 
 if __name__ == '__main__':
     # Run a simulation for each specified benchmark program
@@ -98,6 +118,10 @@ if __name__ == '__main__':
             cmd.insert(1, "--debug-flags=" + args.debugFlags)
 
         call(cmd)
+
+        # Move the output file to the proper file name
+        if args.outputFile is not None:
+            moveoutput("GOLDEN")
 
         # Read all fault input files
         if args.faultInput is not None:
