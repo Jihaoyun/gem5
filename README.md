@@ -54,6 +54,7 @@ The script is located in the main folder of gem5 and it's called `fault-injectio
 This script has the following parameters:
 * **-b --benchmarks** : specify the path of the desired testbench to be executed
 * **-i --fault-input** : specify the path of the file containing all the desired fault to inject
+* **-ci --contro-fault-input** : specify the path of the file containing all the desired control fault to inject
 * **-o --options** : if needed testbench arguments can be passed as a string (i.e. -o "arg1 arg2 ...")
 
 The fault-input file must be formatted in the following way:
@@ -83,6 +84,11 @@ To view graphically this histogram simply execute the following command:
 After a simulation it is possible to plot a barchart to display some given statistics by simply executing the `stats.py` script. Here is reported an execution command example which will plot two different barcharts (one for each specified statistic) for the test `Hello World` program:
 ```
 python stats.py -d m5out/hello -s system.cpu.branchPred.condPredicted sim_seconds -g
+```
+
+Alternativelly the script can also generate a CSV file containing one row for each simulated instance with the respective stats value:
+```
+python stats.py -d m5out/hello -s system.cpu.branchPred.condPredicted sim_seconds -c
 ```
 
 The `stats.py` script requires an additional dependency which can be installed with the following command:
