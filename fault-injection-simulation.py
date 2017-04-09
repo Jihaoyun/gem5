@@ -91,7 +91,7 @@ def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
 
     call(cmd)
 
-    if args.out is not None:
+    if args.outputFile is not None:
         moveoutput("control_fault")
 
 if __name__ == '__main__':
