@@ -54,7 +54,6 @@ The script is located in the main folder of gem5 and it's called `fault-injectio
 This script has the following parameters:
 * **-b --benchmarks** : specify the path of the desired testbench to be executed
 * **-i --fault-input** : specify the path of the file containing all the desired fault to inject
-* **-ci --contro-fault-input** : specify the path of the file containing all the desired control fault to inject
 * **-o --options** : if needed testbench arguments can be passed as a string (i.e. -o "arg1 arg2 ...")
 
 The fault-input file must be formatted in the following way:
@@ -84,11 +83,6 @@ To view graphically this histogram simply execute the following command:
 After a simulation it is possible to plot a barchart to display some given statistics by simply executing the `stats.py` script. Here is reported an execution command example which will plot two different barcharts (one for each specified statistic) for the test `Hello World` program:
 ```
 python stats.py -d m5out/hello -s system.cpu.branchPred.condPredicted sim_seconds -g
-```
-
-Alternativelly the script can also generate a CSV file containing one row for each simulated instance with the respective stats value:
-```
-python stats.py -d m5out/hello -s system.cpu.branchPred.condPredicted sim_seconds -c
 ```
 
 The `stats.py` script requires an additional dependency which can be installed with the following command:
@@ -142,3 +136,57 @@ root.registerFault.bitPosition = 4
 ```
 will flip the 4-th bit of the 13-th int register at the simulation tick 143930180. To understand an appropriate time to inject this fault we recommend to run gem5 with the **Exec** debug flag.
 Please refer to `src/***/registers.hh` file to understand which registers are available for the chosen architecture.
+
+#Control Faults
+Control faults simulate an address decoder fault in the branch prediction unit. The fault is implemented by applying an **Action** onnly on selected addresses through the **Trigger** condition.
+
+##Trigger
+
+With a trigger it is possible to select a subset of address. A boolean expression can be specified using the following operators:
+- & *(bitwise and)*
+- | *(bitwise or)*
+- && *(logic and)*
+- || *(logic or)*
+- ! *(logic not)*
+- > (greather than)
+- < (less than)
+- >= (greater or equal than)
+- <= (less or equal than)
+- == (equal)
+
+Only two type of operands are available:
+- **constants** using hexadecimal base (ex 0x01)
+- **index** (to represent the address)
+
+Notice: in order to access the i-th entry of the BTB since it takes the log2(N_BTB_ENTRIES) least significant bits  of the Program Counter all index reference must be like this:
+```
+(index & 0xFF)   //In case of a BTB size of 256 entries
+```
+
+Notice: **Paranthesis must be always used!**
+
+## Action
+
+With an action it's possible to specify the desired action to be performed on the selected addresses.
+The available operators are:
+
+- &  (bitwise and)
+- |  (bitwise or)
+- ^  (bitwise xor)
+- ~  (bitwise not)
+- << (left shift)
+- >> (right shift)
+
+## Control fault example
+In the following is reported an example to calrify the concepts.
+
+Suppose we want to select all addresses between 0 and 10 and to stuck at 1 the least significant bit.
+
+**Trigger:**
+```
+((index & 0x1F) >= 0x1) && ((index & 0x1F) < 0xA)
+```
+**Action:**
+```
+index | 0x1
+```
