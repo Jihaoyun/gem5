@@ -137,22 +137,22 @@ root.registerFault.bitPosition = 4
 will flip the 4-th bit of the 13-th int register at the simulation tick 143930180. To understand an appropriate time to inject this fault we recommend to run gem5 with the **Exec** debug flag.
 Please refer to `src/***/registers.hh` file to understand which registers are available for the chosen architecture.
 
-#Control Faults
+# Control Faults
 Control faults simulate an address decoder fault in the branch prediction unit. The fault is implemented by applying an **Action** onnly on selected addresses through the **Trigger** condition.
 
-##Trigger
+## Trigger
 
 With a trigger it is possible to select a subset of address. A boolean expression can be specified using the following operators:
-- & *(bitwise and)*
-- | *(bitwise or)*
-- && *(logic and)*
-- || *(logic or)*
-- ! *(logic not)*
-- > (greather than)
-- < (less than)
-- >= (greater or equal than)
-- <= (less or equal than)
-- == (equal)
+- `&` *(bitwise and)*
+- `|` *(bitwise or)*
+- `&&` *(logic and)*
+- `||` *(logic or)*
+- `!` *(logic not)*
+- `>` (greather than)
+- `<` (less than)
+- `>=` (greater or equal than)
+- `<=` (less or equal than)
+- `==` (equal)
 
 Only two type of operands are available:
 - **constants** using hexadecimal base (ex 0x01)
@@ -170,12 +170,12 @@ Notice: **Paranthesis must be always used!**
 With an action it's possible to specify the desired action to be performed on the selected addresses.
 The available operators are:
 
-- &  (bitwise and)
-- |  (bitwise or)
-- ^  (bitwise xor)
-- ~  (bitwise not)
-- << (left shift)
-- >> (right shift)
+- `&` (bitwise and)
+- `|`  (bitwise or)
+- `^`  (bitwise xor)
+- `~`  (bitwise not)
+- `<<` (left shift)
+- `>>` (right shift)
 
 ## Control fault example
 In the following is reported an example to calrify the concepts.
