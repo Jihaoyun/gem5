@@ -32,7 +32,7 @@ input_large: NOT FINISHED AFTER 4 min
 
 ### QSORT SMALL (string sort) ###
 Command:
-/fault-injection-simulation.py -b tests/test-progs/mibench2/qsort/bin/qsort_small -o "tests/test-progs/mibench2/qsort/input_small_100.dat out"
+./fault-injection-simulation.py -b tests/test-progs/mibench2/qsort/bin/qsort_small -o "tests/test-progs/mibench2/qsort/input_small_100.dat out"
 
 Timing:
 100:    0m2.937s
@@ -40,9 +40,15 @@ Timing:
 
 ### QSORT LARGE (3D coordintes) ###
 Command:
-/fault-injection-simulation.py -b tests/test-progs/mibench2/qsort/bin/qsort_large -o "tests/test-progs/mibench2/qsort/input_large_100.dat out"
+./fault-injection-simulation.py -b tests/test-progs/mibench2/qsort/bin/qsort_large -o "tests/test-progs/mibench2/qsort/input_large_100.dat out"
 
 Timing:
 100:    0m6.024s
 1000:   0m55.392s
 
+
+### BASIC MATH SMALL ###
+Command:
+./fault-injection-simulation.py -b tests/test-progs/mibench2/basicmath/bin/basicmath_small -o "out.txt"
+
+Timing: 21m41.204s
