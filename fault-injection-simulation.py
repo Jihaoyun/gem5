@@ -9,7 +9,7 @@ sys.path.append(os.getcwd() + "/configs/fault_injector")
 from FaultParser import *
 from ControlFaultParser import *
 
-from threading import Thread
+from threading import Thread, Semaphore
 
 parser = argparse.ArgumentParser(description='Gem5')
 parser.add_argument('-b', '--benchmarks', type=str, dest='benchmarks',
@@ -33,12 +33,20 @@ parser.add_argument('-o', '--options', type=str, dest='options',
 parser.add_argument('-out', '--output', type=str, dest='outputFile',
                     help='Benchmark produced output file name')
 
-parser.add_argument('-mt', '--multithread', dest='multithread',
-                    action='store_true',
-                    help='Set it to enable multithreaded simulation')
-parser.set_defaults(multithread=False)
+parser.add_argument('-mt', '--multithread', dest='multithread', type=int,
+                    help='When it is set multithreading is enabled on the\
+                        specified number of threads')
+parser.set_defaults(multithread=None)
 
 args = parser.parse_args()
+
+# Validate arguments
+if args.multithread is not None:
+    assert args.multithread > 1, "Multithread should be greater than 1"
+
+# Define data structures needed for TLP
+if args.multithread:
+    sem = Semaphore(args.multithread)
 
 # This function moves the output file produced by the benchmark to
 # a producing instance specific location
@@ -51,6 +59,10 @@ def moveoutput(instance):
     os.rename(args.outputFile, fname)
 
 def startBPUFaultedSim(benchmark, fault):
+    # Acquire rights to execute in multithreading context
+    if args.multithread:
+        sem.acquire()
+
     cmd = ["./build/ALPHA/gem5.opt",
         "--stats-file", statFolder + "/" +
         fault.label + ".txt",
@@ -75,7 +87,15 @@ def startBPUFaultedSim(benchmark, fault):
     if args.outputFile is not None:
         moveoutput(fe.label)
 
+    # Notify thread completition
+    if args.multithread:
+        sem.release()
+
 def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
+    # Acquire rights to execute in multithreading context
+    if args.multithread:
+        sem.acquire()
+
     cmd = ["./build/ALPHA/gem5.opt",
         "--stats-file", statFolder + "/" +
         fname,
@@ -93,6 +113,10 @@ def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
 
     if args.outputFile is not None:
         moveoutput("control_fault")
+
+    # Notify thread completition
+    if args.multithread:
+        sem.release()
 
 if __name__ == '__main__':
     # Run a simulation for each specified benchmark program
