@@ -93,8 +93,6 @@ BiModalBP::setFault(struct FaultBPU::injFault f_parameters, bool faultEnd)
 }
 
 
-
-
 /*
  * For an unconditional branch we set its history such that
  * everything is set to taken. I.e., its choice predictor
@@ -137,7 +135,7 @@ BiModalBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
 
     bool finalPrediction =
         (counters[tid][historyIdx][predictorIdx].read() >> (ctrBits - 1) );
-    //cout << mamma << endl;
+
     BPHistory *history = new BPHistory;
     history->historyRegister = historyRegisters[tid];
     history->finalPred = finalPrediction;
@@ -145,7 +143,7 @@ BiModalBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
     bpHistory = static_cast<void*>(history);
     updateGlobalHistReg(tid, finalPrediction);
 
-    DPRINTF(Fetch,"Ciao: %u %u predicted %d\n",
+    DPRINTF(Fetch,"BiModal Prediction: %u %u predicted %d\n",
         predictorIdx, historyIdx, finalPrediction);
 
     return finalPrediction;
@@ -195,7 +193,7 @@ BiModalBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
         else
             counters[tid][historyIdx][predictorIdx].decrement();
 
-        DPRINTF(Fetch,"Updated: %d %d %#x %d\n",taken,
+        DPRINTF(Fetch,"BiModal update: %d %d %#x %d\n",taken,
             tid, historyIdx, predictorIdx);
     }
 }

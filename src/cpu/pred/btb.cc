@@ -193,7 +193,6 @@ DefaultBTB::update(Addr instPC,const TheISA::PCState &target, ThreadID tid)
 
 
 DefaultBTB::~DefaultBTB(){
-    printf("\nSperiamo che me la cavi\n");
 }
 
 

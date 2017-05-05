@@ -123,21 +123,11 @@ LocalBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 
     counter_val = localCtrs[local_predictor_idx].read();
 
-    DPRINTF(Fetch, "prediction is %i.\n",
+    DPRINTF(Fetch, "BHT lookup: prediction is %i.\n",
             (int)counter_val);
 
     taken = getPrediction(counter_val);
 
-#if 0
-    // Speculative update.
-    if (taken) {
-        DPRINTF(Fetch, "Branch updated as taken.\n");
-        localCtrs[local_predictor_idx].increment();
-    } else {
-        DPRINTF(Fetch, "Branch updated as not taken.\n");
-        localCtrs[local_predictor_idx].decrement();
-    }
-#endif
 
     return taken;
 }
@@ -152,13 +142,13 @@ LocalBP::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
     // Update the local predictor.
     local_predictor_idx = getLocalIndex(branch_addr);
 
-    DPRINTF(Fetch, "Looking up index %#x\n", local_predictor_idx);
+    DPRINTF(Fetch, "BHT update:Looking up index %#x\n", local_predictor_idx);
 
     if (taken) {
-        DPRINTF(Fetch, "Branch updated as taken.\n");
+        DPRINTF(Fetch, "BHT update: Branch updated as taken.\n");
         localCtrs[local_predictor_idx].increment();
     } else {
-        DPRINTF(Fetch, "Branch updated as not taken.\n");
+        DPRINTF(Fetch, "BHT update: Branch updated as not taken.\n");
         localCtrs[local_predictor_idx].decrement();
     }
 }
@@ -167,7 +157,7 @@ inline
 bool
 LocalBP::getPrediction(uint8_t &count)
 {
-    // Get the MSB of the count
+    // Get the MSB of the counter
     return (count >> (localCtrBits - 1));
 }
 

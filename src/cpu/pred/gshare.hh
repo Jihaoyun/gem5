@@ -57,7 +57,8 @@ class GShareBP : public BPredUnit
   private:
 
     void updateGlobalHistReg(ThreadID tid, bool taken);
-    unsigned indexCompute(ThreadID tid,Addr branchAddr);
+    unsigned indexCompute(ThreadID tid,Addr branchAddr,
+       unsigned globalHistoryReg);
 
     struct BPHistory {
         unsigned globalHistoryReg;

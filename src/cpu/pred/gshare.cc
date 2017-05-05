@@ -106,12 +106,13 @@ GShareBP::squash(ThreadID tid, void *bpHistory)
  */
 
 unsigned
-GShareBP::indexCompute(ThreadID tid, Addr branchAddr){
+GShareBP::indexCompute(ThreadID tid, Addr branchAddr,
+    unsigned globalHistoryReg ){
 
     unsigned index = branchAddr >> instShiftAmt;
 
     for ( int i = 0; i < sizeof(Addr)/globalHistoryBits; i++)
-        index ^= (globalHistoryRegs[tid] & historyRegisterMask)
+        index ^= (globalHistoryReg & historyRegisterMask)
           << i*globalHistoryBits;
 
     return index & addressBitMask;
@@ -121,7 +122,7 @@ bool
 GShareBP::lookup(ThreadID tid, Addr branchAddr, void * &bpHistory)
 {
 
-    unsigned index = indexCompute(tid,branchAddr);
+    unsigned index = indexCompute(tid,branchAddr,globalHistoryRegs[tid]);
 
     bool finalPrediction = threadCounters[tid][index].read() >>
                                                     (ctrBits-1);
@@ -149,7 +150,8 @@ GShareBP::update(ThreadID tid, Addr branchAddr, bool taken, void *bpHistory,
 
         BPHistory *history = static_cast<BPHistory*>(bpHistory);
 
-        unsigned index = indexCompute(tid,branchAddr);
+        unsigned index =
+          indexCompute(tid,branchAddr,history->globalHistoryReg);
 
         if ( taken )
             threadCounters[tid][index].increment();
