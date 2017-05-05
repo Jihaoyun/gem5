@@ -11,7 +11,57 @@ class Node:
         self.nodeType = nodeType
         self.nodeValue = nodeValue
 
+class ControlFaultEntry:
+
+    trigger = None
+    action = None
+
+    def __init__(self, trigger, action):
+        self.trigger = trigger
+        self.action = action
+
 class ControlFaultParser:
+    def __init__(self, fileName):
+        try:
+            self.faultsFile = open(fileName, "r")
+        except IOError:
+            raise
+
+    def hasNext(self):
+        # Read trigger string
+        self.currentLine = self.faultsFile.readline()
+        if self.currentLine == '':
+            return False
+
+        while self.currentLine[0] == '#':
+            self.currentLine = self.faultsFile.readline()
+            if self.currentLine == '':
+                return False
+
+        self.currentTriggerLine = self.currentLine
+
+        # Read action line
+        self.currentLine = self.faultsFile.readline()
+        if self.currentLine == '':
+            return False
+
+        while self.currentLine[0] == '#':
+            self.currentLine = self.faultsFile.readline()
+            if self.currentLine == '':
+                return False
+
+        self.currentActionLine = self.currentLine
+
+        return True
+
+    def next(self):
+        if self.currentLine[0] == '#':
+            return None
+
+        return ControlFaultEntry(
+            self.parseTriggerString(self.currentTriggerLine),
+            self.parseActionString(self.currentActionLine)
+        )
 
     def clean(self, string):
         string = string.replace(" ", "")
@@ -33,8 +83,7 @@ class ControlFaultParser:
                 return Node("i", string)
             else:
                 return Node("c", str(int(string, 16)))
-
-        #Find most extern operator
+            #Find most extern operator
         counter = 0;
         for i in range(len(string)):
             if re.match(opsre, string[i]) is not None \
@@ -66,7 +115,6 @@ class ControlFaultParser:
                     counter += 1
                 if(string[i] == ')'):
                     counter -= 1
-
 
     def parseAction(self, string):
         #Check if final case
@@ -108,10 +156,9 @@ class ControlFaultParser:
                 if(string[i] == ')'):
                     counter -= 1
 
-
     def visit(self, n):
         self.nodeString += str(n.id) + " " + n.nodeType + " " + \
-                n.nodeValue + " "
+            n.nodeValue + " "
 
         if n.left is not None:
             self.edgeCount += 1
@@ -126,7 +173,6 @@ class ControlFaultParser:
             self.edgeString += str(n.id) + " " + str(n.right.id) + " "
             self.visit(n.right)
 
-
     def parseTriggerString(self, string):
         self.nodeCount = 0
         self.edgeCount = 0
@@ -139,7 +185,7 @@ class ControlFaultParser:
         self.nodeCount += 1
 
         return str(self.nodeCount) + " " + str(self.edgeCount) + " " \
-                + self.nodeString + " " + self.edgeString
+            + self.nodeString + " " + self.edgeString
 
 
     def parseActionString(self, string):
@@ -154,23 +200,13 @@ class ControlFaultParser:
         self.nodeCount += 1
 
         return str(self.nodeCount) + " " + str(self.edgeCount) + " " \
-                + self.nodeString + " " + self.edgeString
-
-
-    def parseFile(self, path):
-        with open(path) as fp:
-            self.triggerString = self.parseTriggerString(fp.readline())
-            self.actionString = self.parseActionString(fp.readline())
-
-    def getTrigger(self):
-        return self.triggerString
-
-    def getAction(self):
-        return self.actionString
+            + self.nodeString + " " + self.edgeString
 
 #Examples
 if __name__ == "__main__":
-    p = ControlFaultParser()
-    p.parseFile("control_fault.txt")
-    print p.getTrigger()
-    print p.getAction()
+    p = ControlFaultParser("control_fault.txt")
+    n = 1
+    while p.hasNext():
+        cfe = p.next()
+        print cfe.trigger
+        print cfe.action

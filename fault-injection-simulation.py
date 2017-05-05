@@ -180,24 +180,25 @@ if __name__ == '__main__':
             for inputFile in args.controlFaultInput:
                 fname = inputFile.split("/")[-1]
 
-                parser = ControlFaultParser()
-                parser.parseFile(inputFile)
+                parser = ControlFaultParser(inputFile)
+                while parser.hasNext():
+                    cfault = parser.next()
 
-                print "\n\nRunning " + benchmark + " with fault:\n" + \
-                    "control-fault@" + str(inputFile)
+                    print "\n\nRunning " + benchmark + " with fault:\n" + \
+                        "control-fault@" + str(inputFile)
 
-                if args.multithread:
-                    # Run faulted simulation on an indipendent thread
-                    t = Thread(target=startBPUControlFaultedSim,
-                        args=(statFolder, fname, benchmark,
-                            parser.getTrigger().strip(),
-                            parser.getAction().strip()))
-                    tpool.append(t)
-                    t.start()
-                else:
-                    startBPUControlFaultedSim(statFolder, fname, benchmark,
-                        parser.getTrigger().strip(),
-                        parser.getAction().strip())
+                    if args.multithread:
+                        # Run faulted simulation on an indipendent thread
+                        t = Thread(target=startBPUControlFaultedSim,
+                            args=(statFolder, fname, benchmark,
+                                cfault.trigger,
+                                cfault.action))
+                        tpool.append(t)
+                        t.start()
+                    else:
+                        startBPUControlFaultedSim(statFolder, fname, benchmark,
+                            cfault.trigger,
+                            cfault.action)
 
             # Join on the generated thread pool
             if args.multithread:
