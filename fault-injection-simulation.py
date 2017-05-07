@@ -48,16 +48,6 @@ if args.multithread is not None:
 if args.multithread:
     sem = Semaphore(args.multithread)
 
-# This function moves the output file produced by the benchmark to
-# a producing instance specific location
-def moveoutput(instance):
-    if not os.path.isfile(args.outputFile):
-        return
-
-    fname = "/".join([os.path.dirname(args.outputFile),
-        "_".join([instance, os.path.basename(args.outputFile)])])
-    os.rename(args.outputFile, fname)
-
 def startBPUFaultedSim(benchmark, fault):
     # Acquire rights to execute in multithreading context
     if args.multithread:
@@ -83,10 +73,6 @@ def startBPUFaultedSim(benchmark, fault):
 
     call(cmd)
 
-    # Move the output file to the proper file name
-    if args.outputFile is not None:
-        moveoutput(fe.label)
-
     # Notify thread completition
     if args.multithread:
         sem.release()
@@ -111,9 +97,6 @@ def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
 
     call(cmd)
 
-    if args.outputFile is not None:
-        moveoutput("control_fault")
-
     # Notify thread completition
     if args.multithread:
         sem.release()
@@ -125,27 +108,27 @@ if __name__ == '__main__':
 
         # Create a folder to store stats releated to the current benchmark
         statFolder = benchmark.split("/")[-1]
-        if not os.path.exists("m5out/" + statFolder):
-            os.makedirs("m5out/" + statFolder)
+        outputFolder = "m5out/" + statFolder + "/"
+        if not os.path.exists(outputFolder):
+            os.makedirs(outputFolder)
 
         if args.options != None:
             benchmark = " ".join([benchmark, args.options])
 
         # Run Golden simulation
+        benchmarkRun = benchmark.replace(args.outputFile,
+            outputFolder + args.outputFile + "_GOLDEN.txt")
+
         cmd = ["./build/ALPHA/gem5.opt",
             "--stats-file", statFolder + "/" +
             "GOLDEN.txt",
             "configs/fault_injector/injector_system.py",
-            "-b", benchmark ]
+            "-b", benchmarkRun ]
 
         if args.debugFlags is not None:
             cmd.insert(1, "--debug-flags=" + args.debugFlags)
 
         call(cmd)
-
-        # Move the output file to the proper file name
-        if args.outputFile is not None:
-            moveoutput("GOLDEN")
 
         # Read all fault input files
         if args.faultInput is not None:
@@ -159,17 +142,19 @@ if __name__ == '__main__':
                     # Load the next fault entry
                     fe = fp.next()
 
-                    print "\n\nRunning " + benchmark + " with fault:\n" + \
+                    benchmarkRun = benchmark.replace(args.outputFile,
+                        outputFolder + args.outputFile+"_"+fe.label+".txt")
+                    print "\n\nRunning " + benchmarkRun + " with fault:\n" + \
                         str(fe)
 
                     if args.multithread:
                         # Run faulted simulation on an indipendent thread
                         t = Thread(target=startBPUFaultedSim,
-                            args=(benchmark, fe))
+                            args=(benchmarkRun, fe))
                         tpool.append(t)
                         t.start()
                     else:
-                        startBPUFaultedSim(benchmark, fe);
+                        startBPUFaultedSim(benchmarkRun, fe);
 
                 # Join on the generated thread pool
                 if args.multithread:
@@ -178,27 +163,37 @@ if __name__ == '__main__':
 
         if args.controlFaultInput is not None:
             for inputFile in args.controlFaultInput:
-                fname = inputFile.split("/")[-1]
-
+                fname = inputFile.split("/")[-1].replace(".txt","")
                 parser = ControlFaultParser(inputFile)
+                c = 0
+
+                if args.multithread:
+                    tpool = []
+
                 while parser.hasNext():
                     cfault = parser.next()
 
-                    print "\n\nRunning " + benchmark + " with fault:\n" + \
+                    benchmarkRun = benchmark.replace(args.outputFile,
+                        outputFolder + args.outputFile+"_"+str(c)+".txt")
+                    fnameRun = fname + str(c) + ".txt"
+                    print "\n\nRunning " + benchmarkRun + " with fault:\n" + \
                         "control-fault@" + str(inputFile)
 
                     if args.multithread:
                         # Run faulted simulation on an indipendent thread
                         t = Thread(target=startBPUControlFaultedSim,
-                            args=(statFolder, fname, benchmark,
+                            args=(statFolder, fnameRun, benchmarkRun,
                                 cfault.trigger,
                                 cfault.action))
                         tpool.append(t)
                         t.start()
                     else:
-                        startBPUControlFaultedSim(statFolder, fname, benchmark,
+                        startBPUControlFaultedSim(statFolder,
+                            fnameRun,
+                            benchmarkRun,
                             cfault.trigger,
                             cfault.action)
+                    c = c + 1
 
             # Join on the generated thread pool
             if args.multithread:

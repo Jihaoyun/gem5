@@ -1,3 +1,9 @@
-# Woah such a comment
+# Woah such a comment 0
 (((index & 0x1F) >= 0x1) && ((index & 0x1F) < 0xA))
 index | 0x1
+# Woah such a comment 1
+(((index & 0x1F) >= 0x0) && ((index & 0x1F) < 0x2))
+index & 0x1
+# Woah such a comment 2
+(((index & 0x1F) >= 0x1) && ((index & 0x1F) < 0xA))
+index ^ 0x2

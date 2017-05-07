@@ -1,6 +1,0 @@
-tick start function mul 8573565000
-tick end   function mul 11489331000
-e0833002 ; add
-e003039c ; mul
-e0802003 ; add between register
-e2833001 ; add with an immediate
