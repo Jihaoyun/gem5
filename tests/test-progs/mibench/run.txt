@@ -1,0 +1,54 @@
+### BITCNTS ###
+
+Check rand real random, on my pc no. Ok
+
+Command:
+./fault-injection-simulation.py -b tests/test-progs/mibench/bitcount/bin/bitcnts -o "100 out.txt"
+
+Timing:
+100:    0m2.193s
+1000:   0m11.973s
+10000:  1m56.207s
+
+
+### SUSAN SMOOTHING ###
+Command:
+./fault-injection-simulation.py -b "tests/test-progs/mibench/susan/bin/susan" -o "tests/test-progs/mibench/susan/input_small.pgm m5out/susan/out -s"
+
+Timing:
+input_small: real    1m39.180s
+input_large: NOT finished in 19 minutes!
+
+
+### SUSAN EDGE ###
+Command:
+./fault-injection-simulation.py -b "tests/test-progs/mibench/susan/bin/susan" -o "tests/test-progs/mibench/susan/input_small.pgm m5out/susan/out -s"
+
+Timing:
+input_small: real    0m10.222s
+input_large: NOT FINISHED AFTER 4 min 
+
+
+
+### QSORT SMALL (string sort) ###
+Command:
+./fault-injection-simulation.py -b tests/test-progs/mibench/qsort/bin/qsort_small -o "tests/test-progs/mibench/qsort/input_small_100.dat out"
+
+Timing:
+100:    0m2.937s
+1000:   0m19.603s
+
+### QSORT LARGE (3D coordintes) ###
+Command:
+./fault-injection-simulation.py -b tests/test-progs/mibench/qsort/bin/qsort_large -o "tests/test-progs/mibench/qsort/input_large_100.dat out"
+
+Timing:
+100:    0m6.024s
+1000:   0m55.392s
+
+
+### BASIC MATH SMALL ###
+Command:
+./fault-injection-simulation.py -b tests/test-progs/mibench/basicmath/bin/basicmath_small -o "out.txt"
+
+Timing: 21m41.204s
