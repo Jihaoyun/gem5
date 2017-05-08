@@ -37,8 +37,8 @@ class BranchPredictor(SimObject):
     abstract = True
 
     numThreads = Param.Unsigned(1, "Number of threads")
-    BTBEntries = Param.Unsigned(4096, "Number of BTB entries")
-    BTBTagSize = Param.Unsigned(16, "Size of the BTB tags, in bits")
+    BTBEntries = Param.Unsigned(1024, "Number of BTB entries")
+    BTBTagSize = Param.Unsigned(20, "Size of the BTB tags, in bits")
     RASSize = Param.Unsigned(16, "RAS size")
     instShiftAmt = Param.Unsigned(2, "Number of bits to shift instructions by")
 
@@ -75,7 +75,7 @@ class LocalBP(BranchPredictor):
     cxx_class = 'LocalBP'
     cxx_header = "cpu/pred/2bit_local.hh"
 
-    localPredictorSize = Param.Unsigned(128, "Size of local predictor")
+    localPredictorSize = Param.Unsigned(1024, "Size of local predictor")
     localCtrBits = Param.Unsigned(2, "Bits per counter")
 
 
@@ -98,9 +98,9 @@ class BiModalBP(BranchPredictor):
     cxx_class = 'BiModalBP'
     cxx_header = "cpu/pred/bi_modal.hh"
 
-    historyBits = Param.Unsigned(2,
+    historyBits = Param.Unsigned(4,
         "Number of bit of the global history register")
-    predictorSize = Param.Unsigned(512, "Size of global predictor")
+    predictorSize = Param.Unsigned(1024, "Size of global predictor")
     ctrBits = Param.Unsigned(2, "Bits per counter")
 
 
@@ -119,8 +119,8 @@ class GShareBP(BranchPredictor):
     cxx_class = 'GShareBP'
     cxx_header = "cpu/pred/gshare.hh"
 
-    globalHistoryBits = Param.Unsigned(4,
+    globalHistoryBits = Param.Unsigned(6,
         "Number of bit of the global history register")
     ctrBits = Param.Unsigned(2, "Bits per counter")
-    predictorSets = Param.Unsigned(2048,
+    predictorSets = Param.Unsigned(1024,
         "Size of global predictor")

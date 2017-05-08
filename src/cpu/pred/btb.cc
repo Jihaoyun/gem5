@@ -78,9 +78,9 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
         fatal("BTB entries is not a power of 2!");
     }
 
-        // TODO: check if the entry is in the range of the BTB
         btb.resize(numEntries);
-        if ( f_parameters.enabled && f_parameters.tickEnd == -1 ) {
+        if ( f_parameters.enabled && f_parameters.tickEnd == -1
+            && f_parameters.field < 3 ) {
                 if (f_parameters.entry >= numEntries)
                         fatal("BP: FaultEntry exceeds dimension of the BTB");
                 btb[f_parameters.entry].setFaulted(
