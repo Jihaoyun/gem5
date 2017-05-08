@@ -1,0 +1,36 @@
+-----------btb--------------
+BTBEntries = 1024
+BTBTagSize = 20
+
+-----------LocalBP----------
+Bitspercounter = 2
+predictorsize = 1024
+
+-----------BiModalBP--------
+histoybits = 4
+predictor size = 1024
+ctrBits = 2
+
+----------GShareBP----------
+historyBits = 6
+ctrBits = 2
+predictor = 1024
+
+----------O3----------------
+fetchWidth = 4
+decodeWidth = 4
+renameWidth = 4
+dispatchWidth = 4
+issueWidth = 4
+wbWidth = 4
+commit = 4
+squash = 4
+numberofregisters(INT/FLOAT) = 128
+
+IntAlu 2
+IntMultDiv 1
+FloatAlu 2
+FloatMultDiv 1
+
+
+
