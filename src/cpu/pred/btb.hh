@@ -45,19 +45,22 @@ class BTBEntry
 {
         public:
 
-        BTBEntry():
-                valid(false)
+        BTBEntry()
         {
                 tag = new Type();
                 target = new TargetType();
+                valid = new Type(0);
         }
 
         void setFaulted(int field, int numBit, char value) {
                 if ( field == 0 ) {
-                        tag = new FaultedType(numBit,value);
+                    tag = new FaultedType(numBit,value);
                 }
                 if ( field == 1 ) {
-                        target = new FaultedTargetType(numBit,value);
+                    target = new FaultedTargetType(numBit,value);
+                }
+                if (field == 2 ) {
+                    valid = new FaultedType(numBit,value);
                 }
         }
 
@@ -87,11 +90,11 @@ class BTBEntry
         }
 
         bool getValid() {
-                return valid;
+                return valid->getData() & 0x1;
         }
 
         void setValid(bool value) {
-                valid = value;
+                valid->setData(value);
         }
 
         uint64_t getTag() {
@@ -121,7 +124,7 @@ class BTBEntry
         private:
         Type* tag;
         TargetType* target;
-        bool valid; // TO DO modify this in order to allow injection also here
+        Type* valid;
         ThreadID tid;
 
 };

@@ -45,7 +45,7 @@ from FuncUnit import *
 
 class IntALU(FUDesc):
     opList = [ OpDesc(opClass='IntAlu') ]
-    count = 6
+    count = 2
 
 class IntMultDiv(FUDesc):
     opList = [ OpDesc(opClass='IntMult', opLat=3),
@@ -58,13 +58,13 @@ class IntMultDiv(FUDesc):
     if buildEnv['TARGET_ISA'] in ('x86'):
         opList[1].opLat=1
 
-    count=2
+    count=1
 
 class FP_ALU(FUDesc):
     opList = [ OpDesc(opClass='FloatAdd', opLat=2),
                OpDesc(opClass='FloatCmp', opLat=2),
                OpDesc(opClass='FloatCvt', opLat=2) ]
-    count = 4
+    count = 2
 
 class FP_MultDiv(FUDesc):
     opList = [ OpDesc(opClass='FloatMult', opLat=4),
@@ -72,7 +72,7 @@ class FP_MultDiv(FUDesc):
                OpDesc(opClass='FloatMisc', opLat=3),
                OpDesc(opClass='FloatDiv', opLat=12, pipelined=False),
                OpDesc(opClass='FloatSqrt', opLat=24, pipelined=False) ]
-    count = 2
+    count = 1
 
 class SIMD_Unit(FUDesc):
     opList = [ OpDesc(opClass='SimdAdd'),
