@@ -49,10 +49,6 @@ if args.multithread:
     sem = Semaphore(args.multithread)
 
 def startBPUFaultedSim(benchmark, fault):
-    # Acquire rights to execute in multithreading context
-    if args.multithread:
-        sem.acquire()
-
     cmd = ["./build/ALPHA/gem5.opt",
         "--stats-file", statFolder + "/" +
         fault.label + ".txt",
@@ -152,6 +148,9 @@ if __name__ == '__main__':
                             " with fault:\n" + str(fe)
 
                         if args.multithread:
+                            # Acquire rights to execute in multithreading context
+                            if args.multithread:
+                                sem.acquire()
                             # Run faulted simulation on an indipendent thread
                             t = Thread(target=startBPUFaultedSim,
                                 args=(benchmarkRun, fe))
