@@ -49,24 +49,10 @@ int main(int argc, char **argv)
   for(i=0;i<solutions;i++)
     fprintf(fp ," %f",x[i]);
   fprintf(fp ,"\n");
-  /* Now solve some random equations */
-  for(a1=1;a1<10;a1++) {
-    for(b1=10;b1>0;b1--) {
-      for(c1=5;c1<15;c1+=0.5) {
-	for(d1=-1;d1>-11;d1--) {
-	  SolveCubic(a1, b1, c1, d1, &solutions, x);  
-	  fprintf(fp ,"Solutions:");
-	  for(i=0;i<solutions;i++)
-	    fprintf(fp ," %f",x[i]);
-	  fprintf(fp ,"\n");
-	}
-      }
-    }
-  }
   
   fprintf(fp ,"********* INTEGER SQR ROOTS ***********\n");
   /* perform some integer square roots */
-  for (i = 0; i < 1001; ++i)
+  for (i = 0; i < 30; ++i) //EDIT
     {
       usqrt(i, &q);
 			// remainder differs on some machines
@@ -81,12 +67,13 @@ int main(int argc, char **argv)
 
   fprintf(fp ,"********* ANGLE CONVERSION ***********\n");
   /* convert some rads to degrees */
-  for (X = 0.0; X <= 360.0; X += 1.0)
+  for (X = 0.0; X <= 360.0; X += 5.0)
     fprintf(fp ,"%3.0f degrees = %.12f radians\n", X, deg2rad(X));
   puts("");
   for (X = 0.0; X <= (2 * PI + 1e-6); X += (PI / 180))
     fprintf(fp ,"%.12f radians = %3.0f degrees\n", X, rad2deg(X));
   
+  //EDIT removed random
   
   return 0;
 }

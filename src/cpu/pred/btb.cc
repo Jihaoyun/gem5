@@ -79,7 +79,7 @@ DefaultBTB::DefaultBTB(unsigned _numEntries,
     }
 
         btb.resize(numEntries);
-        if ( f_parameters.enabled && f_parameters.tickEnd == -1
+        if ( f_parameters.enabled && ((int)f_parameters.tickEnd) == -1
             && f_parameters.field < 3 ) {
                 if (f_parameters.entry >= numEntries)
                         fatal("BP: FaultEntry exceeds dimension of the BTB");

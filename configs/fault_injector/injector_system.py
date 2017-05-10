@@ -108,7 +108,6 @@ system.cpu.createThreads()
 root = Root(full_system = False, system = system)
 
 system.cpu.branchPred = LocalBP()
-system.cpu.branchPred.BTBEntries = 32
 
 #run all the simulation
 if args.faultEnabled:

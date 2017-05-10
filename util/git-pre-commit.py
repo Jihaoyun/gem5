@@ -93,7 +93,7 @@ for status, fname in git.status(filter="MA", cached=True):
                 staged_mismatch.add(fname)
     f.close()
 
-if failing_files:
+if not failing_files:
     if len(failing_files) > len(staged_mismatch):
         print >> sys.stderr
         print >> sys.stderr, "Style checker failed for the following files:"
