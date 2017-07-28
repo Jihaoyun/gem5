@@ -1,0 +1,82 @@
+===============
+== PREDICTOR ==
+===============
+
+BTB:
+  BTBEntries = 1024
+  BTBTagSize = 20
+
+LOCAL BP:
+  Bitspercounter = 2
+  predictorsize = 1024
+
+
+================
+== GOLDEN RUN ==
+================
+
+Benchmark:  bitcnts 1000
+
+system.cpu.cpi:                           0.556906
+
+system.cpu.branchPred.lookups             139645
+system.cpu.branchPred.condPredicted       105365
+system.cpu.branchPred.condIncorrect       3753
+
+system.cpu.branchPred.BTBLookups:         79823
+system.cpu.branchPred.BTBHits:            79166
+system.cpu.branchPred.BTBHitPct:          99.176929
+BTBEntrycount::736                        32010
+
+
+================
+== FAULT RUN  ==
+================
+
+Benchmark:  bitcnts 1000
+
+Fault:
+  entry:          736
+  field:          target
+  bit position:   10
+  bit stuck at:   1
+  permanent:      true
+
+system.cpu.cpi                             1.148901
+
+system.cpu.branchPred.lookups              372576
+system.cpu.branchPred.condPredicted        251345
+system.cpu.branchPred.condIncorrect        33756
+
+system.cpu.branchPred.BTBLookups           164771
+system.cpu.branchPred.BTBHits              164113
+system.cpu.branchPred.BTBHitPct            99.600658
+
+===========
+== NOTES ==
+===========
+
+Update entry 736 with target      4831841084d = 0x120000B3C
+Lookup entry 736, obtain target   4831842108d = 0x120000F3C (10th bit sitched to 1)
+
+
+Conditional instruction which btb entry is faulted:
+Instruction address: 0x120000b80 = 4831841152 (@bit_shifter+104)
+  bne        r1,0x120000b3c
+
+Correct instruction predicted (without fault)
+Instruction address: 0x120000B3C = 4831841084 (@bit_shifter+36)
+  ldq        r1,32(r15)
+
+Incorrect instruction predicted (with fault)
+Instruction address: 0x120000F3C = 4831842108
+
+
+
+
+
+
+
+
+
+

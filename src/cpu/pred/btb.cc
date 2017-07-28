@@ -168,6 +168,7 @@ DefaultBTB::lookup(Addr instPC, ThreadID tid)
 
     assert(btb_idx < numEntries);
 
+    std::cout<<"[LOOKUP]\tPC\t"<<instPC<<"\tTARGET\t"<<btb[btb_idx].getTarget().pc()<<"\tENTRY\t"<<(instPC >> 2) % 1024 <<std::endl;
 
     if ( btb[btb_idx].getValid()
         && inst_tag == btb[btb_idx].getTag()
@@ -185,10 +186,13 @@ DefaultBTB::update(Addr instPC,const TheISA::PCState &target, ThreadID tid)
 
     assert(btb_idx < numEntries);
 
+
     btb[btb_idx].setTid(tid);
     btb[btb_idx].setValid(true);
     btb[btb_idx].setTarget( target );
     btb[btb_idx].setTag(getTag(instPC));
+
+    std::cout<<"[UPDATE]\tPC\t"<<instPC<<"\tTARGET\t"<<target.pc()<<"\tENTRY\t"<<(instPC >> 2) % 1024 <<std::endl;
 }
 
 
