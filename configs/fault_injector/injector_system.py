@@ -71,6 +71,7 @@ system.mem_ranges = [AddrRange('512MB')] # Create an address range
 
 # Create a simple CPU
 system.cpu = DerivO3CPU()
+#system.cpu = TimingSimpleCPU()
 
 # Caches
 icache = L1_ICache(size="4MB")

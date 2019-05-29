@@ -61,4 +61,27 @@
 #  define M5_CLASS_VAR_USED
 #endif
 
+// This can be removed once all compilers support C++17
+#if defined __has_cpp_attribute
+    // Note: We must separate this if statement because GCC < 5.0 doesn't
+    //       support the function-like syntax in #if statements.
+    #if __has_cpp_attribute(fallthrough)
+        #define M5_FALLTHROUGH [[fallthrough]]
+    #else
+        #define M5_FALLTHROUGH
+    #endif
+
+    #if __has_cpp_attribute(nodiscard)
+        #define M5_NODISCARD [[nodiscard]]
+    #else
+        #define M5_NODISCARD
+    #endif
+#else
+    // Unsupported (and no warning) on GCC < 7.
+    #define M5_FALLTHROUGH
+
+    #define M5_NODISCARD
+#endif
+
+
 #endif // __BASE_COMPILER_HH__

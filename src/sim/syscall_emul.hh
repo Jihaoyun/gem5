@@ -45,10 +45,13 @@
 #ifndef __SIM_SYSCALL_EMUL_HH__
 #define __SIM_SYSCALL_EMUL_HH__
 
-#define NO_STAT64 (defined(__APPLE__) || defined(__OpenBSD__) || \
+#if (defined(__APPLE__) || defined(__OpenBSD__) || \
   defined(__FreeBSD__) || defined(__CYGWIN__) || \
   defined(__NetBSD__))
-
+#define NO_STAT64 1
+#else
+#define NO_STAT64 0
+#endif
 ///
 /// @file syscall_emul.hh
 ///

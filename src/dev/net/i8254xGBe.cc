@@ -2276,15 +2276,23 @@ IGbE::rxStateMachine()
         int descLeft = rxDescCache.descLeft();
         DPRINTF(EthernetSM, "RXS: descLeft: %d rdmts: %d rdlen: %d\n",
                 descLeft, regs.rctl.rdmts(), regs.rdlen());
-        switch (regs.rctl.rdmts()) {
-          case 2: if (descLeft > .125 * regs.rdlen()) break;
-          case 1: if (descLeft > .250 * regs.rdlen()) break;
-          case 0: if (descLeft > .500 * regs.rdlen())  break;
+
+        // rdmts 2->1/8, 1->1/4, 0->1/2
+        int ratio = (1ULL << (regs.rctl.rdmts() + 1));
+        if (descLeft * ratio <= regs.rdlen()) {
             DPRINTF(Ethernet, "RXS: Interrupting (RXDMT) "
                     "because of descriptors left\n");
             postInterrupt(IT_RXDMT);
-            break;
         }
+        //switch (regs.rctl.rdmts()) {
+        //  case 2: if (descLeft > .125 * regs.rdlen()) break;
+        //  case 1: if (descLeft > .250 * regs.rdlen()) break;
+        //  case 0: if (descLeft > .500 * regs.rdlen())  break;
+        //    DPRINTF(Ethernet, "RXS: Interrupting (RXDMT) "
+        //            "because of descriptors left\n");
+        //    postInterrupt(IT_RXDMT);
+        //    break;
+        //}
 
         if (rxFifo.empty())
             rxDescCache.writeback(0);

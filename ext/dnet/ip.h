@@ -428,13 +428,13 @@ inline int
 ip_cksum_add(const void *buf, size_t len, int cksum)
 {
         uint16_t *sp = (uint16_t *)buf;
-        int n, sn;
+        int sn;
 
         sn = len / 2;
-        n = (sn + 15) / 16;
+        //n = (sn + 15) / 16;
 
         /* XXX - unroll loop using Duff's device. */
-        switch (sn % 16) {
+ /*       switch (sn % 16) {
         case 0:	do {
                 cksum += *sp++;
         case 15:
@@ -468,7 +468,10 @@ ip_cksum_add(const void *buf, size_t len, int cksum)
         case 1:
                 cksum += *sp++;
                 } while (--n > 0);
-        }
+        }*/
+        do {
+            cksum += *sp++;
+        } while (--sn > 0);
         if (len & 1)
                 cksum += htons(*(u_char *)sp << 8);
 

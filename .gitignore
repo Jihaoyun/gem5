@@ -16,3 +16,7 @@ m5out
 a.out
 test
 *.csv
+*.dat
+fault.txt
+reg_fault.txt
+matmul_out.txt

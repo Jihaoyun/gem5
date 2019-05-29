@@ -35,6 +35,7 @@
 //
 // Authors: Ali Saidi
 
+syntax = "proto2";
 
 // Put all the generated messages in a namespace
 package ProtoMessage;
@@ -51,7 +52,8 @@ message InstHeader {
 
 message Inst {
   required uint64 pc = 1;
-  required fixed32 inst = 2;
+  optional fixed32 inst = 2;
+  optional bytes inst_bytes = 9;
   optional uint32 nodeid = 3;
   optional uint32 cpuid = 4;
   optional fixed64 tick = 5;
