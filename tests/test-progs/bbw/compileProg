@@ -1,0 +1,1 @@
+gcc bbw.c -o bbwSim -lm
