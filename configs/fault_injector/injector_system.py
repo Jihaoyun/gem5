@@ -72,12 +72,25 @@ system.mem_ranges = [AddrRange('512MB')] # Create an address range
 # Create a simple CPU
 system.cpu = DerivO3CPU()
 #system.cpu = TimingSimpleCPU()
+system.cache_line_size = 64
+system.cpu.numPhysIntRegs = 256
+system.cpu.numPhysFloatRegs = 256
+system.cpu.numIQEntries = 32
+system.cpu.LQEntries = 16
+system.cpu.SQEntries = 16
+system.cpu.numROBEntries = 40
 
 # Caches
-icache = L1_ICache(size="4MB")
-dcache = L1_DCache(size="4MB")
+icache = L1_ICache(size="32kB")
+dcache = L1_DCache(size="32kB")
 
-system.cpu.addPrivateSplitL1Caches(icache, dcache, None, None)
+l2cache = L2Cache(size = "1MB")
+
+#system.cpu.addPrivateSplitL1Caches(icache, dcache, None, None)
+system.cpu.addTwoLevelCacheHierarchy(icache, dcache, l2cache, None, None)
+system.cpu.icache.assoc = 4
+system.cpu.dcache.assoc = 4
+system.cpu.l2cache.assoc = 16
 
 # Create a memory bus, a coherent crossbar, in this case
 system.membus = SystemXBar()
@@ -108,7 +121,8 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 
-system.cpu.branchPred = LocalBP()
+#system.cpu.branchPred = LocalBP()
+system.cpu.branchPred = TournamentBP()
 
 #run all the simulation
 if args.faultEnabled:
