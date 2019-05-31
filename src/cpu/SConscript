@@ -49,6 +49,7 @@ SimObject('IntrControl.py')
 SimObject('TimingExpr.py')
 SimObject('RegisterFault.py')
 SimObject('BpuTransientFault.py')
+SimObject('BpuIntermittentFault.py')
 
 Source('activity.cc')
 Source('base.cc')
@@ -70,6 +71,7 @@ Source('thread_state.cc')
 Source('timing_expr.cc')
 Source('register_fault.cc')
 Source('bpu_transient_fault.cc')
+Source('bpu_intermittent_fault.cc')
 
 SimObject('DummyChecker.py')
 SimObject('StaticInstFlags.py')
@@ -107,6 +109,7 @@ DebugFlag('Quiesce')
 DebugFlag('Mwait')
 DebugFlag('RegisterBitFlip')
 DebugFlag('BpuTransientFault')
+DebugFlag('BpuIntermittentFault')
 
 CompoundFlag('ExecAll', [ 'ExecEnable', 'ExecCPSeq', 'ExecEffAddr',
     'ExecFaulting', 'ExecFetchSeq', 'ExecOpClass', 'ExecRegDelta',

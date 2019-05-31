@@ -78,6 +78,18 @@ class BTBEntry
                 }
         }
 
+        void setInterFaulted(int field, int numBit, char value) {
+            if (field == 0) {
+                uint64_t old_value = tag->getData();
+                tag = new FaultedType(numBit, value);
+                tag->setData(old_value);
+            }
+            if (field == 1) {
+                uint64_t old_value = target->getData().pc();
+                target = new FaultedTargetType(numBit, value);
+                target->getData().set(old_value);
+            }
+        }
 
         void setTranFaulted(int field, int numBit) {
             uint64_t mask = 1 << numBit;
@@ -180,7 +192,9 @@ class DefaultBTB
 
     void setFault(struct FaultBPU::injFault f_parameters, bool faultEnd);
 
+    void setInterFault(struct FaultBPU::injFault f_parameters, bool faultEnd);
 
+    void resetInterFault(struct FaultBPU::injFault f_parameters, bool faultEnd);
 
   private:
     /** Returns the index into the BTB, based on the branch's PC.

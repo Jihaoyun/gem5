@@ -92,6 +92,40 @@ BiModalBP::setFault(struct FaultBPU::injFault f_parameters, bool faultEnd)
           f_parameters.bitPosition);
 }
 
+void
+BiModalBP::setInterFault(struct FaultBPU::injFault f_parameters, bool faultEnd)
+{
+
+    if (  f_parameters.field != 3 )
+        return;
+    if ( f_parameters.entry >= numberOfTable*(predictorSize) )
+        fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
+
+    int inTableIndex = f_parameters.entry & predictorBits;
+    int tableIndex = f_parameters.entry >> predictorBits;
+
+    for (int i = 0; i < numThreads; i++ )
+        counters[i][tableIndex][inTableIndex].setInterFaulted(
+          f_parameters.bitPosition, f_parameters.stuckBit);
+}
+
+void 
+BiModalBP::resetInterFault(struct FaultBPU::injFault f_parameters, bool faultEnd)
+{
+
+    if (  f_parameters.field != 3 )
+        return;
+    if ( f_parameters.entry >= numberOfTable*(predictorSize) )
+        fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
+
+    int inTableIndex = f_parameters.entry & predictorBits;
+    int tableIndex = f_parameters.entry >> predictorBits;
+
+    for (int i = 0; i < numThreads; i++ )
+        counters[i][tableIndex][inTableIndex].setOriginal();
+}
 
 /*
  * For an unconditional branch we set its history such that

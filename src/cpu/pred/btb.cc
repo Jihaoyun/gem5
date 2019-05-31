@@ -110,7 +110,23 @@ DefaultBTB::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {
           f_parameters.bitPosition);
 }
 
+void
+DefaultBTB::setInterFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {
 
+  btb[f_parameters.entry].setInterFaulted(
+          f_parameters.field,
+          f_parameters.bitPosition,
+          f_parameters.stuckBit);
+}
+
+void
+DefaultBTB::resetInterFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {
+
+  btb[f_parameters.entry].setOriginal(
+          f_parameters.field,
+          f_parameters.bitPosition,
+          f_parameters.stuckBit);
+}
 
 void
 DefaultBTB::reset()

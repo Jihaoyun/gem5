@@ -139,6 +139,14 @@ class SatCounter
         free(actual_ptr);
     }
 
+    void setInterFaulted(int numBit, uint8_t value)
+    {
+        Type* actual_ptr = counter;
+        counter = new FaultedType(numBit, value);
+        counter->setData(actual_ptr->getData());
+        free(actual_ptr);
+    }
+
   private:
     uint8_t initialVal;
     uint8_t maxVal;

@@ -204,6 +204,26 @@ BPredUnit::insertFault(
         setFault(faultParameters,faultEnd);
 }
 
+void
+BPredUnit::insertInterFault(
+        struct FaultBPU::injFault faultParameters, bool faultEnd)
+{
+    if ( faultParameters.field <= 2 ) { // which field??
+        BTB.setInterFault(faultParameters, faultEnd);
+    }
+        setInterFault(faultParameters,faultEnd);
+}
+
+void
+BPredUnit::recoverInterFault(
+        struct FaultBPU::injFault faultParameters, bool faultEnd)
+{
+    if ( faultParameters.field <= 2 ) { // which field??
+        BTB.resetInterFault(faultParameters, faultEnd);
+    }
+        resetInterFault(faultParameters,faultEnd);
+}
+
 
 bool
 BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum,

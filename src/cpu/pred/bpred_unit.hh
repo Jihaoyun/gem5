@@ -141,6 +141,12 @@ class BPredUnit : public SimObject
     virtual void setFault(
         struct FaultBPU::injFault f_parameters,bool faultEnd) = 0;
 
+    virtual void setInterFault(
+        struct FaultBPU::injFault f_parameters,bool faultEnd) = 0;
+
+    virtual void resetInterFault(
+        struct FaultBPU::injFault f_parameters,bool faultEnd) = 0;
+
     /**
      * @param bp_history Pointer to the history object.  The predictor
      * will need to update any state and delete the object.
@@ -220,6 +226,10 @@ class BPredUnit : public SimObject
     //TODO: understand injectFault ????
 
     void insertFault(struct FaultBPU::injFault faultParameters, bool faultEnd);
+
+    void insertInterFault(struct FaultBPU::injFault faultParameters, bool faultEnd);
+
+    void recoverInterFault(struct FaultBPU::injFault faultParameters, bool faultEnd);
 
   private:
     struct PredictorHistory {

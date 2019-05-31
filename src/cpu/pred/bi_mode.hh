@@ -67,6 +67,8 @@ class BiModeBP : public BPredUnit
     unsigned getGHR(ThreadID tid, void *bp_history) const;
 
     void setFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {}
+    void setInterFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {}
+    void resetInterFault(struct FaultBPU::injFault f_parameters,bool faultEnd) {}
   private:
     void updateGlobalHistReg(ThreadID tid, bool taken);
 

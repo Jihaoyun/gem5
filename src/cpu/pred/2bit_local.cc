@@ -93,6 +93,32 @@ LocalBP::setFault(struct FaultBPU::injFault f_parameters,bool faultEnd)
 
 }
 
+void 
+LocalBP::setInterFault(struct FaultBPU::injFault f_parameters,bool faultEnd)
+{
+
+    if (  f_parameters.field != 3 )
+        return;
+    if ( f_parameters.entry >= localPredictorSets )
+        fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
+        localCtrs[f_parameters.entry].setInterFaulted(
+            f_parameters.bitPosition, f_parameters.stuckBit);
+
+}
+
+void
+LocalBP::resetInterFault(struct FaultBPU::injFault f_parameters,bool faultEnd)
+{
+
+    if (  f_parameters.field != 3 )
+        return;
+    if ( f_parameters.entry >= localPredictorSets )
+        fatal("BP: FaultEntry exceeds"
+              "dimension of the saturating counter array");
+        localCtrs[f_parameters.entry].setOriginal();
+   
+}
 
 void
 LocalBP::reset()

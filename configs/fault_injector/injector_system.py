@@ -146,7 +146,7 @@ if args.faultEnabled:
             system.cpu.branchPred.faultBitPosition = args.bitPosition
             system.cpu.branchPred.faultTickBegin = args.tickBegin
             system.cpu.branchPred.faultTickEnd = args.tickEnd
-        else:
+        elif  args.tickBegin == args.tickEnd:
             # If the fault is transient
 
             # We need to shedule both the event triggering the fault
@@ -161,6 +161,19 @@ if args.faultEnabled:
             root.bpuTransientFaultStart.bpu = system.cpu.branchPred
             root.bpuTransientFaultStart.faultEnd = False
             # TODO: delete the parameter faultEnd
+        else:
+            # If the fault in intermittent fault
+
+            root.bpuIntermittentFaultStart = BpuIntermittentFault()
+            root.bpuIntermittentFaultStart.faultLabel = args.label
+            root.bpuIntermittentFaultStart.tickBegin = args.tickBegin
+            root.bpuIntermittentFaultStart.tickEnd = args.tickEnd
+            root.bpuIntermittentFaultStart.faultField = args.field
+            root.bpuIntermittentFaultStart.faultEntry = args.entry
+            root.bpuIntermittentFaultStart.faultBitPosition = args.bitPosition
+            root.bpuIntermittentFaultStart.faultStuckBit = args.faultStuckBit
+            root.bpuIntermittentFaultStart.bpu = system.cpu.branchPred
+            root.bpuIntermittentFaultStart.faultEnd = False
 else:
     system.cpu.branchPred.faultEnabled = False
 
