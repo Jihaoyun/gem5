@@ -1,17 +1,21 @@
 class RegFaultEntry:
-    def __init__(self, label, faultTick, regCategory, faultReg, bitPosition):
+    def __init__(self, label, stuckBit, regCategory, faultReg, bitPosition, tickBegin, tickEnd):
         self.label = label
-        self.faultTick = faultTick
+        self.stuckBit = stuckBit
         self.regCategory = regCategory
         self.faultReg = faultReg
         self.bitPosition = bitPosition
+        self.tickBegin = tickBegin
+        self.tickEnd = tickEnd
 
     def __str__(self):
         return ("Label: " + self.label + "\n" +
-                "FaultTick: " + self.faultTick + "\n" +
+                "StuckBit: " + self.stuckBit + "\n" +
                 "RegCategory: " + self.regCategory + "\n" +
                 "FaultReg: " + self.faultReg + "\n" +
-                "BitPosition: " + str(self.bitPosition) + "\n")
+                "BitPosition: " + str(self.bitPosition) + "\n" +
+                "TickBegin: " + self.tickBegin + "\n" +
+                "TickEnd: " + self.tickEnd + "\n")
 
 class RegFaultParser:
     def __init__(self, fileName):
@@ -49,4 +53,6 @@ class RegFaultParser:
                 entries[0],
                 entries[1],
                 entries[2],
-                entries[3])
+                entries[3],
+                entries[4],
+                entries[5])

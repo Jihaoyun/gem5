@@ -20,5 +20,8 @@ test
 fault.txt
 reg_fault.txt
 matmul_out.txt
+float_reg_fault.txt
+reg_fault.log
+float_reg_fault.log
 bus_trace.sh
 configs/**/*.bak

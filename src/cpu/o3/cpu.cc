@@ -1240,11 +1240,27 @@ FullO3CPU<Impl>::readIntReg(int reg_idx)
 }
 
 template <class Impl>
+uint64_t
+FullO3CPU<Impl>::readIntRegWithFault(int reg_idx)
+{
+    intRegfileReads++;
+    return regFile.readIntRegWithFault(reg_idx);
+}
+
+template <class Impl>
 FloatReg
 FullO3CPU<Impl>::readFloatReg(int reg_idx)
 {
     fpRegfileReads++;
     return regFile.readFloatReg(reg_idx);
+}
+
+template <class Impl>
+FloatReg
+FullO3CPU<Impl>::readFloatRegWithFault(int reg_idx)
+{
+    fpRegfileReads++;
+    return regFile.readFloatRegWithFault(reg_idx);
 }
 
 template <class Impl>
@@ -1256,11 +1272,27 @@ FullO3CPU<Impl>::readFloatRegBits(int reg_idx)
 }
 
 template <class Impl>
+FloatRegBits
+FullO3CPU<Impl>::readFloatRegBitsWithFault(int reg_idx)
+{
+    fpRegfileReads++;
+    return regFile.readFloatRegBitsWithFault(reg_idx);
+}
+
+template <class Impl>
 CCReg
 FullO3CPU<Impl>::readCCReg(int reg_idx)
 {
     ccRegfileReads++;
     return regFile.readCCReg(reg_idx);
+}
+
+template <class Impl>
+CCReg
+FullO3CPU<Impl>::readCCRegWithFault(int reg_idx)
+{
+    ccRegfileReads++;
+    return regFile.readCCRegWithFault(reg_idx);
 }
 
 template <class Impl>
@@ -1273,10 +1305,38 @@ FullO3CPU<Impl>::setIntReg(int reg_idx, uint64_t val)
 
 template <class Impl>
 void
+FullO3CPU<Impl>::setIntRegFault(int reg_idx, uint64_t numBit, char value)
+{
+    regFile.setIntRegFault(reg_idx, numBit, value);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::resetIntRegFault(int reg_idx, uint64_t numBit)
+{
+    regFile.resetIntRegFault(reg_idx, numBit);
+}
+
+template <class Impl>
+void
 FullO3CPU<Impl>::setFloatReg(int reg_idx, FloatReg val)
 {
     fpRegfileWrites++;
     regFile.setFloatReg(reg_idx, val);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::setFloatRegFault(int reg_idx, uint64_t numBit, char value)
+{
+    regFile.setFloatRegFault(reg_idx, numBit, value);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::resetFloatRegFault(int reg_idx, uint64_t numBit)
+{
+    regFile.resetFloatRegFault(reg_idx, numBit);
 }
 
 template <class Impl>
@@ -1289,10 +1349,38 @@ FullO3CPU<Impl>::setFloatRegBits(int reg_idx, FloatRegBits val)
 
 template <class Impl>
 void
+FullO3CPU<Impl>::setFloatRegBitsFault(int reg_idx, uint64_t numBit, char value)
+{
+    regFile.setFloatRegBitsFault(reg_idx, numBit, value);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::resetFloatRegBitsFault(int reg_idx, uint64_t numBit)
+{
+    regFile.resetFloatRegBitsFault(reg_idx, numBit);
+}
+
+template <class Impl>
+void
 FullO3CPU<Impl>::setCCReg(int reg_idx, CCReg val)
 {
     ccRegfileWrites++;
     regFile.setCCReg(reg_idx, val);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::setCCRegFault(int reg_idx, uint64_t numBit, char value)
+{
+    regFile.setCCRegFault(reg_idx, numBit, value);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::resetCCRegFault(int reg_idx, uint64_t numBit)
+{
+    regFile.resetCCRegFault(reg_idx, numBit);
 }
 
 template <class Impl>
@@ -1306,6 +1394,16 @@ FullO3CPU<Impl>::readArchIntReg(int reg_idx, ThreadID tid)
 }
 
 template <class Impl>
+uint64_t
+FullO3CPU<Impl>::readArchIntRegWithFault(int reg_idx, ThreadID tid)
+{
+    intRegfileReads++;
+    PhysRegIndex phys_reg = commitRenameMap[tid].lookupInt(reg_idx);
+
+    return regFile.readIntRegWithFault(phys_reg);
+}
+
+template <class Impl>
 float
 FullO3CPU<Impl>::readArchFloatReg(int reg_idx, ThreadID tid)
 {
@@ -1313,6 +1411,16 @@ FullO3CPU<Impl>::readArchFloatReg(int reg_idx, ThreadID tid)
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupFloat(reg_idx);
 
     return regFile.readFloatReg(phys_reg);
+}
+
+template <class Impl>
+float
+FullO3CPU<Impl>::readArchFloatRegWithFault(int reg_idx, ThreadID tid)
+{
+    fpRegfileReads++;
+    PhysRegIndex phys_reg = commitRenameMap[tid].lookupFloat(reg_idx);
+
+    return regFile.readFloatRegWithFault(phys_reg);
 }
 
 template <class Impl>
@@ -1326,6 +1434,16 @@ FullO3CPU<Impl>::readArchFloatRegInt(int reg_idx, ThreadID tid)
 }
 
 template <class Impl>
+uint64_t
+FullO3CPU<Impl>::readArchFloatRegIntWithFault(int reg_idx, ThreadID tid)
+{
+    fpRegfileReads++;
+    PhysRegIndex phys_reg = commitRenameMap[tid].lookupFloat(reg_idx);
+
+    return regFile.readFloatRegBitsWithFault(phys_reg);
+}
+
+template <class Impl>
 CCReg
 FullO3CPU<Impl>::readArchCCReg(int reg_idx, ThreadID tid)
 {
@@ -1333,6 +1451,16 @@ FullO3CPU<Impl>::readArchCCReg(int reg_idx, ThreadID tid)
     PhysRegIndex phys_reg = commitRenameMap[tid].lookupCC(reg_idx);
 
     return regFile.readCCReg(phys_reg);
+}
+
+template <class Impl>
+CCReg
+FullO3CPU<Impl>::readArchCCRegWithFault(int reg_idx, ThreadID tid)
+{
+    ccRegfileReads++;
+    PhysRegIndex phys_reg = commitRenameMap[tid].lookupCC(reg_idx);
+
+    return regFile.readCCRegWithFault(phys_reg);
 }
 
 template <class Impl>

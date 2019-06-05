@@ -54,10 +54,13 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 		"configs/lapo/reg_fault_injector.py",
 		"-fe",
 		"-b", benchmark,
-		"-trf", fault.faultTick,
+		"-l", fault.label,
+		"-sb", fault.stuckBit,
 		"-rfc", fault.regCategory,
 		"-fr", fault.faultReg,
-		"-rfbp", fault.bitPosition ]
+		"-rfbp", fault.bitPosition,
+		"-tb", fault.tickBegin,
+		"-te", fault.tickEnd ]
 
 	if args.debugFlags is not None:
 		cmd.insert(1, "--debug-flags=" + args.debugFlags)

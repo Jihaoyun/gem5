@@ -413,27 +413,59 @@ class FullO3CPU : public BaseO3CPU
 
     uint64_t readIntReg(int reg_idx);
 
+    uint64_t readIntRegWithFault(int reg_idx);
+
     TheISA::FloatReg readFloatReg(int reg_idx);
+
+    TheISA::FloatReg readFloatRegWithFault(int reg_idx);
 
     TheISA::FloatRegBits readFloatRegBits(int reg_idx);
 
+    TheISA::FloatRegBits readFloatRegBitsWithFault(int reg_idx);
+
     TheISA::CCReg readCCReg(int reg_idx);
+
+    TheISA::CCReg readCCRegWithFault(int reg_idx);
 
     void setIntReg(int reg_idx, uint64_t val);
 
+    void setIntRegFault(int reg_idx, uint64_t numBit, char value);
+
+    void resetIntRegFault(int reg_idx, uint64_t numBit);
+
     void setFloatReg(int reg_idx, TheISA::FloatReg val);
+
+    void setFloatRegFault(int reg_idx, uint64_t numBit, char value);
+
+    void resetFloatRegFault(int reg_idx, uint64_t numBit);
 
     void setFloatRegBits(int reg_idx, TheISA::FloatRegBits val);
 
+    void setFloatRegBitsFault(int reg_idx, uint64_t numBit, char value);
+
+    void resetFloatRegBitsFault(int reg_idx, uint64_t numBit);
+
     void setCCReg(int reg_idx, TheISA::CCReg val);
+
+    void setCCRegFault(int reg_idx, uint64_t numBit, char value);
+
+    void resetCCRegFault(int reg_idx, uint64_t numBit);
 
     uint64_t readArchIntReg(int reg_idx, ThreadID tid);
 
+    uint64_t readArchIntRegWithFault(int reg_idx, ThreadID tid);
+
     float readArchFloatReg(int reg_idx, ThreadID tid);
+
+    float readArchFloatRegWithFault(int reg_idx, ThreadID tid);
 
     uint64_t readArchFloatRegInt(int reg_idx, ThreadID tid);
 
+    uint64_t readArchFloatRegIntWithFault(int reg_idx, ThreadID tid);
+
     TheISA::CCReg readArchCCReg(int reg_idx, ThreadID tid);
+
+    TheISA::CCReg readArchCCRegWithFault(int reg_idx, ThreadID tid);
 
     /** Architectural register accessors.  Looks up in the commit
      * rename table to obtain the true physical index of the

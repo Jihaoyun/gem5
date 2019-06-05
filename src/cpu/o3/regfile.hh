@@ -65,11 +65,29 @@ class PhysRegFile
     /** Integer register file. */
     std::vector<IntReg> intRegFile;
 
+    /** Integer register file faults*/
+    std::vector<IntReg> intRegFileFault;
+
+    /** Integer register file fault mask*/
+    std::vector<IntReg> intRegFileMask;
+
     /** Floating point register file. */
     std::vector<PhysFloatReg> floatRegFile;
 
+    /** Floating point register file fault. */
+    std::vector<PhysFloatReg> floatRegFileFault;
+
+    /** Floating point register file fault mask. */
+    std::vector<PhysFloatReg> floatRegFileMask;
+
     /** Condition-code register file. */
     std::vector<CCReg> ccRegFile;
+
+    /** Condition-code register file fault. */
+    std::vector<CCReg> ccRegFileFault;
+
+    /** Condition-code register file fault mask. */
+    std::vector<CCReg> ccRegFileMask;
 
     /**
      * The first floating-point physical register index.  The physical
@@ -164,6 +182,16 @@ class PhysRegFile
         return intRegFile[reg_idx];
     }
 
+    /** Reads an integer register with fault. */
+    uint64_t readIntRegWithFault(PhysRegIndex reg_idx) const
+    {
+        assert(isIntPhysReg(reg_idx));
+
+        DPRINTF(IEW, "RegFile: Access to int register %i, has data "
+                "%#x\n", int(reg_idx), intRegFile[reg_idx]);
+        return (intRegFile[reg_idx] & ~intRegFileMask[reg_idx]) | (intRegFileFault[reg_idx] & intRegFileMask[reg_idx]);
+    }
+
     /** Reads a floating point register (double precision). */
     FloatReg readFloatReg(PhysRegIndex reg_idx) const
     {
@@ -178,6 +206,25 @@ class PhysRegFile
         return floatRegFile[reg_offset].d;
     }
 
+    /** Reads a floating point register (double precision) with fault. */
+    FloatReg readFloatRegWithFault(PhysRegIndex reg_idx) const
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        DPRINTF(IEW, "RegFile: Access to float register %i, has "
+                "data %#x\n", int(reg_idx), floatRegFile[reg_offset].q);
+
+        PhysFloatReg valueWithFault;
+
+        valueWithFault.q = (floatRegFile[reg_offset].q & ~floatRegFileMask[reg_offset].q) |
+            (floatRegFileFault[reg_offset].q & floatRegFileMask[reg_offset].q);
+
+        return valueWithFault.d;
+    }
+
     FloatRegBits readFloatRegBits(PhysRegIndex reg_idx) const
     {
         assert(isFloatPhysReg(reg_idx));
@@ -189,6 +236,22 @@ class PhysRegFile
 
         DPRINTF(IEW, "RegFile: Access to float register %i as int, "
                 "has data %#x\n", int(reg_idx), (uint64_t)floatRegBits);
+
+        return floatRegBits;
+    }
+
+    FloatRegBits readFloatRegBitsWithFault(PhysRegIndex reg_idx) const
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        FloatRegBits floatRegBits = (floatRegFile[reg_offset].q & ~floatRegFileMask[reg_offset].q) |
+            (floatRegFileFault[reg_offset].q & floatRegFileMask[reg_offset].q);
+
+        DPRINTF(IEW, "RegFile: Access to float register %i as int, "
+                "has (faulty) data %#x\n", int(reg_idx), (uint64_t)floatRegBits);
 
         return floatRegBits;
     }
@@ -207,6 +270,21 @@ class PhysRegFile
         return ccRegFile[reg_offset];
     }
 
+    /** Reads a condition-code register with fault. */
+    CCReg readCCRegWithFault(PhysRegIndex reg_idx)
+    {
+        assert(isCCPhysReg(reg_idx));
+
+        // Remove the base CC reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseCCRegIndex;
+
+        DPRINTF(IEW, "RegFile: Access to cc register %i, has "
+                "data %#x\n", int(reg_idx), ccRegFile[reg_offset]);
+
+        return (ccRegFile[reg_offset] & ~ccRegFileMask[reg_offset]) | 
+            (ccRegFileFault[reg_offset] & ccRegFileMask[reg_offset]);
+    }
+
     /** Sets an integer register to the given value. */
     void setIntReg(PhysRegIndex reg_idx, uint64_t val)
     {
@@ -217,6 +295,44 @@ class PhysRegFile
 
         if (reg_idx != TheISA::ZeroReg)
             intRegFile[reg_idx] = val;
+    }
+
+    /** Sets a fault in an integer register. */
+    void setIntRegFault(PhysRegIndex reg_idx, uint64_t numBit, char value)
+    {
+        assert(isIntPhysReg(reg_idx));
+
+        DPRINTF(IEW, "RegFile: Setting fault in int register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        int oldMask = (intRegFileMask[reg_idx] >> numBit) % 2;
+
+        assert(oldMask == 0);
+
+        if (reg_idx != TheISA::ZeroReg) {
+            intRegFileMask[reg_idx] += 1 << numBit;
+            intRegFileFault[reg_idx] += value << numBit;
+        }
+    }
+
+    /** Resets a fault in an integer register. */
+    void resetIntRegFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isIntPhysReg(reg_idx));
+
+        DPRINTF(IEW, "RegFile: Resetting fault in int register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        int mask = (intRegFileMask[reg_idx] >> numBit) % 2;
+        int faultValue = (intRegFileFault[reg_idx] >> numBit) % 2;
+
+        assert(mask == 1);
+
+        if (reg_idx != TheISA::ZeroReg) {
+            intRegFileMask[reg_idx] -= 1 << numBit;
+            if (faultValue)
+                intRegFileFault[reg_idx] -= faultValue << numBit;
+        }
     }
 
     /** Sets a double precision floating point register to the given value. */
@@ -236,6 +352,46 @@ class PhysRegFile
             floatRegFile[reg_offset].d = val;
     }
 
+    /** Sets a fault in a double precision floating point register. */
+    void setFloatRegFault(PhysRegIndex reg_idx, uint64_t numBit, char value)
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        DPRINTF(IEW, "RegFile: Setting fault in float register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        int oldMask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
+
+        assert(oldMask == 0);
+
+        floatRegFileMask[reg_offset].q += 1 << numBit;
+        floatRegFileFault[reg_offset].q += value << numBit;
+    }
+
+    /** Resets a fault in a double precision floating point register. */
+    void resetFloatRegFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        DPRINTF(IEW, "RegFile: Resetting fault in float register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        int mask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
+        int faultValue = (floatRegFileFault[reg_offset].q >> numBit) % 2;
+
+        assert(mask == 1);
+
+        floatRegFileMask[reg_offset].q -= 1 << numBit;
+        if (faultValue)
+            floatRegFileFault[reg_offset].q -= faultValue << numBit;
+    }
+
     void setFloatRegBits(PhysRegIndex reg_idx, FloatRegBits val)
     {
         assert(isFloatPhysReg(reg_idx));
@@ -247,6 +403,46 @@ class PhysRegFile
                 int(reg_idx), (uint64_t)val);
 
         floatRegFile[reg_offset].q = val;
+    }
+
+    /** Sets a fault in a double precision floating point register. */
+    void setFloatRegBitsFault(PhysRegIndex reg_idx, uint64_t numBit, char value)
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        DPRINTF(IEW, "RegFile: Setting fault in float register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        int oldMask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
+
+        assert(oldMask == 0);
+
+        floatRegFileMask[reg_offset].q += 1 << numBit;
+        floatRegFileFault[reg_offset].q += value << numBit;
+    }
+
+    /** Resets a fault in a double precision floating point register. */
+    void resetFloatRegBitsFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        DPRINTF(IEW, "RegFile: Resetting fault in float register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        int mask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
+        int faultValue = (floatRegFileFault[reg_offset].q >> numBit) % 2;
+
+        assert(mask == 1);
+
+        floatRegFileMask[reg_offset].q -= 1 << numBit;
+        if (faultValue)
+            floatRegFileFault[reg_offset].q -= faultValue << numBit;
     }
 
     /** Sets a condition-code register to the given value. */
@@ -262,6 +458,47 @@ class PhysRegFile
 
         ccRegFile[reg_offset] = val;
     }
+
+    /** Sets a fault in a condition-code register. */
+    void setCCRegFault(PhysRegIndex reg_idx, uint64_t numBit, char value)
+    {
+        assert(isCCPhysReg(reg_idx));
+
+        // Remove the base CC reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseCCRegIndex;
+
+        DPRINTF(IEW, "RegFile: Setting fault in cc register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        int oldMask = (ccRegFileMask[reg_offset] >> numBit) % 2;
+
+        assert(oldMask == 0);
+
+        ccRegFileMask[reg_offset] += 1 << numBit;
+        ccRegFileFault[reg_offset] += value << numBit;
+    }
+
+    /** Resets a fault in a condition-code register. */
+    void resetCCRegFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isCCPhysReg(reg_idx));
+
+        // Remove the base CC reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseCCRegIndex;
+
+        DPRINTF(IEW, "RegFile: Resetting fault in cc register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        int mask = (ccRegFileMask[reg_offset] >> numBit) % 2;
+        int faultValue = (ccRegFileFault[reg_offset] >> numBit) % 2;
+
+        assert(mask == 1);
+
+        ccRegFileMask[reg_offset] -= 1 << numBit;
+        if (faultValue)
+            ccRegFileFault[reg_offset] -= faultValue << numBit;
+    }
+
 };
 
 

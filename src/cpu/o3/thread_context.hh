@@ -174,19 +174,19 @@ class O3ThreadContext : public ThreadContext
 
     /** Reads an integer register. */
     virtual uint64_t readIntReg(int reg_idx) {
-        return readIntRegFlat(flattenIntIndex(reg_idx));
+        return readIntRegWithFaultFlat(flattenIntIndex(reg_idx));
     }
 
     virtual FloatReg readFloatReg(int reg_idx) {
-        return readFloatRegFlat(flattenFloatIndex(reg_idx));
+        return readFloatRegWithFaultFlat(flattenFloatIndex(reg_idx));
     }
 
     virtual FloatRegBits readFloatRegBits(int reg_idx) {
-        return readFloatRegBitsFlat(flattenFloatIndex(reg_idx));
+        return readFloatRegBitsWithFaultFlat(flattenFloatIndex(reg_idx));
     }
 
     virtual CCReg readCCReg(int reg_idx) {
-        return readCCRegFlat(flattenCCIndex(reg_idx));
+        return readCCRegWithFaultFlat(flattenCCIndex(reg_idx));
     }
 
     /** Sets an integer register to a value. */
@@ -194,16 +194,48 @@ class O3ThreadContext : public ThreadContext
         setIntRegFlat(flattenIntIndex(reg_idx), val);
     }
 
+    virtual void setIntRegFault(int reg_idx, uint64_t numBit, char value) {
+        setIntRegFaultFlat(flattenIntIndex(reg_idx), numBit, value);
+    }
+
+    virtual void resetIntRegFault(int reg_idx, uint64_t numBit) {
+        resetIntRegFaultFlat(flattenIntIndex(reg_idx), numBit);
+    }
+
     virtual void setFloatReg(int reg_idx, FloatReg val) {
         setFloatRegFlat(flattenFloatIndex(reg_idx), val);
+    }
+
+    virtual void setFloatRegFault(int reg_idx, uint64_t numBit, char value) {
+        setFloatRegFaultFlat(flattenFloatIndex(reg_idx), numBit, value);
+    }
+
+    virtual void resetFloatRegFault(int reg_idx, uint64_t numBit) {
+        resetFloatRegFaultFlat(flattenFloatIndex(reg_idx), numBit);
     }
 
     virtual void setFloatRegBits(int reg_idx, FloatRegBits val) {
         setFloatRegBitsFlat(flattenFloatIndex(reg_idx), val);
     }
 
+    virtual void setFloatRegBitsFault(int reg_idx, uint64_t numBit, char value) {
+        setFloatRegBitsFaultFlat(flattenFloatIndex(reg_idx), numBit, value);
+    }
+
+    virtual void resetFloatRegBitsFault(int reg_idx, uint64_t numBit) {
+        resetFloatRegBitsFaultFlat(flattenFloatIndex(reg_idx), numBit);
+    }
+
     virtual void setCCReg(int reg_idx, CCReg val) {
         setCCRegFlat(flattenCCIndex(reg_idx), val);
+    }
+
+    virtual void setCCRegFault(int reg_idx, uint64_t numBit, char value) {
+        setCCRegFaultFlat(flattenCCIndex(reg_idx), numBit, value);
+    }
+
+    virtual void resetCCRegFault(int reg_idx, uint64_t numBit) {
+        resetCCRegFaultFlat(flattenCCIndex(reg_idx), numBit);
     }
 
     /** Reads this thread's PC state. */
@@ -281,16 +313,29 @@ class O3ThreadContext : public ThreadContext
     }
 
     virtual uint64_t readIntRegFlat(int idx);
+    virtual uint64_t readIntRegWithFaultFlat(int idx);
     virtual void setIntRegFlat(int idx, uint64_t val);
+    virtual void setIntRegFaultFlat(int idx, uint64_t numBit, char value);
+    virtual void resetIntRegFaultFlat(int idx, uint64_t numBit);
 
     virtual FloatReg readFloatRegFlat(int idx);
+    virtual FloatReg readFloatRegWithFaultFlat(int idx);
     virtual void setFloatRegFlat(int idx, FloatReg val);
+    virtual void setFloatRegFaultFlat(int idx, uint64_t numBit, char value);
+    virtual void resetFloatRegFaultFlat(int idx, uint64_t numBit);
 
     virtual FloatRegBits readFloatRegBitsFlat(int idx);
+    virtual FloatRegBits readFloatRegBitsWithFaultFlat(int idx);
     virtual void setFloatRegBitsFlat(int idx, FloatRegBits val);
+    virtual void setFloatRegBitsFaultFlat(int idx, uint64_t numBit, char value);
+    virtual void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit);
 
     virtual CCReg readCCRegFlat(int idx);
+    virtual CCReg readCCRegWithFaultFlat(int idx);
     virtual void setCCRegFlat(int idx, CCReg val);
+    virtual void setCCRegFaultFlat(int idx, uint64_t numBit, char value);
+    virtual void resetCCRegFaultFlat(int idx, uint64_t numBit);
+    
 };
 
 #endif

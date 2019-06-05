@@ -213,11 +213,27 @@ class ThreadContext
 
     virtual void setIntReg(int reg_idx, uint64_t val) = 0;
 
+    virtual void setIntRegFault(int reg_idx, uint64_t numBit, char value) = 0;
+
+    virtual void resetIntRegFault(int reg_idx, uint64_t numBit) = 0;
+
     virtual void setFloatReg(int reg_idx, FloatReg val) = 0;
+
+    virtual void setFloatRegFault(int reg_idx, uint64_t numBit, char value) = 0;
+
+    virtual void resetFloatRegFault(int reg_idx, uint64_t numBit) = 0;
 
     virtual void setFloatRegBits(int reg_idx, FloatRegBits val) = 0;
 
+    virtual void setFloatRegBitsFault(int reg_idx, uint64_t numBit, char value) = 0;
+
+    virtual void resetFloatRegBitsFault(int reg_idx, uint64_t numBit) = 0;
+
     virtual void setCCReg(int reg_idx, CCReg val) = 0;
+
+    virtual void setCCRegFault(int reg_idx, uint64_t numBit, char value) = 0;
+
+    virtual void resetCCRegFault(int reg_idx, uint64_t numBit) = 0;
 
     virtual TheISA::PCState pcState() = 0;
 
@@ -287,16 +303,28 @@ class ThreadContext
      */
 
     virtual uint64_t readIntRegFlat(int idx) = 0;
+    virtual uint64_t readIntRegWithFaultFlat(int idx) = 0;
     virtual void setIntRegFlat(int idx, uint64_t val) = 0;
+    virtual void setIntRegFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void resetIntRegFaultFlat(int idx, uint64_t numBit) = 0;
 
     virtual FloatReg readFloatRegFlat(int idx) = 0;
+    virtual FloatReg readFloatRegWithFaultFlat(int idx) = 0;
     virtual void setFloatRegFlat(int idx, FloatReg val) = 0;
+    virtual void setFloatRegFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void resetFloatRegFaultFlat(int idx, uint64_t numBit) = 0;
 
     virtual FloatRegBits readFloatRegBitsFlat(int idx) = 0;
+    virtual FloatRegBits readFloatRegBitsWithFaultFlat(int idx)  = 0;
     virtual void setFloatRegBitsFlat(int idx, FloatRegBits val) = 0;
+    virtual void setFloatRegBitsFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit) = 0;
 
     virtual CCReg readCCRegFlat(int idx) = 0;
+    virtual CCReg readCCRegWithFaultFlat(int idx) = 0;
     virtual void setCCRegFlat(int idx, CCReg val) = 0;
+    virtual void setCCRegFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void resetCCRegFaultFlat(int idx, uint64_t numBit) = 0;
     /** @} */
 
 };
@@ -417,14 +445,38 @@ class ProxyThreadContext : public ThreadContext
     void setIntReg(int reg_idx, uint64_t val)
     { actualTC->setIntReg(reg_idx, val); }
 
+    void setIntRegFault(int reg_idx, uint64_t numBit, char value)
+    { actualTC->setIntRegFault(reg_idx, numBit, value); }
+
+    void resetIntRegFault(int reg_idx, uint64_t numBit)
+    { actualTC->resetIntRegFault(reg_idx, numBit); }
+
     void setFloatReg(int reg_idx, FloatReg val)
     { actualTC->setFloatReg(reg_idx, val); }
+
+    void setFloatRegFault(int reg_idx, uint64_t numBit, char value)
+    { actualTC->setFloatRegFault(reg_idx, numBit, value); }
+
+    void resetFloatRegFault(int reg_idx, uint64_t numBit)
+    { actualTC->resetFloatRegFault(reg_idx, numBit); }
 
     void setFloatRegBits(int reg_idx, FloatRegBits val)
     { actualTC->setFloatRegBits(reg_idx, val); }
 
+    void setFloatRegBitsFault(int reg_idx, uint64_t numBit, char value)
+    { actualTC->setFloatRegBitsFault(reg_idx, numBit, value); }
+
+    void resetFloatRegBitsFault(int reg_idx, uint64_t numBit)
+    { actualTC->resetFloatRegBitsFault(reg_idx, numBit); }
+
     void setCCReg(int reg_idx, CCReg val)
     { actualTC->setCCReg(reg_idx, val); }
+
+    void setCCRegFault(int reg_idx, uint64_t numBit, char value)
+    { actualTC->setCCRegFault(reg_idx, numBit, value); }
+
+    void resetCCRegFault(int reg_idx, uint64_t numBit)
+    { actualTC->resetCCRegFault(reg_idx, numBit); }
 
     TheISA::PCState pcState() { return actualTC->pcState(); }
 
@@ -479,26 +531,62 @@ class ProxyThreadContext : public ThreadContext
     uint64_t readIntRegFlat(int idx)
     { return actualTC->readIntRegFlat(idx); }
 
+    uint64_t readIntRegWithFaultFlat(int idx)
+    { return actualTC->readIntRegWithFaultFlat(idx); }
+
     void setIntRegFlat(int idx, uint64_t val)
     { actualTC->setIntRegFlat(idx, val); }
+
+    void setIntRegFaultFlat(int idx, uint64_t numBit, char value)
+    { actualTC->setIntRegFaultFlat(idx, numBit, value); }
+
+    void resetIntRegFaultFlat(int idx, uint64_t numBit)
+    { actualTC->resetIntRegFaultFlat(idx, numBit); }
 
     FloatReg readFloatRegFlat(int idx)
     { return actualTC->readFloatRegFlat(idx); }
 
+    FloatReg readFloatRegWithFaultFlat(int idx)
+    { return actualTC->readFloatRegWithFaultFlat(idx); }
+
     void setFloatRegFlat(int idx, FloatReg val)
     { actualTC->setFloatRegFlat(idx, val); }
+
+    void setFloatRegFaultFlat(int idx, uint64_t numBit, char value)
+    { actualTC->setFloatRegFaultFlat(idx, numBit, value); }
+
+    void resetFloatRegFaultFlat(int idx, uint64_t numBit)
+    { actualTC->resetFloatRegFaultFlat(idx, numBit); }
 
     FloatRegBits readFloatRegBitsFlat(int idx)
     { return actualTC->readFloatRegBitsFlat(idx); }
 
+    FloatRegBits readFloatRegBitsWithFaultFlat(int idx)
+    { return actualTC->readFloatRegBitsWithFaultFlat(idx); }
+
     void setFloatRegBitsFlat(int idx, FloatRegBits val)
     { actualTC->setFloatRegBitsFlat(idx, val); }
+
+    void setFloatRegBitsFaultFlat(int idx, uint64_t numBit, char value)
+    { actualTC->setFloatRegBitsFaultFlat(idx, numBit, value); }
+
+    void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit)
+    { actualTC->resetFloatRegBitsFaultFlat(idx, numBit); }
 
     CCReg readCCRegFlat(int idx)
     { return actualTC->readCCRegFlat(idx); }
 
+    CCReg readCCRegWithFaultFlat(int idx)
+    { return actualTC->readCCRegWithFaultFlat(idx); }
+
     void setCCRegFlat(int idx, CCReg val)
     { actualTC->setCCRegFlat(idx, val); }
+
+    void setCCRegFaultFlat(int idx, uint64_t numBit, char value)
+    { actualTC->setCCRegFaultFlat(idx, numBit, value); }
+
+    void resetCCRegFaultFlat(int idx, uint64_t numBit)
+    { actualTC->resetCCRegFaultFlat(idx, numBit); }
 };
 
 /** @{ */

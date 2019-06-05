@@ -109,10 +109,14 @@ class SimpleThread : public ThreadState
     union {
         FloatReg f[TheISA::NumFloatRegs];
         FloatRegBits i[TheISA::NumFloatRegs];
-    } floatRegs;
+    } floatRegs, floatRegsFault, floatRegsMask;
     TheISA::IntReg intRegs[TheISA::NumIntRegs];
+    TheISA::IntReg intRegsFault[TheISA::NumIntRegs];
+    TheISA::IntReg intRegsMask[TheISA::NumIntRegs];
 #ifdef ISA_HAS_CC_REGS
     TheISA::CCReg ccRegs[TheISA::NumCCRegs];
+    TheISA::CCReg ccRegsFault[TheISA::NumCCRegs];
+    TheISA::CCReg ccRegsMask[TheISA::NumCCRegs];
 #endif
     TheISA::ISA *const isa;    // one "instance" of the current ISA.
 
@@ -226,9 +230,15 @@ class SimpleThread : public ThreadState
     {
         _pcState = 0;
         memset(intRegs, 0, sizeof(intRegs));
+        memset(intRegsMask, 0, sizeof(intRegs));
+        memset(intRegsFault, 0, sizeof(intRegs));
         memset(floatRegs.i, 0, sizeof(floatRegs.i));
+        memset(floatRegsMask.i, 0, sizeof(floatRegs.i));
+        memset(floatRegsFault.i, 0, sizeof(floatRegs.i));
 #ifdef ISA_HAS_CC_REGS
         memset(ccRegs, 0, sizeof(ccRegs));
+        memset(ccRegsMask, 0, sizeof(ccRegs));
+        memset(ccRegsFault, 0, sizeof(ccRegs));
 #endif
         isa->clear();
     }
@@ -240,7 +250,7 @@ class SimpleThread : public ThreadState
     {
         int flatIndex = isa->flattenIntIndex(reg_idx);
         assert(flatIndex < TheISA::NumIntRegs);
-        uint64_t regVal(readIntRegFlat(flatIndex));
+        uint64_t regVal(readIntRegWithFaultFlat(flatIndex));
         DPRINTF(IntRegs, "Reading int reg %d (%d) as %#x.\n",
                 reg_idx, flatIndex, regVal);
         return regVal;
@@ -250,7 +260,7 @@ class SimpleThread : public ThreadState
     {
         int flatIndex = isa->flattenFloatIndex(reg_idx);
         assert(flatIndex < TheISA::NumFloatRegs);
-        FloatReg regVal(readFloatRegFlat(flatIndex));
+        FloatReg regVal(readFloatRegWithFaultFlat(flatIndex));
         DPRINTF(FloatRegs, "Reading float reg %d (%d) as %f, %#x.\n",
                 reg_idx, flatIndex, regVal, floatRegs.i[flatIndex]);
         return regVal;
@@ -260,7 +270,7 @@ class SimpleThread : public ThreadState
     {
         int flatIndex = isa->flattenFloatIndex(reg_idx);
         assert(flatIndex < TheISA::NumFloatRegs);
-        FloatRegBits regVal(readFloatRegBitsFlat(flatIndex));
+        FloatRegBits regVal(readFloatRegBitsWithFaultFlat(flatIndex));
         DPRINTF(FloatRegs, "Reading float reg %d (%d) bits as %#x, %f.\n",
                 reg_idx, flatIndex, regVal, floatRegs.f[flatIndex]);
         return regVal;
@@ -272,7 +282,7 @@ class SimpleThread : public ThreadState
         int flatIndex = isa->flattenCCIndex(reg_idx);
         assert(0 <= flatIndex);
         assert(flatIndex < TheISA::NumCCRegs);
-        uint64_t regVal(readCCRegFlat(flatIndex));
+        uint64_t regVal(readCCRegWithFaultFlat(flatIndex));
         DPRINTF(CCRegs, "Reading CC reg %d (%d) as %#x.\n",
                 reg_idx, flatIndex, regVal);
         return regVal;
@@ -291,6 +301,25 @@ class SimpleThread : public ThreadState
         setIntRegFlat(flatIndex, val);
     }
 
+    void setIntRegFault(int reg_idx, uint64_t numBit, char value)
+    {
+        int flatIndex = isa->flattenIntIndex(reg_idx);
+        assert(flatIndex < TheISA::NumIntRegs);
+        assert(value == 0 || value == 1);
+        DPRINTF(IntRegs, "Setting fault in int reg %d (%d) at bit %d to %#x.\n",
+                reg_idx, flatIndex, numBit, value);
+        setIntRegFaultFlat(flatIndex, numBit, value);
+    }
+
+    void resetIntRegFault(int reg_idx, uint64_t numBit)
+    {
+        int flatIndex = isa->flattenIntIndex(reg_idx);
+        assert(flatIndex < TheISA::NumIntRegs);
+        DPRINTF(IntRegs, "Resetting fault in int reg %d (%d) at bit %d.\n",
+                reg_idx, flatIndex, numBit);
+        resetIntRegFaultFlat(flatIndex, numBit);
+    }
+
     void setFloatReg(int reg_idx, FloatReg val)
     {
         int flatIndex = isa->flattenFloatIndex(reg_idx);
@@ -298,6 +327,25 @@ class SimpleThread : public ThreadState
         setFloatRegFlat(flatIndex, val);
         DPRINTF(FloatRegs, "Setting float reg %d (%d) to %f, %#x.\n",
                 reg_idx, flatIndex, val, floatRegs.i[flatIndex]);
+    }
+
+    void setFloatRegFault(int reg_idx, uint64_t numBit, char value)
+    {
+        int flatIndex = isa->flattenFloatIndex(reg_idx);
+        assert(flatIndex < TheISA::NumFloatRegs);
+        assert(value == 0 || value == 1);
+        setFloatRegFaultFlat(flatIndex, numBit, value);
+        DPRINTF(FloatRegs, "Setting fault in float reg %d (%d) at bit %d to %f, %#x.\n",
+                reg_idx, flatIndex, numBit, value, floatRegs.i[flatIndex]);
+    }
+
+    void resetFloatRegFault(int reg_idx, uint64_t numBit)
+    {
+        int flatIndex = isa->flattenFloatIndex(reg_idx);
+        assert(flatIndex < TheISA::NumFloatRegs);
+        DPRINTF(FloatRegs, "Resetting fault in float reg %d (%d) at bit %d.\n",
+                reg_idx, flatIndex, numBit);
+        resetFloatRegFaultFlat(flatIndex, numBit);
     }
 
     void setFloatRegBits(int reg_idx, FloatRegBits val)
@@ -312,6 +360,29 @@ class SimpleThread : public ThreadState
                 reg_idx, flatIndex, val, floatRegs.f[flatIndex]);
     }
 
+    void setFloatRegBitsFault(int reg_idx, uint64_t numBit, char value)
+    {
+        int flatIndex = isa->flattenFloatIndex(reg_idx);
+        assert(flatIndex < TheISA::NumFloatRegs);
+        assert(value == 0 || value == 1);
+        // XXX: Fix array out of bounds compiler error for gem5.fast
+        // when checkercpu enabled
+        if (flatIndex < TheISA::NumFloatRegs)
+            setFloatRegBitsFaultFlat(flatIndex, numBit, value);
+        DPRINTF(FloatRegs, "Setting fault in float reg %d (%d) bits at bit %d to %#x, %#f.\n",
+                reg_idx, flatIndex, numBit, value, floatRegs.f[flatIndex]);
+    }
+
+    void resetFloatRegBitsFault(int reg_idx, uint64_t numBit)
+    {
+        int flatIndex = isa->flattenFloatIndex(reg_idx);
+        assert(flatIndex < TheISA::NumFloatRegs);
+        DPRINTF(FloatRegs, "Resetting fault in float reg %d (%d) at bit %d.\n",
+                reg_idx, flatIndex, numBit);
+        if (flatIndex < TheISA::NumFloatRegs)
+            resetFloatRegBitsFaultFlat(flatIndex, numBit);
+    }
+
     void setCCReg(int reg_idx, CCReg val)
     {
 #ifdef ISA_HAS_CC_REGS
@@ -320,6 +391,33 @@ class SimpleThread : public ThreadState
         DPRINTF(CCRegs, "Setting CC reg %d (%d) to %#x.\n",
                 reg_idx, flatIndex, val);
         setCCRegFlat(flatIndex, val);
+#else
+        panic("Tried to set a CC register.");
+#endif
+    }
+
+    void setCCRegFault(int reg_idx, uint64_t numBit, char value)
+    {
+#ifdef ISA_HAS_CC_REGS
+        int flatIndex = isa->flattenCCIndex(reg_idx);
+        assert(flatIndex < TheISA::NumCCRegs);
+        assert(value == 0 || value == 1);
+        DPRINTF(CCRegs, "Setting fault in CC reg %d (%d) at bit %d to %#x.\n",
+                reg_idx, flatIndex, numBit, value);
+        setCCRegFaultFlat(flatIndex, numBit, value);
+#else
+        panic("Tried to set a CC register.");
+#endif
+    }
+
+    void resetCCRegFault(int reg_idx, uint64_t numBit)
+    {
+#ifdef ISA_HAS_CC_REGS
+        int flatIndex = isa->flattenCCIndex(reg_idx);
+        assert(flatIndex < TheISA::NumCCRegs);
+        DPRINTF(CCRegs, "Resetting fault in CC reg %d (%d) at bit %d.\n",
+                reg_idx, flatIndex, numBit);
+        resetCCRegFaultFlat(flatIndex, numBit);
 #else
         panic("Tried to set a CC register.");
 #endif
@@ -430,24 +528,117 @@ class SimpleThread : public ThreadState
     }
 
     uint64_t readIntRegFlat(int idx) { return intRegs[idx]; }
+    uint64_t readIntRegWithFaultFlat(int idx) 
+    { 
+        return (intRegs[idx] & ~intRegsMask[idx]) | ((intRegsFault[idx] & intRegsMask[idx])); 
+    }
     void setIntRegFlat(int idx, uint64_t val) { intRegs[idx] = val; }
+    void setIntRegFaultFlat(int idx, uint64_t numBit, char value) 
+    { 
+        intRegsMask[idx] += 1 << numBit;
+        intRegsFault[idx] += value << numBit; 
+    }
+    void resetIntRegFaultFlat(int idx, uint64_t numBit)
+    {
+        int mask = (intRegsMask[idx] >> numBit) % 2;
+        int faultValue = (intRegsFault[idx] >> numBit) % 2;
+
+        assert(mask == 1);
+
+        intRegsMask[idx] -= 1 << numBit;
+        if (faultValue)
+            intRegsFault[idx] -= faultValue << numBit;
+    }
 
     FloatReg readFloatRegFlat(int idx) { return floatRegs.f[idx]; }
+    FloatReg readFloatRegWithFaultFlat(int idx) 
+    { 
+        union {
+            FloatReg f;
+            FloatRegBits i;
+        } valueWithFault;
+        valueWithFault.i = (floatRegs.i[idx] & ~floatRegsMask.i[idx]) | (floatRegsFault.i[idx] & floatRegsMask.i[idx]);
+        return valueWithFault.f; 
+    }
     void setFloatRegFlat(int idx, FloatReg val) { floatRegs.f[idx] = val; }
+    void setFloatRegFaultFlat(int idx, uint64_t numBit, char value) 
+    { 
+        floatRegsMask.i[idx] += 1 << numBit;
+        floatRegsFault.i[idx] += value << numBit; 
+    }
+    void resetFloatRegFaultFlat(int idx, uint64_t numBit)
+    {
+        int mask = (floatRegsMask.i[idx] >> numBit) % 2;
+        int faultValue = (floatRegsFault.i[idx] >> numBit) % 2;
+
+        assert(mask == 1);
+
+        floatRegsMask.i[idx] -= 1 << numBit;
+        if (faultValue)
+            floatRegsFault.i[idx] -= faultValue << numBit;
+    }
 
     FloatRegBits readFloatRegBitsFlat(int idx) { return floatRegs.i[idx]; }
+    FloatRegBits readFloatRegBitsWithFaultFlat(int idx) 
+    { 
+        return (floatRegs.i[idx] & ~floatRegsMask.i[idx]) | (floatRegsFault.i[idx] & floatRegsMask.i[idx]); 
+    }
     void setFloatRegBitsFlat(int idx, FloatRegBits val) {
         floatRegs.i[idx] = val;
+    }
+    void setFloatRegBitsFaultFlat(int idx, uint64_t numBit, char value) {
+        floatRegsMask.i[idx] += 1 << numBit;
+        floatRegsFault.i[idx] += value << numBit;
+    }
+    void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit)
+    {
+        int mask = (floatRegsMask.i[idx] >> numBit) % 2;
+        int faultValue = (floatRegsFault.i[idx] >> numBit) % 2;
+
+        assert(mask == 1);
+
+        floatRegsMask.i[idx] -= 1 << numBit;
+        if (faultValue)
+            floatRegsFault.i[idx] -= faultValue << numBit;
     }
 
 #ifdef ISA_HAS_CC_REGS
     CCReg readCCRegFlat(int idx) { return ccRegs[idx]; }
+    CCReg readCCRegWithFaultFlat(int idx) 
+    { 
+        return (ccRegs[idx] & ~ccRegsMask[idx]) | (ccRegsFault[idx] & ccRegsMask[idx]); 
+    }
     void setCCRegFlat(int idx, CCReg val) { ccRegs[idx] = val; }
+    void setCCRegFaultFlat(int idx, uint64_t numBit, char value) 
+    { 
+        ccRegsMask[idx] += 1 << numBit;
+        ccRegsFault[idx] += value << numBit; 
+    }
+    void resetCCRegFaultFlat(int idx, uint64_t numBit)
+    {
+        int mask = (ccRegsMask[idx] >> numBit) % 2;
+        int faultValue = (ccRegsFault[idx] >> numBit) % 2;
+
+        assert(mask == 1);
+
+        ccRegsMask[idx] -= 1 << numBit;
+        if (faultValue)
+            ccRegsFault[idx] -= faultValue << numBit;
+    }
 #else
     CCReg readCCRegFlat(int idx)
     { panic("readCCRegFlat w/no CC regs!\n"); }
 
+    CCReg readCCRegWithFaultFlat(int idx)
+    { panic("readCCRegFlat w/no CC regs!\n"); }
+
     void setCCRegFlat(int idx, CCReg val)
+    { panic("setCCRegFlat w/no CC regs!\n"); }
+
+    void setCCRegFaultFlat(int idx, uint64_t numBit, char value)
+    { panic("setCCRegFlat w/no CC regs!\n"); }
+
+    void resetCCRegFaultFlat(int idx, uint64_t numBit)
     { panic("setCCRegFlat w/no CC regs!\n"); }
 #endif
 };

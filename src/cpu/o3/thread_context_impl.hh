@@ -195,10 +195,24 @@ O3ThreadContext<Impl>::readIntRegFlat(int reg_idx)
 }
 
 template <class Impl>
+uint64_t
+O3ThreadContext<Impl>::readIntRegWithFaultFlat(int reg_idx)
+{
+    return cpu->readArchIntRegWithFault(reg_idx, thread->threadId());
+}
+
+template <class Impl>
 TheISA::FloatReg
 O3ThreadContext<Impl>::readFloatRegFlat(int reg_idx)
 {
     return cpu->readArchFloatReg(reg_idx, thread->threadId());
+}
+
+template <class Impl>
+TheISA::FloatReg
+O3ThreadContext<Impl>::readFloatRegWithFaultFlat(int reg_idx)
+{
+    return cpu->readArchFloatRegWithFault(reg_idx, thread->threadId());
 }
 
 template <class Impl>
@@ -209,6 +223,13 @@ O3ThreadContext<Impl>::readFloatRegBitsFlat(int reg_idx)
 }
 
 template <class Impl>
+TheISA::FloatRegBits
+O3ThreadContext<Impl>::readFloatRegBitsWithFaultFlat(int reg_idx)
+{
+    return cpu->readArchFloatRegIntWithFault(reg_idx, thread->threadId());
+}
+
+template <class Impl>
 TheISA::CCReg
 O3ThreadContext<Impl>::readCCRegFlat(int reg_idx)
 {
@@ -216,10 +237,35 @@ O3ThreadContext<Impl>::readCCRegFlat(int reg_idx)
 }
 
 template <class Impl>
+TheISA::CCReg
+O3ThreadContext<Impl>::readCCRegWithFaultFlat(int reg_idx)
+{
+    return cpu->readArchCCRegWithFault(reg_idx, thread->threadId());
+}
+
+template <class Impl>
 void
 O3ThreadContext<Impl>::setIntRegFlat(int reg_idx, uint64_t val)
 {
     cpu->setArchIntReg(reg_idx, val, thread->threadId());
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
+O3ThreadContext<Impl>::setIntRegFaultFlat(int reg_idx, uint64_t numBit, char value)
+{
+    cpu->setIntRegFault(reg_idx, numBit, value);
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
+O3ThreadContext<Impl>::resetIntRegFaultFlat(int reg_idx, uint64_t numBit)
+{
+    cpu->resetIntRegFault(reg_idx, numBit);
 
     conditionalSquash();
 }
@@ -235,6 +281,24 @@ O3ThreadContext<Impl>::setFloatRegFlat(int reg_idx, FloatReg val)
 
 template <class Impl>
 void
+O3ThreadContext<Impl>::setFloatRegFaultFlat(int reg_idx, uint64_t numBit, char value)
+{
+    cpu->setFloatRegFault(reg_idx, numBit, value);
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
+O3ThreadContext<Impl>::resetFloatRegFaultFlat(int reg_idx, uint64_t numBit)
+{
+    cpu->resetFloatRegFault(reg_idx, numBit);
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
 O3ThreadContext<Impl>::setFloatRegBitsFlat(int reg_idx, FloatRegBits val)
 {
     cpu->setArchFloatRegInt(reg_idx, val, thread->threadId());
@@ -244,9 +308,45 @@ O3ThreadContext<Impl>::setFloatRegBitsFlat(int reg_idx, FloatRegBits val)
 
 template <class Impl>
 void
+O3ThreadContext<Impl>::setFloatRegBitsFaultFlat(int reg_idx, uint64_t numBit, char value)
+{
+    cpu->setFloatRegBitsFault(reg_idx, numBit, value);
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
+O3ThreadContext<Impl>::resetFloatRegBitsFaultFlat(int reg_idx, uint64_t numBit)
+{
+    cpu->resetFloatRegBitsFault(reg_idx, numBit);
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
 O3ThreadContext<Impl>::setCCRegFlat(int reg_idx, TheISA::CCReg val)
 {
     cpu->setArchCCReg(reg_idx, val, thread->threadId());
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
+O3ThreadContext<Impl>::setCCRegFaultFlat(int reg_idx, uint64_t numBit, char value)
+{
+    cpu->setCCRegFault(reg_idx, numBit, value);
+
+    conditionalSquash();
+}
+
+template <class Impl>
+void
+O3ThreadContext<Impl>::resetCCRegFaultFlat(int reg_idx, uint64_t numBit)
+{
+    cpu->resetCCRegFault(reg_idx, numBit);
 
     conditionalSquash();
 }
