@@ -214,15 +214,15 @@ class BaseO3DynInst : public BaseDynInst<Impl>
             switch (regIdxToClass(original_dest_reg)) {
               case IntRegClass:
                 this->setIntRegOperand(this->staticInst.get(), idx,
-                                       this->cpu->readIntReg(prev_phys_reg));
+                                       this->cpu->readIntRegWithFault(prev_phys_reg));
                 break;
               case FloatRegClass:
                 this->setFloatRegOperandBits(this->staticInst.get(), idx,
-                                             this->cpu->readFloatRegBits(prev_phys_reg));
+                                             this->cpu->readFloatRegBitsWithFault(prev_phys_reg));
                 break;
               case CCRegClass:
                 this->setCCRegOperand(this->staticInst.get(), idx,
-                                      this->cpu->readCCReg(prev_phys_reg));
+                                      this->cpu->readCCRegWithFault(prev_phys_reg));
                 break;
               case MiscRegClass:
                 // no need to forward misc reg values
@@ -254,22 +254,22 @@ class BaseO3DynInst : public BaseDynInst<Impl>
 
     IntReg readIntRegOperand(const StaticInst *si, int idx)
     {
-        return this->cpu->readIntReg(this->_srcRegIdx[idx]);
+        return this->cpu->readIntRegWithFault(this->_srcRegIdx[idx]);
     }
 
     FloatReg readFloatRegOperand(const StaticInst *si, int idx)
     {
-        return this->cpu->readFloatReg(this->_srcRegIdx[idx]);
+        return this->cpu->readFloatRegWithFault(this->_srcRegIdx[idx]);
     }
 
     FloatRegBits readFloatRegOperandBits(const StaticInst *si, int idx)
     {
-        return this->cpu->readFloatRegBits(this->_srcRegIdx[idx]);
+        return this->cpu->readFloatRegBitsWithFault(this->_srcRegIdx[idx]);
     }
 
     CCReg readCCRegOperand(const StaticInst *si, int idx)
     {
-        return this->cpu->readCCReg(this->_srcRegIdx[idx]);
+        return this->cpu->readCCRegWithFault(this->_srcRegIdx[idx]);
     }
 
     /** @todo: Make results into arrays so they can handle multiple dest
