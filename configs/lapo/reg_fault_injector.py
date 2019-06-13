@@ -16,7 +16,7 @@ parser.add_argument('-fe', '--fault-enabled', dest = 'faultEnabled',
 parser.set_defaults(faultEnabled = False)
 
 parser.add_argument('-b', '--benchmark', type = str, dest = 'benchmark',
-					required = True, nargs = '+',
+					required = True,
 					help = 'Benchmark for reg fault simulation')
 
 parser.add_argument('-l', '--label', type = str, dest = 'label',
@@ -94,7 +94,7 @@ process = LiveProcess()
 # Set the command
 # cmd is a list which begins with the executable (like argv)
 #process.cmd = sys.argv[1]
-process.cmd = args.benchmark
+process.cmd = args.benchmark.split()
 
 # Set the cpu to use the process as its workload and create thread contexts
 system.cpu.workload = process

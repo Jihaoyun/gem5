@@ -19,7 +19,10 @@ parser.add_argument('-b', '--benchmark', type = str, dest = 'benchmark',
 					required = True,
 					help = 'Benchmark for reg fault simulation')
 
-parser.add_argument('-trf', '--tick-reg-fault', type = int, dest = 'faultTick',
+parser.add_argument('-l', '--label', type = str, dest = 'label',
+					help = 'Reg fault name')
+
+parser.add_argument('-sb', '--stuck-bit', type = int, dest = 'stuckBit',
 					help = 'Start tick for register fault.')
 
 parser.add_argument('-rfc', '--reg-fault-category', type = int, dest = 'regCategory',
@@ -30,6 +33,12 @@ parser.add_argument('-fr', '--fault-reg', type = int, dest = 'faultReg',
 
 parser.add_argument('-rfbp', '--reg-fault-bit-posi', type = int, dest = 'bitPosition',
 					help = 'Register fault bit position.')
+
+parser.add_argument('-tb', '--tick-begin', type = int, dest = 'tickBegin',
+					help = 'Start tick for register fault.')
+
+parser.add_argument('-te', '--tick-end', type = int, dest = 'tickEnd',
+					help = 'End tick for register fault.')
 
 args = parser.parse_args()
 # create the system we are going to simulate
@@ -45,14 +54,26 @@ system.mem_mode = 'timing'               # Use timing accesses
 system.mem_ranges = [AddrRange('512MB')] # Create an address range
 
 # Create a simple CPU
-system.cpu = TimingSimpleCPU()
+system.cpu = DerivO3CPU()
+system.cache_line_size = 64
+system.cpu.numPhysIntRegs = 256
+system.cpu.numPhysFloatRegs = 256
+system.cpu.numIQEntries = 32
+system.cpu.LQEntries = 16
+system.cpu.SQEntries = 16
+system.cpu.numROBEntries = 40
 
-icache = L1_ICache(size = '4MB')
-dcache = L1_DCache(size = '4MB')
+icache = L1_ICache(size = '32kB')
+dcache = L1_DCache(size = '32kB')
+l2cache = L2Cache(size = '1MB')
+#system.cpu.addPrivateSplitL1Caches(icache, dcache, None, None)
 
-system.cpu.addPrivateSplitL1Caches(icache, dcache, None, None)
+system.cpu.addTwoLevelCacheHierarchy(icache, dcache, l2cache, None, None)
+system.cpu.icache.assoc = 4
+system.cpu.dcache.assoc = 4
+system.cpu.l2cache.assoc = 16
 
-system.cpu.monitor = CommMonitor()
+#system.cpu.monitor = CommMonitor()
 #system.cpu.monitor.trace = MemTraceProbe(trace_file="my_trace.trc.gz")
 
 # Create a memory bus, a coherent crossbar, in this case
@@ -60,11 +81,11 @@ system.membus = SystemXBar()
 
 # Hook the CPU ports up to the membus
 #system.cpu.icache_port = system.membus.slave
-system.cpu.dcache.mem_side = system.membus.slave
-system.cpu.icache.mem_side = system.cpu.monitor.slave
-system.cpu.monitor.master = system.membus.slave
-system.cpu.itb.walker.port = system.membus.slave
-system.cpu.dtb.walker.port = system.membus.slave
+#system.cpu.dcache_port = system.membus.slave
+#system.cpu.icache_port = system.cpu.monitor.slave
+#system.cpu.monitor.master = system.membus.slave
+
+
 
 # create the interrupt controller for the CPU and connect to the membus
 system.cpu.createInterruptController()
@@ -79,6 +100,8 @@ system.mem_ctrl.port = system.membus.master
 
 # Connect the system up to the membus
 system.system_port = system.membus.slave
+
+system.cpu.connectAllPorts(system.membus)
 
 # Create a process for a simple "Hello World" application
 process = LiveProcess()
@@ -95,30 +118,33 @@ system.cpu.createThreads()
 root = Root(full_system = False, system = system)
 
 if args.faultEnabled:
-	root.registerFault = RegisterFault()
-
-	if args.faultTick is not None:
-		root.registerFault.startTick = args.faultTick
-	else:
-		root.registerFault.startTick = 143930180	
-
-	root.registerFault.system = system	
-
-	if args.regCategory is not None:
+	if args.tickBegin == 0 and args.tickEnd == -1:
+		# If the fault is permanent
+		root.registerPermanentFault = RegisterPermanentFault()
+		root.registerPermanentFault.system = system
+		root.registerPermanentFault.registerCategory = args.regCategory
+		root.registerPermanentFault.faultRegister = args.faultReg
+		root.registerPermanentFault.bitPosition = args.bitPosition
+		root.registerPermanentFault.faultLabel = args.label
+		root.registerPermanentFault.faultStuckBit = args.stuckBit
+	elif args.tickBegin == args.tickEnd:
+		# If the fault is transient
+		root.registerFault = RegisterFault()
+		root.registerFault.startTick = args.tickBegin
+		root.registerFault.system = system	
 		root.registerFault.registerCategory = args.regCategory
-	else:
-		root.registerFault.registerCategory = 0	
-
-	if args.faultReg is not None:
 		root.registerFault.faultRegister = args.faultReg
-	else:
-		root.registerFault.faultRegister = 13	
-
-	if args.bitPosition is not None:
 		root.registerFault.bitPosition = args.bitPosition
 	else:
-		root.registerFault.bitPosition = 4
-
+		root.registerIntermittentFault = RegisterIntermittentFault()
+		root.registerIntermittentFault.system = system
+		root.registerIntermittentFault.registerCategory = args.regCategory
+		root.registerIntermittentFault.faultRegister = args.faultReg
+		root.registerIntermittentFault.bitPosition = args.bitPosition
+		root.registerIntermittentFault.faultLabel = args.label
+		root.registerIntermittentFault.faultStuckBit = args.stuckBit
+		root.registerIntermittentFault.tickBegin = args.tickBegin
+		root.registerIntermittentFault.tickEnd = args.tickEnd
 
 # instantiate all of the objects we've created above
 m5.instantiate()

@@ -42,6 +42,7 @@
 #include "config/the_isa.hh"
 #include "cpu/o3/comm.hh"
 #include "debug/IEW.hh"
+#include "debug/O3Registers.hh"
 
 class UnifiedFreeList;
 
@@ -179,6 +180,8 @@ class PhysRegFile
 
         DPRINTF(IEW, "RegFile: Access to int register %i, has data "
                 "%#x\n", int(reg_idx), intRegFile[reg_idx]);
+        DPRINTF(O3Registers, "RegFile: Access to int register %i, has data "
+                "%#x\n", int(reg_idx), intRegFile[reg_idx]);
         return intRegFile[reg_idx];
     }
 
@@ -187,8 +190,15 @@ class PhysRegFile
     {
         assert(isIntPhysReg(reg_idx));
 
+        uint64_t faultyRegFile = (intRegFile[reg_idx] & ~intRegFileMask[reg_idx]) | 
+                (intRegFileFault[reg_idx] & intRegFileMask[reg_idx]);
+
         DPRINTF(IEW, "RegFile: Access to int register %i, has data "
-                "%#x\n", int(reg_idx), intRegFile[reg_idx]);
+                "%#x and faulty value %#x\n", int(reg_idx), intRegFile[reg_idx], faultyRegFile);
+
+        DPRINTF(O3Registers, "RegFile: Access to int register %i, has data "
+                "%#x and faulty value %#x\n", int(reg_idx), intRegFile[reg_idx], faultyRegFile);
+
         return (intRegFile[reg_idx] & ~intRegFileMask[reg_idx]) | (intRegFileFault[reg_idx] & intRegFileMask[reg_idx]);
     }
 
@@ -203,6 +213,9 @@ class PhysRegFile
         DPRINTF(IEW, "RegFile: Access to float register %i, has "
                 "data %#x\n", int(reg_idx), floatRegFile[reg_offset].q);
 
+        DPRINTF(O3Registers, "RegFile: Access to float register %i, has "
+                "data %#x\n", int(reg_idx), floatRegFile[reg_offset].q);
+
         return floatRegFile[reg_offset].d;
     }
 
@@ -214,13 +227,18 @@ class PhysRegFile
         // Remove the base Float reg dependency.
         PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
 
-        DPRINTF(IEW, "RegFile: Access to float register %i, has "
-                "data %#x\n", int(reg_idx), floatRegFile[reg_offset].q);
-
         PhysFloatReg valueWithFault;
 
         valueWithFault.q = (floatRegFile[reg_offset].q & ~floatRegFileMask[reg_offset].q) |
             (floatRegFileFault[reg_offset].q & floatRegFileMask[reg_offset].q);
+
+        DPRINTF(IEW, "RegFile: Access to float register %i, has "
+                "data %#x and faulty value %#x\n", int(reg_idx), floatRegFile[reg_offset].q, 
+                valueWithFault.q);
+
+        DPRINTF(O3Registers, "RegFile: Access to float register %i, has "
+                "data %#x and faulty value %#x\n", int(reg_idx), floatRegFile[reg_offset].q, 
+                valueWithFault.q);
 
         return valueWithFault.d;
     }
@@ -237,6 +255,9 @@ class PhysRegFile
         DPRINTF(IEW, "RegFile: Access to float register %i as int, "
                 "has data %#x\n", int(reg_idx), (uint64_t)floatRegBits);
 
+        DPRINTF(O3Registers, "RegFile: Access to float register %i as int, "
+                "has data %#x\n", int(reg_idx), (uint64_t)floatRegBits);
+
         return floatRegBits;
     }
 
@@ -251,7 +272,12 @@ class PhysRegFile
             (floatRegFileFault[reg_offset].q & floatRegFileMask[reg_offset].q);
 
         DPRINTF(IEW, "RegFile: Access to float register %i as int, "
-                "has (faulty) data %#x\n", int(reg_idx), (uint64_t)floatRegBits);
+                "has data %#x and faulty value %#x\n", int(reg_idx), 
+                (uint64_t)floatRegFile[reg_offset].q, (uint64_t)floatRegBits);
+
+        DPRINTF(O3Registers, "RegFile: Access to float register %i as int, "
+                "has data %#x and faulty value %#x\n", int(reg_idx), 
+                (uint64_t)floatRegFile[reg_offset].q, (uint64_t)floatRegBits);
 
         return floatRegBits;
     }
@@ -267,6 +293,9 @@ class PhysRegFile
         DPRINTF(IEW, "RegFile: Access to cc register %i, has "
                 "data %#x\n", int(reg_idx), ccRegFile[reg_offset]);
 
+        DPRINTF(O3Registers, "RegFile: Access to cc register %i, has "
+                "data %#x\n", int(reg_idx), ccRegFile[reg_offset]);
+
         return ccRegFile[reg_offset];
     }
 
@@ -278,8 +307,16 @@ class PhysRegFile
         // Remove the base CC reg dependency.
         PhysRegIndex reg_offset = reg_idx - baseCCRegIndex;
 
+        CCReg faultyRegFile = (ccRegFile[reg_offset] & ~ccRegFileMask[reg_offset]) | 
+            (ccRegFileFault[reg_offset] & ccRegFileMask[reg_offset]);
+
         DPRINTF(IEW, "RegFile: Access to cc register %i, has "
-                "data %#x\n", int(reg_idx), ccRegFile[reg_offset]);
+                "data %#x and faulty value %#x\n", int(reg_idx), ccRegFile[reg_offset],
+                faultyRegFile);
+
+        DPRINTF(O3Registers, "RegFile: Access to cc register %i, has "
+                "data %#x and faulty value %#x\n", int(reg_idx), ccRegFile[reg_offset],
+                faultyRegFile);
 
         return (ccRegFile[reg_offset] & ~ccRegFileMask[reg_offset]) | 
             (ccRegFileFault[reg_offset] & ccRegFileMask[reg_offset]);
@@ -293,6 +330,9 @@ class PhysRegFile
         DPRINTF(IEW, "RegFile: Setting int register %i to %#x\n",
                 int(reg_idx), val);
 
+        DPRINTF(O3Registers, "RegFile: Setting int register %i to %#x\n",
+                int(reg_idx), val);
+
         if (reg_idx != TheISA::ZeroReg)
             intRegFile[reg_idx] = val;
     }
@@ -303,6 +343,9 @@ class PhysRegFile
         assert(isIntPhysReg(reg_idx));
 
         DPRINTF(IEW, "RegFile: Setting fault in int register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        DPRINTF(O3Registers, "RegFile: Setting fault in int register %i at bit %i to %#x\n",
                 int(reg_idx), int(numBit), (uint64_t)value);
 
         int oldMask = (intRegFileMask[reg_idx] >> numBit) % 2;
@@ -321,6 +364,9 @@ class PhysRegFile
         assert(isIntPhysReg(reg_idx));
 
         DPRINTF(IEW, "RegFile: Resetting fault in int register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Resetting fault in int register %i at bit %i \n",
                 int(reg_idx), int(numBit));
 
         int mask = (intRegFileMask[reg_idx] >> numBit) % 2;
@@ -346,6 +392,9 @@ class PhysRegFile
         DPRINTF(IEW, "RegFile: Setting float register %i to %#x\n",
                 int(reg_idx), (uint64_t)val);
 
+        DPRINTF(O3Registers, "RegFile: Setting float register %i to %#x\n",
+                int(reg_idx), (uint64_t)val);
+
 #if THE_ISA == ALPHA_ISA
         if (reg_offset != TheISA::ZeroReg)
 #endif
@@ -361,6 +410,9 @@ class PhysRegFile
         PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
 
         DPRINTF(IEW, "RegFile: Setting fault in float register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        DPRINTF(O3Registers, "RegFile: Setting fault in float register %i at bit %i to %#x\n",
                 int(reg_idx), int(numBit), (uint64_t)value);
 
         int oldMask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
@@ -380,6 +432,9 @@ class PhysRegFile
         PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
 
         DPRINTF(IEW, "RegFile: Resetting fault in float register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Resetting fault in float register %i at bit %i \n",
                 int(reg_idx), int(numBit));
 
         int mask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
@@ -402,6 +457,9 @@ class PhysRegFile
         DPRINTF(IEW, "RegFile: Setting float register %i to %#x\n",
                 int(reg_idx), (uint64_t)val);
 
+        DPRINTF(O3Registers, "RegFile: Setting float register %i to %#x\n",
+                int(reg_idx), (uint64_t)val);
+
         floatRegFile[reg_offset].q = val;
     }
 
@@ -414,6 +472,9 @@ class PhysRegFile
         PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
 
         DPRINTF(IEW, "RegFile: Setting fault in float register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        DPRINTF(O3Registers, "RegFile: Setting fault in float register %i at bit %i to %#x\n",
                 int(reg_idx), int(numBit), (uint64_t)value);
 
         int oldMask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
@@ -433,6 +494,9 @@ class PhysRegFile
         PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
 
         DPRINTF(IEW, "RegFile: Resetting fault in float register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Resetting fault in float register %i at bit %i \n",
                 int(reg_idx), int(numBit));
 
         int mask = (floatRegFileMask[reg_offset].q >> numBit) % 2;
@@ -456,6 +520,9 @@ class PhysRegFile
         DPRINTF(IEW, "RegFile: Setting cc register %i to %#x\n",
                 int(reg_idx), (uint64_t)val);
 
+        DPRINTF(O3Registers, "RegFile: Setting cc register %i to %#x\n",
+                int(reg_idx), (uint64_t)val);
+
         ccRegFile[reg_offset] = val;
     }
 
@@ -468,6 +535,9 @@ class PhysRegFile
         PhysRegIndex reg_offset = reg_idx - baseCCRegIndex;
 
         DPRINTF(IEW, "RegFile: Setting fault in cc register %i at bit %i to %#x\n",
+                int(reg_idx), int(numBit), (uint64_t)value);
+
+        DPRINTF(O3Registers, "RegFile: Setting fault in cc register %i at bit %i to %#x\n",
                 int(reg_idx), int(numBit), (uint64_t)value);
 
         int oldMask = (ccRegFileMask[reg_offset] >> numBit) % 2;
@@ -487,6 +557,9 @@ class PhysRegFile
         PhysRegIndex reg_offset = reg_idx - baseCCRegIndex;
 
         DPRINTF(IEW, "RegFile: Resetting fault in cc register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Resetting fault in cc register %i at bit %i \n",
                 int(reg_idx), int(numBit));
 
         int mask = (ccRegFileMask[reg_offset] >> numBit) % 2;
