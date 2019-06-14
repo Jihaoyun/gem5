@@ -184,6 +184,9 @@ DefaultBTB::lookup(Addr instPC, ThreadID tid)
 
     assert(btb_idx < numEntries);
 
+    DPRINTF(Fetch, "BTB: Looking up BTB entry %#x, BTB tag is %#x, target is %#x.\n", btb_idx,
+      btb[btb_idx].getTag(), btb[btb_idx].getTarget());
+
 
     if ( btb[btb_idx].getValid()
         && inst_tag == btb[btb_idx].getTag()
@@ -205,6 +208,9 @@ DefaultBTB::update(Addr instPC,const TheISA::PCState &target, ThreadID tid)
     btb[btb_idx].setValid(true);
     btb[btb_idx].setTarget( target );
     btb[btb_idx].setTag(getTag(instPC));
+
+    DPRINTF(Fetch, "BTB: Updating BTB entry %#x, BTB tag is %#x, target is %#x.\n", btb_idx,
+      btb[btb_idx].getTag(), btb[btb_idx].getTarget());
 }
 
 
