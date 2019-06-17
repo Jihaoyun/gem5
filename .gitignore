@@ -26,8 +26,5 @@ configs/**/*.bak
 fault*.txt
 reg_fault*.txt
 tests/test-progs/bbw_stat/
-bbw*.py
-fault_generator.py
-reg_extractor.py
-btb_extractor.py
+bbw-fault*.py
 toy_fault_generator.py
