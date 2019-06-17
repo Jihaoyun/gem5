@@ -1319,6 +1319,13 @@ FullO3CPU<Impl>::resetIntRegFault(int reg_idx, uint64_t numBit)
 
 template <class Impl>
 void
+FullO3CPU<Impl>::setIntRegTransFault(int reg_idx, uint64_t numBit)
+{
+    regFile.setIntRegTransFault(reg_idx, numBit);
+}
+
+template <class Impl>
+void
 FullO3CPU<Impl>::setFloatReg(int reg_idx, FloatReg val)
 {
     fpRegfileWrites++;
@@ -1337,6 +1344,13 @@ void
 FullO3CPU<Impl>::resetFloatRegFault(int reg_idx, uint64_t numBit)
 {
     regFile.resetFloatRegFault(reg_idx, numBit);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::setFloatRegTransFault(int reg_idx, uint64_t numBit)
+{
+    regFile.setFloatRegTransFault(reg_idx, numBit);
 }
 
 template <class Impl>
@@ -1363,6 +1377,13 @@ FullO3CPU<Impl>::resetFloatRegBitsFault(int reg_idx, uint64_t numBit)
 
 template <class Impl>
 void
+FullO3CPU<Impl>::setFloatRegBitsTransFault(int reg_idx, uint64_t numBit)
+{
+    regFile.setFloatRegBitsTransFault(reg_idx, numBit);
+}
+
+template <class Impl>
+void
 FullO3CPU<Impl>::setCCReg(int reg_idx, CCReg val)
 {
     ccRegfileWrites++;
@@ -1381,6 +1402,13 @@ void
 FullO3CPU<Impl>::resetCCRegFault(int reg_idx, uint64_t numBit)
 {
     regFile.resetCCRegFault(reg_idx, numBit);
+}
+
+template <class Impl>
+void
+FullO3CPU<Impl>::setCCRegTransFault(int reg_idx, uint64_t numBit)
+{
+    regFile.setCCRegTransFault(reg_idx, numBit);
 }
 
 template <class Impl>

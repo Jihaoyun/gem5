@@ -215,17 +215,23 @@ class ThreadContext
 
     virtual void setIntRegFault(int reg_idx, uint64_t numBit, char value) = 0;
 
+    virtual void setIntRegTransFault(int reg_idx, uint64_t numBit) = 0;
+
     virtual void resetIntRegFault(int reg_idx, uint64_t numBit) = 0;
 
     virtual void setFloatReg(int reg_idx, FloatReg val) = 0;
 
     virtual void setFloatRegFault(int reg_idx, uint64_t numBit, char value) = 0;
 
+    virtual void setFloatRegTransFault(int reg_idx, uint64_t numBit) = 0;
+
     virtual void resetFloatRegFault(int reg_idx, uint64_t numBit) = 0;
 
     virtual void setFloatRegBits(int reg_idx, FloatRegBits val) = 0;
 
     virtual void setFloatRegBitsFault(int reg_idx, uint64_t numBit, char value) = 0;
+
+    virtual void setFloatRegBitsTransFault(int reg_idx, uint64_t numBit) = 0;
 
     virtual void resetFloatRegBitsFault(int reg_idx, uint64_t numBit) = 0;
 
@@ -234,6 +240,8 @@ class ThreadContext
     virtual void setCCRegFault(int reg_idx, uint64_t numBit, char value) = 0;
 
     virtual void resetCCRegFault(int reg_idx, uint64_t numBit) = 0;
+
+    virtual void setCCRegTransFault(int reg_idx, uint64_t numBit) = 0;
 
     virtual TheISA::PCState pcState() = 0;
 
@@ -306,24 +314,28 @@ class ThreadContext
     virtual uint64_t readIntRegWithFaultFlat(int idx) = 0;
     virtual void setIntRegFlat(int idx, uint64_t val) = 0;
     virtual void setIntRegFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void setIntRegTransFaultFlat(int idx, uint64_t numBit) = 0;
     virtual void resetIntRegFaultFlat(int idx, uint64_t numBit) = 0;
 
     virtual FloatReg readFloatRegFlat(int idx) = 0;
     virtual FloatReg readFloatRegWithFaultFlat(int idx) = 0;
     virtual void setFloatRegFlat(int idx, FloatReg val) = 0;
     virtual void setFloatRegFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void setFloatRegTransFaultFlat(int idx, uint64_t numBit) = 0;
     virtual void resetFloatRegFaultFlat(int idx, uint64_t numBit) = 0;
 
     virtual FloatRegBits readFloatRegBitsFlat(int idx) = 0;
     virtual FloatRegBits readFloatRegBitsWithFaultFlat(int idx)  = 0;
     virtual void setFloatRegBitsFlat(int idx, FloatRegBits val) = 0;
     virtual void setFloatRegBitsFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void setFloatRegBitsTransFaultFlat(int idx, uint64_t numBit) = 0;
     virtual void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit) = 0;
 
     virtual CCReg readCCRegFlat(int idx) = 0;
     virtual CCReg readCCRegWithFaultFlat(int idx) = 0;
     virtual void setCCRegFlat(int idx, CCReg val) = 0;
     virtual void setCCRegFaultFlat(int idx, uint64_t numBit, char value) = 0;
+    virtual void setCCRegTransFaultFlat(int idx, uint64_t numBit) = 0;
     virtual void resetCCRegFaultFlat(int idx, uint64_t numBit) = 0;
     /** @} */
 
@@ -451,6 +463,9 @@ class ProxyThreadContext : public ThreadContext
     void resetIntRegFault(int reg_idx, uint64_t numBit)
     { actualTC->resetIntRegFault(reg_idx, numBit); }
 
+    void setIntRegTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setIntRegTransFault(reg_idx, numBit); }
+
     void setFloatReg(int reg_idx, FloatReg val)
     { actualTC->setFloatReg(reg_idx, val); }
 
@@ -459,6 +474,9 @@ class ProxyThreadContext : public ThreadContext
 
     void resetFloatRegFault(int reg_idx, uint64_t numBit)
     { actualTC->resetFloatRegFault(reg_idx, numBit); }
+
+    void setFloatRegTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setFloatRegTransFault(reg_idx, numBit); }
 
     void setFloatRegBits(int reg_idx, FloatRegBits val)
     { actualTC->setFloatRegBits(reg_idx, val); }
@@ -469,6 +487,9 @@ class ProxyThreadContext : public ThreadContext
     void resetFloatRegBitsFault(int reg_idx, uint64_t numBit)
     { actualTC->resetFloatRegBitsFault(reg_idx, numBit); }
 
+    void setFloatRegBitsTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setFloatRegBitsTransFault(reg_idx, numBit); }
+
     void setCCReg(int reg_idx, CCReg val)
     { actualTC->setCCReg(reg_idx, val); }
 
@@ -477,6 +498,9 @@ class ProxyThreadContext : public ThreadContext
 
     void resetCCRegFault(int reg_idx, uint64_t numBit)
     { actualTC->resetCCRegFault(reg_idx, numBit); }
+
+    void setCCRegTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setCCRegTransFault(reg_idx, numBit); }
 
     TheISA::PCState pcState() { return actualTC->pcState(); }
 
@@ -543,6 +567,9 @@ class ProxyThreadContext : public ThreadContext
     void resetIntRegFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetIntRegFaultFlat(idx, numBit); }
 
+    void setIntRegTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setIntRegTransFaultFlat(idx, numBit); }
+
     FloatReg readFloatRegFlat(int idx)
     { return actualTC->readFloatRegFlat(idx); }
 
@@ -557,6 +584,9 @@ class ProxyThreadContext : public ThreadContext
 
     void resetFloatRegFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetFloatRegFaultFlat(idx, numBit); }
+
+    void setFloatRegTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setFloatRegTransFaultFlat(idx, numBit); }
 
     FloatRegBits readFloatRegBitsFlat(int idx)
     { return actualTC->readFloatRegBitsFlat(idx); }
@@ -573,6 +603,9 @@ class ProxyThreadContext : public ThreadContext
     void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetFloatRegBitsFaultFlat(idx, numBit); }
 
+    void setFloatRegBitsTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setFloatRegBitsTransFaultFlat(idx, numBit); }
+
     CCReg readCCRegFlat(int idx)
     { return actualTC->readCCRegFlat(idx); }
 
@@ -587,6 +620,9 @@ class ProxyThreadContext : public ThreadContext
 
     void resetCCRegFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetCCRegFaultFlat(idx, numBit); }
+
+    void setCCRegTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setCCRegTransFaultFlat(idx, numBit); }
 };
 
 /** @{ */

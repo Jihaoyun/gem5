@@ -202,6 +202,10 @@ class O3ThreadContext : public ThreadContext
         resetIntRegFaultFlat(flattenIntIndex(reg_idx), numBit);
     }
 
+    virtual void setIntRegTransFault(int reg_idx, uint64_t numBit) {
+        setIntRegTransFaultFlat(flattenIntIndex(reg_idx), numBit);
+    }
+
     virtual void setFloatReg(int reg_idx, FloatReg val) {
         setFloatRegFlat(flattenFloatIndex(reg_idx), val);
     }
@@ -212,6 +216,10 @@ class O3ThreadContext : public ThreadContext
 
     virtual void resetFloatRegFault(int reg_idx, uint64_t numBit) {
         resetFloatRegFaultFlat(flattenFloatIndex(reg_idx), numBit);
+    }
+
+    virtual void setFloatRegTransFault(int reg_idx, uint64_t numBit) {
+        setFloatRegTransFaultFlat(flattenFloatIndex(reg_idx), numBit);
     }
 
     virtual void setFloatRegBits(int reg_idx, FloatRegBits val) {
@@ -226,6 +234,10 @@ class O3ThreadContext : public ThreadContext
         resetFloatRegBitsFaultFlat(flattenFloatIndex(reg_idx), numBit);
     }
 
+    virtual void setFloatRegBitsTransFault(int reg_idx, uint64_t numBit) {
+        setFloatRegBitsTransFaultFlat(flattenFloatIndex(reg_idx), numBit);
+    }
+
     virtual void setCCReg(int reg_idx, CCReg val) {
         setCCRegFlat(flattenCCIndex(reg_idx), val);
     }
@@ -237,6 +249,10 @@ class O3ThreadContext : public ThreadContext
     virtual void resetCCRegFault(int reg_idx, uint64_t numBit) {
         resetCCRegFaultFlat(flattenCCIndex(reg_idx), numBit);
     }
+
+    virtual void setCCRegTransFault(int reg_idx, uint64_t numBit) {
+        setCCRegTransFaultFlat(flattenCCIndex(reg_idx), numBit);
+    }    
 
     /** Reads this thread's PC state. */
     virtual TheISA::PCState pcState()
@@ -317,24 +333,28 @@ class O3ThreadContext : public ThreadContext
     virtual void setIntRegFlat(int idx, uint64_t val);
     virtual void setIntRegFaultFlat(int idx, uint64_t numBit, char value);
     virtual void resetIntRegFaultFlat(int idx, uint64_t numBit);
+    virtual void setIntRegTransFaultFlat(int idx, uint64_t numBit);
 
     virtual FloatReg readFloatRegFlat(int idx);
     virtual FloatReg readFloatRegWithFaultFlat(int idx);
     virtual void setFloatRegFlat(int idx, FloatReg val);
     virtual void setFloatRegFaultFlat(int idx, uint64_t numBit, char value);
     virtual void resetFloatRegFaultFlat(int idx, uint64_t numBit);
+    virtual void setFloatRegTransFaultFlat(int idx, uint64_t numBit);
 
     virtual FloatRegBits readFloatRegBitsFlat(int idx);
     virtual FloatRegBits readFloatRegBitsWithFaultFlat(int idx);
     virtual void setFloatRegBitsFlat(int idx, FloatRegBits val);
     virtual void setFloatRegBitsFaultFlat(int idx, uint64_t numBit, char value);
     virtual void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit);
+    virtual void setFloatRegBitsTransFaultFlat(int idx, uint64_t numBit);
 
     virtual CCReg readCCRegFlat(int idx);
     virtual CCReg readCCRegWithFaultFlat(int idx);
     virtual void setCCRegFlat(int idx, CCReg val);
     virtual void setCCRegFaultFlat(int idx, uint64_t numBit, char value);
     virtual void resetCCRegFaultFlat(int idx, uint64_t numBit);
+    virtual void setCCRegTransFaultFlat(int idx, uint64_t numBit);
     
 };
 

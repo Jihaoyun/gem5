@@ -129,12 +129,13 @@ if args.faultEnabled:
 		root.registerPermanentFault.faultStuckBit = args.stuckBit
 	elif args.tickBegin == args.tickEnd:
 		# If the fault is transient
-		root.registerFault = RegisterFault()
-		root.registerFault.startTick = args.tickBegin
-		root.registerFault.system = system	
-		root.registerFault.registerCategory = args.regCategory
-		root.registerFault.faultRegister = args.faultReg
-		root.registerFault.bitPosition = args.bitPosition
+		root.registerTransientFault = PhysicalRegisterTransientFault()
+		root.registerTransientFault.tickBegin = args.tickBegin
+		root.registerTransientFault.system = system	
+		root.registerTransientFault.registerCategory = args.regCategory
+		root.registerTransientFault.faultRegister = args.faultReg
+		root.registerTransientFault.bitPosition = args.bitPosition
+		root.registerTransientFault.faultLabel = args.label
 	else:
 		root.registerIntermittentFault = RegisterIntermittentFault()
 		root.registerIntermittentFault.system = system

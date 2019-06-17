@@ -381,6 +381,27 @@ class PhysRegFile
         }
     }
 
+    /** Inject a transient fault in physical reg file (flip a bit in the reg). */
+    void setIntRegTransFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isIntPhysReg(reg_idx));
+
+        DPRINTF(IEW, "RegFile: Transient fault in int register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Transient fault in int register %i at bit %i, before fault: %#x, ",
+                int(reg_idx), int(numBit), uint64_t(intRegFile[reg_idx]));
+
+        uint64_t mask = 1 << numBit;
+
+        if (reg_idx != TheISA::ZeroReg) {
+            intRegFile[reg_idx] = intRegFile[reg_idx] ^ mask;
+        }
+
+        DPRINTF(O3Registers, "after fault: %#x\n",
+                uint64_t(intRegFile[reg_idx]));
+    }
+
     /** Sets a double precision floating point register to the given value. */
     void setFloatReg(PhysRegIndex reg_idx, FloatReg val)
     {
@@ -447,6 +468,29 @@ class PhysRegFile
             floatRegFileFault[reg_offset].q -= faultValue << numBit;
     }
 
+    /** Inject a transient fault in a double precision floating point register. */
+    void setFloatRegTransFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        DPRINTF(IEW, "RegFile: Transient fault in float register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Transient fault in float register %i at bit %i, before fault: %#x, ",
+                int(reg_idx), int(numBit), uint64_t(floatRegFile[reg_offset].q));
+
+        uint64_t mask = 1 << numBit;
+
+
+        floatRegFile[reg_offset].q = floatRegFile[reg_offset].q ^ mask;
+
+        DPRINTF(O3Registers, "after fault: %#x\n",
+                uint64_t(floatRegFile[reg_offset].q));
+    }
+
     void setFloatRegBits(PhysRegIndex reg_idx, FloatRegBits val)
     {
         assert(isFloatPhysReg(reg_idx));
@@ -507,6 +551,29 @@ class PhysRegFile
         floatRegFileMask[reg_offset].q -= 1 << numBit;
         if (faultValue)
             floatRegFileFault[reg_offset].q -= faultValue << numBit;
+    }
+
+    /** Inject a transient fault in a double precision floating point register. */
+    void setFloatRegBitsTransFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isFloatPhysReg(reg_idx));
+
+        // Remove the base Float reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseFloatRegIndex;
+
+        DPRINTF(IEW, "RegFile: Transient fault in float register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Transient fault in float register %i at bit %i, before fault: %#x, ",
+                int(reg_idx), int(numBit), uint64_t(floatRegFile[reg_offset].q));
+
+        uint64_t mask = 1 << numBit;
+
+
+        floatRegFile[reg_offset].q = floatRegFile[reg_offset].q ^ mask;
+
+        DPRINTF(O3Registers, "after fault: %#x\n",
+                uint64_t(floatRegFile[reg_offset].q));
     }
 
     /** Sets a condition-code register to the given value. */
@@ -570,6 +637,28 @@ class PhysRegFile
         ccRegFileMask[reg_offset] -= 1 << numBit;
         if (faultValue)
             ccRegFileFault[reg_offset] -= faultValue << numBit;
+    }
+
+    /** Inject a transient fault in a condition-code register. */
+    void setCCRegTransFault(PhysRegIndex reg_idx, uint64_t numBit)
+    {
+        assert(isCCPhysReg(reg_idx));
+
+        // Remove the base CC reg dependency.
+        PhysRegIndex reg_offset = reg_idx - baseCCRegIndex;
+
+        DPRINTF(IEW, "RegFile: Transient fault in cc register %i at bit %i \n",
+                int(reg_idx), int(numBit));
+
+        DPRINTF(O3Registers, "RegFile: Transient fault in cc register %i at bit %i, before fault %#x, ",
+                int(reg_idx), int(numBit), uint64_t(ccRegFile[reg_offset]) );
+
+        uint64_t mask = 1 << numBit;
+ 
+        ccRegFile[reg_offset] = ccRegFile[reg_offset] ^ mask;
+
+        DPRINTF(O3Registers, "after fault %#x\n",
+                uint64_t(ccRegFile[reg_offset]) );        
     }
 
 };

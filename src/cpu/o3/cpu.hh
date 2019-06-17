@@ -433,11 +433,15 @@ class FullO3CPU : public BaseO3CPU
 
     void resetIntRegFault(int reg_idx, uint64_t numBit);
 
+    void setIntRegTransFault(int reg_idx, uint64_t numBit);
+
     void setFloatReg(int reg_idx, TheISA::FloatReg val);
 
     void setFloatRegFault(int reg_idx, uint64_t numBit, char value);
 
     void resetFloatRegFault(int reg_idx, uint64_t numBit);
+
+    void setFloatRegTransFault(int reg_idx, uint64_t numBit);
 
     void setFloatRegBits(int reg_idx, TheISA::FloatRegBits val);
 
@@ -445,11 +449,15 @@ class FullO3CPU : public BaseO3CPU
 
     void resetFloatRegBitsFault(int reg_idx, uint64_t numBit);
 
+    void setFloatRegBitsTransFault(int reg_idx, uint64_t numBit);
+
     void setCCReg(int reg_idx, TheISA::CCReg val);
 
     void setCCRegFault(int reg_idx, uint64_t numBit, char value);
 
     void resetCCRegFault(int reg_idx, uint64_t numBit);
+
+    void setCCRegTransFault(int reg_idx, uint64_t numBit);
 
     uint64_t readArchIntReg(int reg_idx, ThreadID tid);
 

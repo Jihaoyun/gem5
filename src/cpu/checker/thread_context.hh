@@ -228,6 +228,9 @@ class CheckerThreadContext : public ThreadContext
     void resetIntRegFault(int reg_idx, uint64_t numBit)
     { actualTC->resetIntRegFault(reg_idx, numBit); }
 
+    void setIntRegTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setIntRegTransFault(reg_idx, numBit); }
+
     void setFloatReg(int reg_idx, FloatReg val)
     {
         actualTC->setFloatReg(reg_idx, val);
@@ -239,6 +242,9 @@ class CheckerThreadContext : public ThreadContext
 
     void resetFloatRegFault(int reg_idx, uint64_t numBit)
     { actualTC->resetFloatRegFault(reg_idx, numBit); }
+
+    void setFloatRegTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setFloatRegTransFault(reg_idx, numBit); }
 
     void setFloatRegBits(int reg_idx, FloatRegBits val)
     {
@@ -252,6 +258,9 @@ class CheckerThreadContext : public ThreadContext
     void resetFloatRegBitsFault(int reg_idx, uint64_t numBit)
     { actualTC->resetFloatRegBitsFault(reg_idx, numBit); }
 
+    void setFloatRegBitsTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setFloatRegBitsTransFault(reg_idx, numBit); }
+
     void setCCReg(int reg_idx, CCReg val)
     {
         actualTC->setCCReg(reg_idx, val);
@@ -263,6 +272,9 @@ class CheckerThreadContext : public ThreadContext
 
     void resetCCRegFault(int reg_idx, uint64_t numBit)
     { actualTC->resetCCRegFault(reg_idx, numBit); }
+
+    void setCCRegTransFault(int reg_idx, uint64_t numBit)
+    { actualTC->setCCRegTransFault(reg_idx, numBit); }
 
     /** Reads this thread's PC state. */
     TheISA::PCState pcState()
@@ -347,6 +359,9 @@ class CheckerThreadContext : public ThreadContext
     void resetIntRegFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetIntRegFaultFlat(idx, numBit); }
 
+    void setIntRegTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setIntRegTransFaultFlat(idx, numBit); }
+
     FloatReg readFloatRegFlat(int idx)
     { return actualTC->readFloatRegFlat(idx); }
 
@@ -361,6 +376,9 @@ class CheckerThreadContext : public ThreadContext
 
     void resetFloatRegFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetFloatRegFaultFlat(idx, numBit); }
+
+    void setFloatRegTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setFloatRegTransFaultFlat(idx, numBit); }
 
     FloatRegBits readFloatRegBitsFlat(int idx)
     { return actualTC->readFloatRegBitsFlat(idx); }
@@ -377,6 +395,9 @@ class CheckerThreadContext : public ThreadContext
     void resetFloatRegBitsFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetFloatRegBitsFaultFlat(idx, numBit); }
 
+    void setFloatRegBitsTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setFloatRegBitsTransFaultFlat(idx, numBit); }
+
     CCReg readCCRegFlat(int idx)
     { return actualTC->readCCRegFlat(idx); }
 
@@ -391,6 +412,9 @@ class CheckerThreadContext : public ThreadContext
 
     void resetCCRegFaultFlat(int idx, uint64_t numBit)
     { actualTC->resetCCRegFaultFlat(idx, numBit); }
+
+    void setCCRegTransFaultFlat(int idx, uint64_t numBit)
+    { actualTC->setCCRegTransFaultFlat(idx, numBit); }
 };
 
 #endif // __CPU_CHECKER_EXEC_CONTEXT_HH__
