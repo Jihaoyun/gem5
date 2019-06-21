@@ -25,7 +25,6 @@ bus_trace.sh
 configs/**/*.bak
 fault*.txt
 reg_fault*.txt
-tests/test-progs/bbw_stat/
 bbw-fault*.py
 toy_fault_generator.py
 btb_extractor_2.py
