@@ -28,3 +28,7 @@ reg_fault*.txt
 tests/test-progs/bbw_stat/
 bbw-fault*.py
 toy_fault_generator.py
+btb_extractor_2.py
+fault_generator_2.py
+fault_generator_3.py
+tests/test-progs/bbw_stat_copy1/

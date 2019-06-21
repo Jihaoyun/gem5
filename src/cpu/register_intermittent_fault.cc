@@ -26,40 +26,40 @@ void RegisterIntermittentFault::faultSimBegin()
 
     if ( registerCategory == 1 ) {
 
-        registerBits = (*tc).readFloatRegBits(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "before FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readFloatRegBits(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "before FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
         (*tc).setFloatRegBitsFault(faultRegister, bitPosition, faultStuckBit);
-        registerBits = (*tc).readFloatRegBits(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "after FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readFloatRegBits(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "after FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
     }
     else if (registerCategory == 2 ){
 
-        registerBits = (*tc).readCCReg(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "before CCREG_C%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readCCReg(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "before CCREG_C%d: 0x%x\n", faultRegister, registerBits);
         (*tc).setCCRegFault(faultRegister, bitPosition, faultStuckBit);
-        registerBits = (*tc).readCCReg(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "after CCREG_C%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readCCReg(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "after CCREG_C%d: 0x%x\n", faultRegister, registerBits);
         }
     else {
-        registerBits =
-                (*tc).readIntRegFlat((*tc).flattenIntIndex(faultRegister));
+        //registerBits =
+        //        (*tc).readIntRegFlat((faultRegister));
 
-        DPRINTF(RegisterIntermittentFault,
-                "before INTREG_R%d: 0x%x\n",
-                (*tc).flattenIntIndex(faultRegister), registerBits);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "before INTREG_R%d: 0x%x\n",
+        //        (faultRegister), registerBits);
 
         (*tc).setIntRegFault(faultRegister, bitPosition, faultStuckBit);
 
-        registerBits =
-                (*tc).readIntRegWithFaultFlat((*tc).flattenIntIndex(faultRegister));
+        //registerBits =
+        //        (*tc).readIntRegWithFaultFlat((faultRegister));
 
-                DPRINTF(RegisterIntermittentFault,
-                "after INTREG_R%d: 0x%x\n",
-                (*tc).flattenIntIndex(faultRegister), registerBits);
+        //        DPRINTF(RegisterIntermittentFault,
+        //        "after INTREG_R%d: 0x%x\n",
+        //        (faultRegister), registerBits);
     }
 }
 
@@ -71,40 +71,40 @@ void RegisterIntermittentFault::faultSimEnd()
 
     if ( registerCategory == 1 ) {
 
-        registerBits = (*tc).readFloatRegBits(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "before FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readFloatRegBits(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "before FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
         (*tc).resetFloatRegBitsFault(faultRegister, bitPosition);
-        registerBits = (*tc).readFloatRegBits(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "after FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readFloatRegBits(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "after FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
     }
     else if (registerCategory == 2 ){
 
-        registerBits = (*tc).readCCReg(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "before CCREG_C%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readCCReg(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "before CCREG_C%d: 0x%x\n", faultRegister, registerBits);
         (*tc).resetCCRegFault(faultRegister, bitPosition);
-        registerBits = (*tc).readCCReg(faultRegister);
-        DPRINTF(RegisterIntermittentFault,
-                "after CCREG_C%d: 0x%x\n", faultRegister, registerBits);
+        //registerBits = (*tc).readCCReg(faultRegister);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "after CCREG_C%d: 0x%x\n", faultRegister, registerBits);
         }
     else {
-        registerBits =
-                (*tc).readIntRegWithFaultFlat((*tc).flattenIntIndex(faultRegister));
+        //registerBits =
+        //        (*tc).readIntRegWithFaultFlat((faultRegister));
 
-        DPRINTF(RegisterIntermittentFault,
-                "before INTREG_R%d: 0x%x\n",
-                (*tc).flattenIntIndex(faultRegister), registerBits);
+        //DPRINTF(RegisterIntermittentFault,
+        //        "before INTREG_R%d: 0x%x\n",
+        //        (faultRegister), registerBits);
 
         (*tc).resetIntRegFault(faultRegister, bitPosition);
 
-        registerBits =
-                (*tc).readIntRegWithFaultFlat((*tc).flattenIntIndex(faultRegister));
+        //registerBits =
+        //        (*tc).readIntRegWithFaultFlat((faultRegister));
 
-                DPRINTF(RegisterIntermittentFault,
-                "after INTREG_R%d: 0x%x\n",
-                (*tc).flattenIntIndex(faultRegister), registerBits);
+        //        DPRINTF(RegisterIntermittentFault,
+        //        "after INTREG_R%d: 0x%x\n",
+        //        (faultRegister), registerBits);
     }
 }
 

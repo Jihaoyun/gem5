@@ -1,5 +1,6 @@
 import re
 import argparse
+import random
 
 parser = argparse.ArgumentParser(description = 'gem5 with fault injection')
 
@@ -30,10 +31,10 @@ for logFile in args.logFile:
 						btb[btbIndex] = currentLine[0].strip()
 
 for key in btb.keys():
-	faultFile.write("1,0," + str(eval(key)) + ",0," + btb[key] + "\n")
+	faultFile.write("1,0," + str(eval(key)) + "," + str(random.randint(0, 19)) + "," + btb[key] + "\n")
 
 for key in btb.keys():
-	faultFile.write("1,1," + str(eval(key)) + ",0," + btb[key] + "\n")
+	faultFile.write("1,1," + str(eval(key)) + "," + str(random.randint(0, 31)) + "," + btb[key] + "\n")
 
 for key in btb.keys():
 	faultFile.write("1,2," + str(eval(key)) + ",0," + btb[key] + "\n")	

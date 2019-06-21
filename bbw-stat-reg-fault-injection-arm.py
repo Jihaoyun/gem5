@@ -5,6 +5,8 @@ from subprocess import call
 
 import os, sys
 
+import re
+
 sys.path.append(os.getcwd() + "/configs/lapo")
 sys.path.append(os.getcwd() + "/configs/fault_injector")
 
@@ -60,24 +62,30 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 		"-fr", fault.faultReg,
 		"-rfbp", fault.bitPosition,
 		"-tb", fault.tickBegin,
-		"-te", fault.tickEnd ]
+		"-te", fault.tickEnd]
 
 	cmd.insert(1, "--debug-file=" + statFolder + "/" + fault.label + "/" +\
 		fault.label + ".log")
 
-	cmd.insert(1, "--debug-start=0")
-	cmd.insert(1, "--debug-end=50000000")
+	#time = int(round(eval(re.match("FAULT(.*)", fault.label).group(1)) / 100000))
+
+	cmd.insert(1, "--debug-start=" + str(500000000))
+	cmd.insert(1, "--debug-end=" + str(1000000000))
 
 	if args.debugFlags is not None:
 		cmd.insert(1, "--debug-flags=" + args.debugFlags)
 	else:
+		#cmd.insert(1, "--debug-flags=" + "PseudoInst")
 		cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
 
-	try:
-		call(cmd)
-	finally:
-		if args.multiThread:
-			sem.release()
+	if eval(re.match("FAULT(.*)", fault.label).group(1)) % 500000 == 240011:
+		try:
+			f = open("m5out/" + statFolder + "/" + fault.label + "/debug.log", "w")
+			call(cmd, stdout = f, stderr = f)
+			f.close()
+		finally:
+			if args.multiThread:
+				sem.release()
 
 if __name__ == '__main__':
 	for benchmark in args.benchmarks:
@@ -107,57 +115,48 @@ if __name__ == '__main__':
 		cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN" + "/" +\
 			"GOLDEN" + ".log")
 
-		cmd.insert(1, "--debug-start=0")
-		cmd.insert(1, "--debug-end=50000000")
+		cmd.insert(1, "--debug-start=500000000")
+		cmd.insert(1, "--debug-end=1000000000")
 
 		if args.debugFlags is not None:
 			cmd.insert(1, "--debug-flags=" + args.debugFlags)
 		else:
 			cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
+			#cmd.insert(1, "--debug-flags=" + "PseudoInst")
 
-		try:
-			call(cmd)
-		finally:
-			if args.faultInput is not None:
-				for inputFile in args.faultInput.split(" "):
-					fp = RegFaultParser(inputFile)
-
-					if args.multiThread:
-						tpool = []
-
-					while fp.hasNext():
-
-						fe = fp.next()
-
-						outputFolder = "m5out/" + statFolder + "/"  + fe.label + "/"
+		#try:
+		#	call(cmd)
+		#finally:
+		if args.faultInput is not None:
+			for inputFile in args.faultInput.split(" "):
+				fp = RegFaultParser(inputFile)
+				if args.multiThread:
+					tpool = []
+				while fp.hasNext():
+					fe = fp.next()
+					outputFolder = "m5out/" + statFolder + "/"  + fe.label + "/"
+					if eval(re.match("FAULT(.*)", fe.label).group(1)) % 500000 == 240011:
 						if not os.path.exists(outputFolder):
 							os.makedirs(outputFolder)
-
-						benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
-						#benchmarkRun = benchmark
-						if args.outputFile != None:
-							benchmarkRun = benchmark.replace(args.outputFile,
-								outputFolder + args.outputFile+"_"+fe.label+".txt")
+					benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
+					#benchmarkRun = benchmark
+					if args.outputFile != None:
+						benchmarkRun = benchmark.replace(args.outputFile,
+							outputFolder + args.outputFile+"_"+fe.label+".txt")
+					if eval(re.match("FAULT(.*)", fe.label).group(1)) % 500000 == 240011:	
 						print "\n\nRunning " + benchmarkRun +\
 							" with fault:\n" + str(fe)
-
-						if args.multiThread:
-
-							sem.acquire()
-
-							t = Thread(target = StartRegFaultSim,
-								args = (statFolder, benchmarkRun, fe))
-
-							tpool.append(t)
-
-							t.start()
-
-						else:
-							StartRegFaultSim(statFolder, benchmarkRun, fe)
-
 					if args.multiThread:
-						for t in tpool:
-							t.join()
+						sem.acquire()
+						t = Thread(target = StartRegFaultSim,
+							args = (statFolder, benchmarkRun, fe))
+						tpool.append(t)
+						t.start()
+					else:
+						StartRegFaultSim(statFolder, benchmarkRun, fe)
+				if args.multiThread:
+					for t in tpool:
+						t.join()
 
 
 

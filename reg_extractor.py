@@ -1,5 +1,6 @@
 import re
 import argparse
+import random
 
 parser = argparse.ArgumentParser(description = 'gem5 with fault injection')
 
@@ -48,10 +49,10 @@ for logFile in args.logFile:
 
 
 for key in intReg.keys():
-	faultFile.write("1,0," + key + ",0," + intReg[key] + "\n")
+	faultFile.write("1,0," + key + "," + str(random.randint(0, 31)) + "," + intReg[key] + "\n")
 
 for key in floatReg.keys():
-	faultFile.write("1,1," + key + ",0," + floatReg[key] + "\n")
+	faultFile.write("1,1," + key + "," + str(random.randint(0, 31)) + "," + floatReg[key] + "\n")
 
 for key in ccReg.keys():
 	faultFile.write("1,2," + key + ",0," + ccReg[key] + "\n")	

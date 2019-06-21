@@ -74,17 +74,17 @@ def startBPUFaultedSim(benchmark, fault):
 
     if args.debugFlags is not None:
         cmd.insert(1, "--debug-flags=" + args.debugFlags)
-    else:
-        cmd.insert(1, "--debug-flags=" + "Fetch,PseudoInst,BpuIntermittentFault,BpuTransientFault")
+    #else:
+    #    cmd.insert(1, "--debug-flags=" + "Fetch,PseudoInst,BpuIntermittentFault,BpuTransientFault")
 
-    #if eval(re.match("FAULT(.*)", fault.label).group(1)) % 10000 == 5001: 
-    try:
-        call(cmd)
+    if eval(re.match("FAULT(.*)", fault.label).group(1)) % 50 == 11: 
+        try:
+            call(cmd)
 
-    finally:
-        # Notify thread completition
-        if args.multithread:
-            sem.release()
+        finally:
+            # Notify thread completition
+            if args.multithread:
+                sem.release()
 
 def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
     # Acquire rights to execute in multithreading context
@@ -140,13 +140,13 @@ if __name__ == '__main__':
         cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN" + "/" +\
             "GOLDEN" + ".log")
 
-        cmd.insert(1, "--debug-start=21800000000")
-        cmd.insert(1, "--debug-end=100000000")
+        cmd.insert(1, "--debug-start=3000000000")
+        cmd.insert(1, "--debug-end=3500000000")
 
         if args.debugFlags is not None:
             cmd.insert(1, "--debug-flags=" + args.debugFlags)
-        else:
-            cmd.insert(1, "--debug-flags=" + "Fetch,PseudoInst")
+        #else:
+            #cmd.insert(1, "--debug-flags=" + "Fetch,PseudoInst")
 
         try:
             call(cmd)
@@ -165,9 +165,9 @@ if __name__ == '__main__':
                         fe = fp.next()
 
                         outputFolder = "m5out/" + statFolder + "/"  + fe.label + "/"
-                        #if eval(re.match("FAULT(.*)", fe.label).group(1)) % 10000 == 5001: 
-                        if not os.path.exists(outputFolder):
-                            os.makedirs(outputFolder)
+                        if eval(re.match("FAULT(.*)", fe.label).group(1)) % 50 == 11: 
+                            if not os.path.exists(outputFolder):
+                                os.makedirs(outputFolder)
 
                         benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
                         if args.outputFile != None:

@@ -195,15 +195,15 @@ class O3ThreadContext : public ThreadContext
     }
 
     virtual void setIntRegFault(int reg_idx, uint64_t numBit, char value) {
-        setIntRegFaultFlat(flattenIntIndex(reg_idx), numBit, value);
+        setIntRegFaultFlat((reg_idx), numBit, value);
     }
 
     virtual void resetIntRegFault(int reg_idx, uint64_t numBit) {
-        resetIntRegFaultFlat(flattenIntIndex(reg_idx), numBit);
+        resetIntRegFaultFlat((reg_idx), numBit);
     }
 
     virtual void setIntRegTransFault(int reg_idx, uint64_t numBit) {
-        setIntRegTransFaultFlat(flattenIntIndex(reg_idx), numBit);
+        setIntRegTransFaultFlat((reg_idx), numBit);
     }
 
     virtual void setFloatReg(int reg_idx, FloatReg val) {
