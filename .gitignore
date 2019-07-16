@@ -31,3 +31,4 @@ btb_extractor_2.py
 fault_generator_2.py
 fault_generator_3.py
 tests/test-progs/bbw_stat_copy1/
+test*.rcS

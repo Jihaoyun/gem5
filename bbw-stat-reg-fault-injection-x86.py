@@ -51,7 +51,7 @@ if args.multiThread:
 
 
 def StartRegFaultSim(statFolder, benchmark, fault):
-	cmd = ["./build/ARM/gem5.opt", 
+	cmd = ["./build/X86/gem5.opt", 
 		"--stats-file", statFolder + "/" + fault.label + "/" + fault.label + ".txt",
 		"configs/lapo/reg_fault_injector_o3.py",
 		"-fe",
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 	for benchmark in args.benchmarks:
 		print "\n\nRunning " + benchmark + " GOLDEN\n"
 
-		statFolder = benchmark.split("/")[-1] + "-regFault-ARM-bbw-stat"
+		statFolder = benchmark.split("/")[-1] + "-regFault-X86-bbw-stat"
 		outputFolder = "m5out/" + statFolder + "/" + "GOLDEN/"
 
 		if not os.path.exists(outputFolder):
@@ -101,13 +101,13 @@ if __name__ == '__main__':
 			benchmark = " ".join([benchmark, args.options])
 
 		# Run Golden simulation
-		benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
-		#benchmarkRun = benchmark
+		#benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
+		benchmarkRun = benchmark
 		if args.outputFile != None:
 			benchmarkRun = benchmark.replace(args.outputFile,
 				outputFolder + args.outputFile + "_GOLDEN.txt")
 
-		cmd = ["./build/ARM/gem5.opt", 
+		cmd = ["./build/X86/gem5.opt", 
 			"--stats-file", statFolder + "/GOLDEN/" + "GOLDEN" + ".txt",
 			"configs/lapo/reg_fault_injector_o3.py",
 			"-b", benchmarkRun ]
@@ -120,8 +120,8 @@ if __name__ == '__main__':
 
 		if args.debugFlags is not None:
 			cmd.insert(1, "--debug-flags=" + args.debugFlags)
-		#else:
-			#cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
+		else:
+			cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
 			#cmd.insert(1, "--debug-flags=" + "PseudoInst")
 
 		try:

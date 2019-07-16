@@ -51,9 +51,9 @@ if args.multiThread:
 
 
 def StartRegFaultSim(statFolder, benchmark, fault):
-	cmd = ["./build/ARM/gem5.opt", 
+	cmd = ["./build/X86/gem5.opt", 
 		"--stats-file", statFolder + "/" + fault.label + "/" + fault.label + ".txt",
-		"configs/lapo/reg_fault_injector_o3.py",
+		"configs/lapo/reg_fault_injector_fs_o3.py",
 		"-fe",
 		"-b", benchmark,
 		"-l", fault.label,
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 	for benchmark in args.benchmarks:
 		print "\n\nRunning " + benchmark + " GOLDEN\n"
 
-		statFolder = benchmark.split("/")[-1] + "-regFault-ARM-bbw-stat"
+		statFolder = benchmark.split("/")[-1] + "-regFault-X86-bbw-stat"
 		outputFolder = "m5out/" + statFolder + "/" + "GOLDEN/"
 
 		if not os.path.exists(outputFolder):
@@ -101,16 +101,20 @@ if __name__ == '__main__':
 			benchmark = " ".join([benchmark, args.options])
 
 		# Run Golden simulation
-		benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
+		benchmarkRun = "../../pin-3.10-97971-gc5e41af74-gcc-linux/pin -t " +\
+			"../../pin-3.10-97971-gc5e41af74-gcc-linux/pin/source/tools/ManualExamples/obj-intel64/branchtrace.so -- " +\
+			benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
 		#benchmarkRun = benchmark
 		if args.outputFile != None:
 			benchmarkRun = benchmark.replace(args.outputFile,
 				outputFolder + args.outputFile + "_GOLDEN.txt")
 
-		cmd = ["./build/ARM/gem5.opt", 
+		scriptRun = "test.rcS"
+
+		cmd = ["./build/X86/gem5.opt", 
 			"--stats-file", statFolder + "/GOLDEN/" + "GOLDEN" + ".txt",
-			"configs/lapo/reg_fault_injector_o3.py",
-			"-b", benchmarkRun ]
+			"configs/lapo/reg_fault_injector_fs_o3.py",
+			"-s", scriptRun ]
 
 		cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN" + "/" +\
 			"GOLDEN" + ".log")
@@ -157,7 +161,3 @@ if __name__ == '__main__':
 					if args.multiThread:
 						for t in tpool:
 							t.join()
-
-
-
-
