@@ -51,9 +51,9 @@ class FDEntry : public Serializable
      * Constructor contains default values
      * The file descriptor is free.
      */
-    FDEntry()
+    FDEntry(bool close_on_exec = false)
         : fd(-1), mode(0), flags(0), isPipe(false), readPipeSource(0),
-          fileOffset(0), filename(""), driver(NULL)
+          fileOffset(0), filename(""), driver(NULL), _closeOnExec(close_on_exec)
     { }
 
     void serialize(CheckpointOut &cp) const override;
@@ -64,6 +64,10 @@ class FDEntry : public Serializable
      * @return value denoting if target file descriptor already used
      */
     bool isFree();
+
+    inline bool getCOE() const { return _closeOnExec; }
+ 
+    inline void setCOE(bool close_on_exec) { _closeOnExec = close_on_exec; }
 
     /**
      * Fill in members for this file descriptor entry.
@@ -87,6 +91,8 @@ class FDEntry : public Serializable
     uint64_t fileOffset;
     std::string filename;
     EmulatedDriver *driver;
+   protected:
+     bool _closeOnExec;
 };
 
 #endif // __FD_ENTRY_HH__

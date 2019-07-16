@@ -90,6 +90,8 @@
 #include "sim/syscall_emul_buf.hh"
 #include "sim/syscallreturn.hh"
 #include "sim/system.hh"
+#include "params/LiveProcess.hh"
+#include "params/Process.hh"
 
 // This wrapper macro helps out with readability a bit. FLAGEXT specifies
 // the verbosity and FMT is the message to be appended to the syscall
@@ -1567,6 +1569,82 @@ utimesFunc(SyscallDesc *desc, int callnum, LiveProcess *process,
 
     return 0;
 }
+
+ template <class OS>
+ SyscallReturn
+ execveFunc(SyscallDesc *desc, int callnum, LiveProcess *p, ThreadContext *tc)
+ {
+     desc->flags = 0;
+ 
+     int index = 0;
+     std::string path;
+     SETranslatingPortProxy & mem_proxy = tc->getMemProxy();
+     if (!mem_proxy.tryReadString(path, p->getSyscallArg(tc, index)))
+         return -EFAULT;
+ 
+     if (access(path.c_str(), F_OK) == -1)
+         return -EACCES;
+ 
+     auto read_in = [](std::vector<std::string> & vect,
+                       SETranslatingPortProxy & mem_proxy,
+                       Addr mem_loc)
+     {
+         for (int inc = 0; ; inc++) {
+             BufferArg b((mem_loc + sizeof(Addr) * inc), sizeof(Addr));
+             b.copyIn(mem_proxy);
+ 
+             if (!*(Addr*)b.bufferPtr())
+                 break;
+ 
+             vect.push_back(std::string());
+             mem_proxy.tryReadString(vect[inc], *(Addr*)b.bufferPtr());
+         }
+     };
+ 
+     LiveProcessParams *pp = new LiveProcessParams();
+     pp->executable = path;
+     Addr argv_mem_loc = p->getSyscallArg(tc, index);
+     read_in(pp->cmd, mem_proxy, argv_mem_loc);
+     Addr envp_mem_loc = p->getSyscallArg(tc, index);
+     read_in(pp->env, mem_proxy, envp_mem_loc);
+     pp->uid = p->uid();
+     pp->egid = p->egid();
+     pp->euid = p->euid();
+     pp->gid = p->gid();
+     pp->ppid = p->ppid();
+     pp->pid = p->pid();
+     pp->input.assign("cin");
+     pp->output.assign("cout");
+     pp->errout.assign("cerr");
+     pp->cwd.assign(p->getcwd());
+     pp->system = p->system;
+     p->system->PIDs.erase(p->pid());
+     Process *new_p = pp->create();
+     delete pp;
+ 
+     new_p->fd_array = p->fd_array;
+     for (int i = 0; i < new_p->fd_array->size(); i++) {
+         FDEntry* fdep = &(*new_p->fd_array)[i];
+         if (fdep && fdep->getCOE())
+            fdep->reset();
+             //new_p->fd_array->closeFDEntry(i);
+     }
+ 
+     *new_p->sigchld = true;
+ 
+     delete p;
+     tc->clearArchRegs();
+     tc->setProcessPtr(new_p);
+     new_p->assignThreadContext(tc->contextId());
+     new_p->initState();
+     tc->activate();
+     TheISA::PCState pcState = tc->pcState();
+     tc->setNPC(pcState.instAddr());
+ 
+     desc->flags = SyscallDesc::SuppressReturnValue;
+     return 0;
+ }
+
 /// Target getrusage() function.
 template <class OS>
 SyscallReturn

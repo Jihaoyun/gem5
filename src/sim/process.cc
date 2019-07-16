@@ -186,6 +186,9 @@ Process::Process(ProcessParams * params)
     mmap_end = 0;
     nxm_start = nxm_end = 0;
     // other parameters will be initialized when the program is loaded
+
+
+     sigchld = new bool();
 }
 
 
@@ -474,8 +477,17 @@ LiveProcess::LiveProcess(LiveProcessParams *params, ObjectFile *_objFile)
       __uid(params->uid), __euid(params->euid),
       __gid(params->gid), __egid(params->egid),
       __pid(params->pid), __ppid(params->ppid),
+      __pgid(params->pgid),
       drivers(params->drivers)
 {
+    if (__pid >= System::maxPID)
+         fatal("_pid is too large: %d", __pid);
+ 
+     auto ret_pair = system->PIDs.emplace(__pid);
+     if (!ret_pair.second)
+         fatal("_pid %d is already used", __pid);
+
+     __tgid = params->pid;
 
     // load up symbols, if any... these may be used for debugging or
     // profiling.

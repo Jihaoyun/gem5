@@ -120,15 +120,18 @@ class Process : public SimObject
 
     Stats::Scalar num_syscalls;       // number of syscalls executed
 
+     // Process was forked with SIGCHLD set.
+     bool *sigchld;
+
   protected:
     // constructor
     Process(ProcessParams *params);
 
-    void initState() override;
-
     DrainState drain() override;
 
   public:
+
+    void initState() override;
 
     //This id is assigned by m5 and is used to keep process' tlb entries
     //separated.
@@ -148,9 +151,11 @@ class Process : public SimObject
   private:
     static const int NUM_FDS = 1024;
 
+  public:
     // File descriptor remapping support.
     std::shared_ptr<std::array<FDEntry, NUM_FDS>> fd_array;
 
+  private:
     // Standard file descriptor options for initialization and checkpoints.
     std::map<std::string, int> imap;
     std::map<std::string, int> oemap;
@@ -255,9 +260,13 @@ class LiveProcess : public Process
     // pid of the process and it's parent
     uint64_t __pid;
     uint64_t __ppid;
+    uint64_t __pgid;
+    uint64_t __tgid;
 
     // Emulated drivers available to this process
     std::vector<EmulatedDriver *> drivers;
+
+    //std::shared_ptr<FDArray> fds;
 
   public:
 
@@ -297,6 +306,7 @@ class LiveProcess : public Process
     inline uint64_t egid() {return __egid;}
     inline uint64_t pid() {return __pid;}
     inline uint64_t ppid() {return __ppid;}
+    inline uint64_t tgid() {return __tgid;}
 
     // provide program name for debug messages
     virtual const char *progName() const { return executable.c_str(); }

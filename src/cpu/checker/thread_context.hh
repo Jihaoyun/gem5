@@ -130,6 +130,8 @@ class CheckerThreadContext : public ThreadContext
 
     Process *getProcessPtr() { return actualTC->getProcessPtr(); }
 
+    void setProcessPtr(Process *p) { actualTC->setProcessPtr(p); }
+
     PortProxy &getPhysProxy() { return actualTC->getPhysProxy(); }
 
     FSTranslatingPortProxy &getVirtProxy()
@@ -289,6 +291,12 @@ class CheckerThreadContext : public ThreadContext
         checkerCPU->recordPCChange(val);
         return actualTC->pcState(val);
     }
+
+    void setNPC(Addr val)
+     {
+         checkerTC->setNPC(val);
+         actualTC->setNPC(val);
+     }
 
     void pcStateNoRecord(const TheISA::PCState &val)
     {

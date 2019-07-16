@@ -66,6 +66,7 @@ class LiveProcess(Process):
     egid = Param.Int(100, 'effective group id')
     pid = Param.Int(100, 'process id')
     ppid = Param.Int(99, 'parent process id')
+    pgid = Param.Int(100, 'process group id')
     simpoint = Param.UInt64(0, 'simulation point at which to start simulation')
     drivers = VectorParam.EmulatedDriver([], 'Available emulated drivers')
 

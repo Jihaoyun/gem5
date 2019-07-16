@@ -107,6 +107,16 @@ struct ThreadState : public Serializable {
 
     Process *getProcessPtr() { return process; }
 
+    void setProcessPtr(Process *p)
+     {
+         process = p;
+         if (proxy) {
+             delete proxy;
+             proxy = NULL;
+             initMemProxies(NULL);
+         }
+     }
+
     SETranslatingPortProxy &getMemProxy();
 
     /** Reads the number of instructions functionally executed and

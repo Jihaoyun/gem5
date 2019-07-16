@@ -113,8 +113,8 @@ if __name__ == '__main__':
 
 		cmd = ["./build/X86/gem5.opt", 
 			"--stats-file", statFolder + "/GOLDEN/" + "GOLDEN" + ".txt",
-			"configs/lapo/reg_fault_injector_fs_o3.py",
-			"-s", scriptRun ]
+			"configs/lapo/reg_fault_injector_o3.py",
+			"-b", benchmarkRun ]
 
 		cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN" + "/" +\
 			"GOLDEN" + ".log")

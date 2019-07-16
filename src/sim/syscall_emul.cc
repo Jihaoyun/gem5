@@ -812,8 +812,8 @@ getpidFunc(SyscallDesc *desc, int callnum, LiveProcess *process,
     // fake_syscall mode, so there's no way for a process to know it's
     // not getting a unique value.
 
-    tc->setIntReg(SyscallPseudoReturnReg, process->ppid()); //PID
-    return process->pid();
+    //tc->setIntReg(SyscallPseudoReturnReg, process->ppid()); //PID
+    return process->tgid();
 }
 
 SyscallReturn
