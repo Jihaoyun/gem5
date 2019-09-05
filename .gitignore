@@ -26,9 +26,12 @@ configs/**/*.bak
 fault*.txt
 reg_fault*.txt
 bbw-fault*.py
+!bbw-fault-injection-arm-iter.py
 toy_fault_generator.py
 btb_extractor_2.py
 fault_generator_2.py
 fault_generator_3.py
 tests/test-progs/bbw_stat_copy1/
+tests/test-progs/bbw_stat_copy[0-9]*/
 test*.rcS
+fault_lite.py
