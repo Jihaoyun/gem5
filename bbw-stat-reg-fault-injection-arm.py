@@ -101,8 +101,8 @@ if __name__ == '__main__':
 			benchmark = " ".join([benchmark, args.options])
 
 		# Run Golden simulation
-		benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
-		#benchmarkRun = benchmark
+		#benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
+		benchmarkRun = benchmark
 		if args.outputFile != None:
 			benchmarkRun = benchmark.replace(args.outputFile,
 				outputFolder + args.outputFile + "_GOLDEN.txt")
@@ -115,13 +115,13 @@ if __name__ == '__main__':
 		cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN" + "/" +\
 			"GOLDEN" + ".log")
 
-		cmd.insert(1, "--debug-start=500000000")
-		cmd.insert(1, "--debug-end=1000000000")
+		#cmd.insert(1, "--debug-start=500000000")
+		#cmd.insert(1, "--debug-end=1000000000")
 
 		if args.debugFlags is not None:
 			cmd.insert(1, "--debug-flags=" + args.debugFlags)
-		#else:
-			#cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
+		else:
+			cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
 			#cmd.insert(1, "--debug-flags=" + "PseudoInst")
 
 		try:
@@ -138,8 +138,8 @@ if __name__ == '__main__':
 						#if eval(re.match("FAULT(.*)", fe.label).group(1)) % 20000 == 12:
 						if not os.path.exists(outputFolder):
 							os.makedirs(outputFolder)
-						benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
-						#benchmarkRun = benchmark
+						#benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
+						benchmarkRun = benchmark
 						if args.outputFile != None:
 							benchmarkRun = benchmark.replace(args.outputFile,
 								outputFolder + args.outputFile+"_"+fe.label+".txt")

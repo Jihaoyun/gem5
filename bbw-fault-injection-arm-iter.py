@@ -118,7 +118,7 @@ if __name__ == '__main__':
         # Create a folder to store stats releated to the current benchmark
         statFolder = benchmark.split("/")[-1] + "-ARM-bbw-stat"
 
-        for i in range(10):
+        for i in range(3):
             outputFolder = "m5out/" + statFolder + "/"  + "GOLDEN-jmp/try" + str(i) + "/"
             if not os.path.exists(outputFolder):
                 os.makedirs(outputFolder)   
@@ -127,7 +127,8 @@ if __name__ == '__main__':
                 benchmark = " ".join([benchmark, args.options]) 
 
             # Run Golden simulation
-            benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
+            benchmarkRun = benchmark
+            #benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
             if args.outputFile != None:
                 benchmarkRun = benchmark.replace(args.outputFile,
                     outputFolder + args.outputFile + "_GOLDEN.txt") 
