@@ -157,7 +157,7 @@ CommMonitor::print(PacketPtr pkt, bool is_req)
         mem_trace_fout<<std::dec<<curTick()<<"ps "
                       <<cmd<<" "
                       <<std::hex<<std::setfill('0')<<std::setw(16)
-                      <<pkt->getAddr()<<" ";    
+                      <<pkt->getAddr()<<" ";
 
         int_data = 0;
         for ( int i = 0; i < pkt->getSize(); i++ ) {
@@ -167,6 +167,10 @@ CommMonitor::print(PacketPtr pkt, bool is_req)
 
         mem_trace_fout<<std::setfill('0')<<std::setw(16)<<std::hex
                       <<int_data<<std::endl;
+
+        DPRINTF(DataCommMonitor,
+            "At tick %d forward %c command, at address %#018x, the data on bus is %#018x\n",
+            curTick(), cmd, pkt->getAddr(), int_data); 
     }
 }
 

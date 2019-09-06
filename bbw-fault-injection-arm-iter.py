@@ -118,7 +118,7 @@ if __name__ == '__main__':
         # Create a folder to store stats releated to the current benchmark
         statFolder = benchmark.split("/")[-1] + "-ARM-bbw-stat"
 
-        for i in range(10):
+        for i in range(1):
             outputFolder = "m5out/" + statFolder + "/"  + "GOLDEN-jmp/try" + str(i) + "/"
             if not os.path.exists(outputFolder):
                 os.makedirs(outputFolder)   
