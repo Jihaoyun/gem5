@@ -141,13 +141,13 @@ if __name__ == '__main__':
             cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN-jmp" + "/try" + str(i) + "/" +\
                 "GOLDEN" + ".log")  
 
-            #cmd.insert(1, "--debug-start=17500000000")
-            cmd.insert(1, "--debug-end=700000000")    
+            cmd.insert(1, "--debug-start=21000000000")
+            #cmd.insert(1, "--debug-end=21000000000")    
 
             if args.debugFlags is not None:
                 cmd.insert(1, "--debug-flags=" + args.debugFlags)
             else:
-                cmd.insert(1, "--debug-flags=" + "CommMonitor")
+                cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
                 #cmd.insert(1, "--debug-flags=" + "PseudoInst,Registers,O3Registers,Branch")    
 
             f = open("m5out/" + statFolder + "/" + "GOLDEN-jmp/try" + str(i) + "/" + "debug.log", "w")

@@ -86,8 +86,23 @@ dcache = L1_DCache(size="32kB")
 
 l2cache = L2Cache(size = "1MB")
 
+system.cpu.monitor = CommMonitor()
+
 #system.cpu.addPrivateSplitL1Caches(icache, dcache, None, None)
-system.cpu.addTwoLevelCacheHierarchy(icache, dcache, l2cache, None, None)
+#system.cpu.addTwoLevelCacheHierarchy(icache, dcache, l2cache, None, None)
+system.cpu.icache = icache
+system.cpu.dcache = dcache
+system.cpu.dcache_port = system.cpu.monitor.slave
+system.cpu.monitor.master = system.cpu.dcache.cpu_side
+system.cpu.icache_port = system.cpu.icache.cpu_side
+system.cpu.toL2Bus = L2XBar()
+system.cpu.icache.mem_side = system.cpu.toL2Bus.slave
+system.cpu.dtb.walker.port = system.cpu.toL2Bus.slave
+system.cpu.itb.walker.port = system.cpu.toL2Bus.slave
+system.cpu.dcache.mem_side = system.cpu.toL2Bus.slave
+system.cpu.l2cache = l2cache
+system.cpu.toL2Bus.master = system.cpu.l2cache.cpu_side
+
 system.cpu.icache.assoc = 4
 system.cpu.dcache.assoc = 4
 system.cpu.l2cache.assoc = 16
@@ -103,14 +118,11 @@ system.mem_ctrl = DDR3_1600_x64()
 system.mem_ctrl.range = system.mem_ranges[0]
 system.mem_ctrl.port = system.membus.master
 
-system.cpu.monitor = CommMonitor()
-
 # Connect the system up to the membus
 system.system_port = system.membus.slave
 
 #system.cpu.connectAllPorts(system.membus)
-system.cpu.l2cache.mem_side = system.cpu.monitor.slave
-system.cpu.monitor.master = system.membus.slave
+system.cpu.l2cache.mem_side = system.membus.slave
 
 # Create a process for a simple "Hello World" application
 process = LiveProcess()
