@@ -138,34 +138,40 @@ void
 CommMonitor::print(PacketPtr pkt, bool is_req)
 {
     char cmd;
-    const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
-    static uint64_t int_data;
+    if (pkt->flags.isSet(0x00001000 | 0x00002000)) {
+        const uint8_t* ptr = pkt->getConstPtr<uint8_t>();
+        static uint64_t int_data;   
 
-    if ( pkt->isRead() )
-      cmd = 'r';
-    else if ( pkt->isWrite() )
-      cmd = 'w';
-    else
-      cmd = 'u';
+        if ( pkt->isRead() )
+          cmd = 'r';
+        else if ( pkt->isWrite() )
+          cmd = 'w';
+        else
+          cmd = 'u';    
 
-    if (is_req)
-      mem_trace_fout<<"r ";
-    else
-      mem_trace_fout<<"a ";
+        if (is_req)
+          mem_trace_fout<<"r ";
+        else
+          mem_trace_fout<<"a "; 
 
-    mem_trace_fout<<std::dec<<curTick()<<"ps "
-                  <<cmd<<" "
-                  <<std::hex<<std::setfill('0')<<std::setw(16)
-                  <<pkt->getAddr()<<" ";
+        mem_trace_fout<<std::dec<<curTick()<<"ps "
+                      <<cmd<<" "
+                      <<std::hex<<std::setfill('0')<<std::setw(16)
+                      <<pkt->getAddr()<<" ";
 
-    int_data = 0;
-    for ( int i = 0; i < pkt->getSize(); i++ ) {
-      int_data |= (*ptr)<<i*8;
-      ptr++;
+        int_data = 0;
+        for ( int i = 0; i < pkt->getSize(); i++ ) {
+          int_data |= (*ptr)<<i*8;
+          ptr++;
+        }   
+
+        mem_trace_fout<<std::setfill('0')<<std::setw(16)<<std::hex
+                      <<int_data<<std::endl;
+
+        DPRINTF(DataCommMonitor,
+            "At tick %d forward %c command, at address %#018x, the data on bus is %#018x\n",
+            curTick(), cmd, pkt->getAddr(), int_data); 
     }
-
-    mem_trace_fout<<std::setfill('0')<<std::setw(16)<<std::hex
-                  <<int_data<<std::endl;
 }
 
 

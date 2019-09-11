@@ -54,7 +54,7 @@ def startBPUFaultedSim(benchmark, fault):
     cmd = ["./build/ARM/gem5.opt",
         "--stats-file", statFolder + "/" + fault.label + "/" + 
         fault.label + ".txt",
-        "configs/fault_injector/injector_system.py",
+        "configs/fault_injector/injector_system_monitor.py",
         "-fe",
         "-b", benchmark,
         "-l", fault.label,
@@ -93,7 +93,7 @@ def startBPUControlFaultedSim(statFolder, fname, benchmark, trigger, action):
     cmd = ["./build/ARM/gem5.opt",
         "--stats-file", statFolder + "/" +
         fname,
-        "configs/fault_injector/injector_system.py",
+        "configs/fault_injector/injector_system_monitor.py",
         "-fe",
         "-b", benchmark,
         "-l", "control-fault_" + fname,
@@ -136,19 +136,19 @@ if __name__ == '__main__':
             cmd = ["./build/ARM/gem5.opt",
                 "--stats-file", statFolder + "/GOLDEN-jmp/try" + str(i) + "/" +
                 "GOLDEN.txt",
-                "configs/fault_injector/injector_system.py",
+                "configs/fault_injector/injector_system_monitor.py",
                 "-b", benchmarkRun] 
 
             cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN-jmp" + "/try" + str(i) + "/" +\
                 "GOLDEN" + ".log")  
 
-            cmd.insert(1, "--debug-start=17500000000")
-            cmd.insert(1, "--debug-end=17700000000")    
+            cmd.insert(1, "--debug-start=21000000000")
+            #cmd.insert(1, "--debug-end=21000000000")    
 
             if args.debugFlags is not None:
                 cmd.insert(1, "--debug-flags=" + args.debugFlags)
-            #else:
-                #cmd.insert(1, "--debug-flags=" + "SyscallBase")
+            else:
+                cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
                 #cmd.insert(1, "--debug-flags=" + "PseudoInst,Registers,O3Registers,Branch")    
 
             f = open("m5out/" + statFolder + "/" + "GOLDEN-jmp/try" + str(i) + "/" + "debug.log", "w")
