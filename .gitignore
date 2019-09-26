@@ -33,5 +33,6 @@ fault_generator_2.py
 fault_generator_3.py
 tests/test-progs/bbw_stat_copy1/
 tests/test-progs/bbw_stat_copy[0-9]*/
+tests/test-progs/fault_tole_matmul_v[0-9]*/
 test*.rcS
 fault_lite.py

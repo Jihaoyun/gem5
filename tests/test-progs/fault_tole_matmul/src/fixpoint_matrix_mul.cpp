@@ -11,6 +11,11 @@ typedef vector< vector<int> > Matrix;
 const int mOrder = 2;
 const int BitWidth = 1 << 4;
 
+int DumbFunc()
+{
+    return 0;
+}
+
 
 // Print out the matrix
 void PrintMat(const Matrix &m, const int &num_row, const int &num_col) {
@@ -223,6 +228,8 @@ int main() {
             m_product[i][j] = m_product_chk[i][j];
         }
     }
+
+    DumbFunc();
 
     // Print and check the final result to simplify checking validity
     // Since the hardware do not have this print function, we need to insert hardware error before this function call

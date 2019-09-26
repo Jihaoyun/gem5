@@ -53,7 +53,7 @@ if args.multiThread:
 def StartRegFaultSim(statFolder, benchmark, fault):
 	cmd = ["./build/ARM/gem5.opt", 
 		"--stats-file", statFolder + "/" + fault.label + "/" + fault.label + ".txt",
-		"configs/lapo/reg_fault_injector_o3.py",
+		"configs/lapo/reg_fault_injector_o3_monitor.py",
 		"-fe",
 		"-b", benchmark,
 		"-l", fault.label,
@@ -69,13 +69,13 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 
 	#time = int(round(eval(re.match("FAULT(.*)", fault.label).group(1)) / 100000))
 
-	cmd.insert(1, "--debug-start=" + str(500000000))
-	cmd.insert(1, "--debug-end=" + str(1000000000))
+	#cmd.insert(1, "--debug-start=" + str(500000000))
+	#cmd.insert(1, "--debug-end=" + str(1000000000))
 
 	if args.debugFlags is not None:
 		cmd.insert(1, "--debug-flags=" + args.debugFlags)
 	#else:
-		#cmd.insert(1, "--debug-flags=" + "PseudoInst")
+		#cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
 		#cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
 
 	#if eval(re.match("FAULT(.*)", fault.label).group(1)) % 20000 == 12:
@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
 		cmd = ["./build/ARM/gem5.opt", 
 			"--stats-file", statFolder + "/GOLDEN/" + "GOLDEN" + ".txt",
-			"configs/lapo/reg_fault_injector_o3.py",
+			"configs/lapo/reg_fault_injector_o3_monitor.py",
 			"-b", benchmarkRun ]
 
 		cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN" + "/" +\
@@ -121,8 +121,8 @@ if __name__ == '__main__':
 		if args.debugFlags is not None:
 			cmd.insert(1, "--debug-flags=" + args.debugFlags)
 		else:
-			cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
-			#cmd.insert(1, "--debug-flags=" + "PseudoInst")
+			#cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
+			cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
 
 		try:
 			call(cmd)
