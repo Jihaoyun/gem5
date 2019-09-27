@@ -91,7 +91,7 @@ if __name__ == '__main__':
 	for benchmark in args.benchmarks:
 		print "\n\nRunning " + benchmark + " GOLDEN\n"
 
-		statFolder = benchmark.split("/")[-1] + "-regFault-ARM-bbw-stat"
+		statFolder = benchmark.split("/")[-1] + "-regFault-ARM-stat-core1"
 		outputFolder = "m5out/" + statFolder + "/" + "GOLDEN/"
 
 		if not os.path.exists(outputFolder):
@@ -102,14 +102,14 @@ if __name__ == '__main__':
 
 		# Run Golden simulation
 		#benchmarkRun = benchmark + " " + outputFolder + "simData.dat" + " " + outputFolder + "checkData.dat"
-		benchmarkRun = benchmark
+		benchmarkRun = benchmark + " " + benchmark
 		if args.outputFile != None:
 			benchmarkRun = benchmark.replace(args.outputFile,
 				outputFolder + args.outputFile + "_GOLDEN.txt")
 
 		cmd = ["./build/ARM/gem5.opt", 
 			"--stats-file", statFolder + "/GOLDEN/" + "GOLDEN" + ".txt",
-			"configs/lapo/reg_fault_injector_o3_monitor.py",
+			"configs/lapo/reg_fault_injector_o3_dualcore.py",
 			"-b", benchmarkRun ]
 
 		cmd.insert(1, "--debug-file=" + statFolder + "/" + "GOLDEN" + "/" +\

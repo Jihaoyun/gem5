@@ -97,7 +97,7 @@ BPredUnit::regStats()
     SimObject::regStats();
 
         BTBExcited
-                .name("BTBEntrycount");
+                .name(name() + "BTBEntrycount");
 
 
     lookups
