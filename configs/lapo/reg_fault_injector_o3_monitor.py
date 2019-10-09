@@ -6,7 +6,9 @@ from m5.util import addToPath
 import sys, os
 import argparse
 
+addToPath('../')
 addToPath(os.path.join('..', 'common'))
+from Options import *
 from Caches import *
 
 parser = argparse.ArgumentParser(description='Gem5')
@@ -39,6 +41,10 @@ parser.add_argument('-tb', '--tick-begin', type = int, dest = 'tickBegin',
 
 parser.add_argument('-te', '--tick-end', type = int, dest = 'tickEnd',
 					help = 'End tick for register fault.')
+
+parser.add_argument("-m", "--abs-max-tick", type=int, dest = 'maxTick',
+                      help="Run to absolute simulated tick.")
+parser.set_defaults(maxTick = 200000000000)
 
 args = parser.parse_args()
 # create the system we are going to simulate
@@ -170,5 +176,5 @@ if args.faultEnabled:
 m5.instantiate()
 
 print "Beginning simulation!"
-exit_event = m5.simulate()
+exit_event = m5.simulate(args.maxTick)
 print 'Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause())
