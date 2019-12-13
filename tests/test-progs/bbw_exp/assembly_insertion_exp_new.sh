@@ -19,7 +19,9 @@ dir_clean_cmd="rmdir ${dir}/Exp_result/*/*"
 sim_file="${dir}/simData.dat"
 chk_file="${dir}/checkData.dat"
 
-num_exp=50
+ckpt_file="${dir}/exp.ckpt"
+
+num_exp=100
 
 make build
 
@@ -59,19 +61,26 @@ if [ $flag -eq 1 ]; then
     mkdir ${result_dir}/Detected_checksum_error
 fi
 
-#---------------------
-# Coverage Experiment
-#---------------------
-echo ""
-echo "-------------------------------------------------"
-echo "- Clean experiment dir and start new experiment  "
-echo "-------------------------------------------------"
-echo ""
-echo $result_clean_cmd
-echo $dir_clean_cmd
-${result_clean_cmd} && ${dir_clean_cmd}
+test -f ${ckpt_file}
+flag=`echo $?`
+if [ $flag -eq 0 ]; then
+    ckpt=`cat $ckpt_file`
+else
+    ckpt=1
+    #---------------------
+    # Coverage Experiment
+    #---------------------
+    echo ""
+    echo "-------------------------------------------------"
+    echo "- Clean experiment dir and start new experiment  "
+    echo "-------------------------------------------------"
+    echo ""
+    echo $result_clean_cmd
+    echo $dir_clean_cmd
+    ${result_clean_cmd} && ${dir_clean_cmd}
+fi
 
-for exp_id in `seq 1 $num_exp`; do
+for exp_id in `seq $ckpt $num_exp`; do
 
     exp_res_file="exp_${exp_id}.txt"
 
@@ -174,6 +183,13 @@ for exp_id in `seq 1 $num_exp`; do
         cp ${src_file/.assemble/.s} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/.s}
         cp ${sim_file} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_sim.dat}
         cp ${chk_file} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_check.dat}
+    fi
+
+    #--------------------
+    # Checkpoint
+    #--------------------
+    if [ $(($exp_id % 2)) -eq 0 ]; then
+        echo "$exp_id" > ${ckpt_file}
     fi
 
 done

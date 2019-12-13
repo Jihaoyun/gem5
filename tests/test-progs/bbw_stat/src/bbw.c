@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
 
 		if (vx[i] <= 0){
 			vx[i] = 0;
-			//rpns();
+			rpns();
 			break;
 		}
 

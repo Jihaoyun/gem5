@@ -34,5 +34,17 @@ fault_generator_3.py
 tests/test-progs/bbw_stat_copy1/
 tests/test-progs/bbw_stat_copy[0-9]*/
 tests/test-progs/fault_tole_matmul_v[0-9]*/
+tests/test-progs/multiplication/*result/**/*.*
+tests/test-progs/multiplication/*.o
+tests/test-progs/multiplication/*.s
+tests/test-progs/multiplication/*.txt
+tests/test-progs/multiplication/*.assemble
+tests/test-progs/bbw_exp/*result/**/*.*
+tests/test-progs/bbw_exp/*.o
+tests/test-progs/bbw_exp/*.s
+tests/test-progs/bbw_exp/*.txt
+tests/test-progs/bbw_exp/*.log
+tests/test-progs/bbw_exp/*.assemble
+tests/test-progs/bbw_stat/*.o
 test*.rcS
 fault_lite.py
