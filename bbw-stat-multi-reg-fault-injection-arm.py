@@ -10,7 +10,7 @@ import re
 sys.path.append(os.getcwd() + "/configs/lapo")
 sys.path.append(os.getcwd() + "/configs/fault_injector")
 
-from RegFaultParser import *
+from MultiRegFaultParser import *
 
 from threading import Thread, Semaphore
 
@@ -61,8 +61,8 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 		"-rfc", " ".join([str(elem) for elem in fault.regCategoryList]),
 		"-fr", " ".join([str(elem) for elem in fault.faultRegList]),
 		"-rfbp", " ".join([str(elem) for elem in fault.bitPositionList]),
-		"-tb", " ".join([str(elem) for elem in fault.tickList]),
-		"-te", " ".join([str(elem) for elem in fault.operationList])]
+		"-t", " ".join([str(elem) for elem in fault.tickList]),
+		"-op", " ".join([str(elem) for elem in fault.operationList])]
 
 	cmd.insert(1, "--debug-file=" + statFolder + "/" + fault.label + "/" +\
 		fault.label + ".log")
@@ -70,13 +70,13 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 	#time = int(round(eval(re.match("FAULT(.*)", fault.label).group(1)) / 100000))
 
 	#cmd.insert(1, "--debug-start=" + str(500000000))
-	#cmd.insert(1, "--debug-end=" + str(1000000000))
+	cmd.insert(1, "--debug-end=" + str(5000000))
 
 	if args.debugFlags is not None:
 		cmd.insert(1, "--debug-flags=" + args.debugFlags)
-	#else:
+	else:
 		#cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
-		#cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
+		cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
 
 	#if eval(re.match("FAULT(.*)", fault.label).group(1)) % 20000 == 12:
 	try:
@@ -134,7 +134,7 @@ if __name__ == '__main__':
 						tpool = []
 					while fp.hasNext():
 						fe = fp.next()
-						if fe != None:
+						if fe is not None:
 							outputFolder = "m5out/" + statFolder + "/"  + fe.label + "/"
 							#if eval(re.match("FAULT(.*)", fe.label).group(1)) % 20000 == 12:
 							if not os.path.exists(outputFolder):

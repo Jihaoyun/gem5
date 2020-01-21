@@ -22,22 +22,22 @@ parser.add_argument('-b', '--benchmark', type = str, dest = 'benchmark',
 parser.add_argument('-l', '--label', type = str, dest = 'label',
 					help = 'Reg fault name')
 
-parser.add_argument('-sb', '--stuck-bit', nargs = '+', type = int, dest = 'stuckBit',
+parser.add_argument('-sb', '--stuck-bit', type = str, dest = 'stuckBitStr',
 					help = 'Start tick for register fault.')
 
-parser.add_argument('-rfc', '--reg-fault-category', nargs = '+', type = int, dest = 'regCategory',
+parser.add_argument('-rfc', '--reg-fault-category', type = str, dest = 'regCategoryStr',
 					help = 'Register category for register fault.')
 
-parser.add_argument('-fr', '--fault-reg', nargs = '+', type = int, dest = 'faultReg',
+parser.add_argument('-fr', '--fault-reg', type = str, dest = 'faultRegStr',
 					help = 'Fault register.')
 
-parser.add_argument('-rfbp', '--reg-fault-bit-posi', nargs = '+', type = int, dest = 'bitPosition',
+parser.add_argument('-rfbp', '--reg-fault-bit-posi', type = str, dest = 'bitPositionStr',
 					help = 'Register fault bit position.')
 
-parser.add_argument('-t', '--tick', nargs = '+', type = int, dest = 'tick',
+parser.add_argument('-t', '--tick', type = str, dest = 'tickStr',
 					help = 'Tick for register fault.')
 
-parser.add_argument('-op', '--operation', nargs = '+', type = int, dest = 'operation',
+parser.add_argument('-op', '--operation', type = str, dest = 'operationStr',
 					help = 'Operation of the fault injection.')
 
 args = parser.parse_args()
@@ -117,19 +117,29 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 
-if args.faultEnabled:
-	for i in range(len(args.operation)):
-		faultEntry = MultiRegisterFault()
-		faultEntry.system = system
-		faultEntry.registerCategory = args.regCategory[i]
-		faultEntry.faultRegister = args.faultReg[i]
-		faultEntry.bitPosition = args.bitPosition[i]
-		faultEntry.faultLabel = args.label
-		faultEntry.faultStuckBit = args.stuckBit[i]
-		faultEntry.tick = args.tick[i]
-		faultEntry.operation = args.operation[i]
-		root.multiRegisterFault.append(faultEntry)
+regCategory = args.regCategoryStr.strip('\'').split()
+regCategory = [int(elem) for elem in regCategory]
+faultReg = args.faultRegStr.strip('\'').split()
+faultReg = [int(elem) for elem in faultReg]
+bitPosition = args.bitPositionStr.strip('\'').split()
+bitPosition = [int(elem) for elem in bitPosition]
+stuckBit = args.stuckBitStr.strip('\'').split()
+stuckBit = [int(elem) for elem in stuckBit]
+tick = args.tickStr.strip('\'').split()
+tick = [int(elem) for elem in tick]
+operation = args.operationStr.strip('\'').split()
+operation = [int(elem) for elem in operation]
 
+if args.faultEnabled:
+	root.faultEntry = MultiRegisterFaultList()
+	root.faultEntry.system = system
+	root.faultEntry.registerCategoryList = regCategory
+	root.faultEntry.faultRegisterList = faultReg
+	root.faultEntry.bitPositionList = bitPosition
+	root.faultEntry.faultLabel = args.label
+	root.faultEntry.faultStuckBitList = stuckBit
+	root.faultEntry.tickList = tick
+	root.faultEntry.operationList = operation
 
 # instantiate all of the objects we've created above
 m5.instantiate()
