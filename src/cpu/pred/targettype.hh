@@ -18,6 +18,7 @@ class TargetType
         ~TargetType();
         TargetType(TheISA::PCState initial);
         virtual TheISA::PCState getData();
+        TheISA::PCState getInitData();
 
         void setData(TheISA::PCState value);
 

@@ -13,6 +13,7 @@ class Type
         ~Type();
         Type(uint64_t initial_value);
         virtual uint64_t getData();
+        uint64_t getInitData();
 
         void setData(uint64_t value);
 

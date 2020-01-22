@@ -40,6 +40,14 @@ FaultedTargetType::getData() {
 
 }
 
+TheISA::PCState 
+FaultedTargetType::getInitData()
+{
+        TheISA::PCState faultedPC;
+        faultedPC = TargetType::getData();
+        return faultedPC;
+}
+
 void
 FaultedTargetType::setData(TheISA::PCState value) {
 

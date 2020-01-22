@@ -20,6 +20,12 @@ TargetType::getData() {
 
 }
 
+TheISA::PCState
+TargetType::getInitData() {
+
+        return target;
+
+}
 
 void
 TargetType::setData(TheISA::PCState value) {

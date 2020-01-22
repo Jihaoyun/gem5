@@ -47,6 +47,13 @@ FaultedType::getData() {
 
 }
 
+uint64_t 
+FaultedType::getInitData() {
+        uint64_t value;
+        value =  Type::getData();
+        return value;
+}
+
 void
 FaultedType::setData(uint64_t value) {
 

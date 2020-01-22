@@ -14,7 +14,7 @@ class FaultedTargetType : public TargetType
         FaultedTargetType(uint64_t numBit, char value,
                 TheISA::PCState initial);
         virtual TheISA::PCState getData();
-
+        TheISA::PCState getInitData();
 
         void setData(TheISA::PCState value);
 

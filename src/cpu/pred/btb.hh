@@ -40,6 +40,7 @@
 #include "faultedtargettype.hh"
 #include "faultedtype.hh"
 #include "sim/sim_object.hh"
+#include "debug/Fetch.hh"
 
 class BTBEntry
 {
@@ -65,20 +66,37 @@ class BTBEntry
         }
 
          void setOriginal(int field, int numBit, char value) {
+
+              DPRINTF(Fetch, "BTB: Before fault reset, tag: 0x%x, target: 0x%x, valid: 0x%x", 
+                  tag->getData(), target->getData().pc(), valid->getData());
+
                 if ( field == 0 ) {
                     //Type* old_tag = tag;
-                    tag = new Type(tag->getData());
+                    tag = new Type(tag->getInitData());
                     //delete old_tag;
                 }
 
                 if ( field == 1 ) {
                     //TargetType* old_target = target;
-                    target = new TargetType(target->getData());
+                    target = new TargetType(target->getInitData());
                     //delete old_target;
                 }
+
+                if ( field == 2 ) {
+                    //Type* old_valid = valid;
+                    valid = new Type(valid->getInitData());
+                    //delete old_valid;
+                }
+
+                DPRINTF(Fetch, "BTB: After fault reset, tag: 0x%x, target: 0x%x, valid: 0x%x", 
+                  tag->getData(), target->getData().pc(), valid->getData());
         }
 
         void setInterFaulted(int field, int numBit, char value) {
+
+          DPRINTF(Fetch, "BTB: Before fault set, tag: 0x%x, target: 0x%x, valid: 0x%x", 
+                  tag->getData(), target->getData().pc(), valid->getData());
+
             if (field == 0) {
                 uint64_t old_value = tag->getData();
                 tag = new FaultedType(numBit, value);
@@ -89,9 +107,21 @@ class BTBEntry
                 target = new FaultedTargetType(numBit, value);
                 target->getData().set(old_value);
             }
+            if (field == 2) {
+                uint64_t old_value = valid->getData();
+                valid = new FaultedType(numBit, value);
+                valid->setData(old_value);
+            }
+
+            DPRINTF(Fetch, "BTB: After fault set, tag: 0x%x, target: 0x%x, valid: 0x%x", 
+                  tag->getData(), target->getData().pc(), valid->getData());
         }
 
         void setTranFaulted(int field, int numBit) {
+
+          DPRINTF(Fetch, "BTB: Before transient fault, tag: 0x%x, target: 0x%x, valid: 0x%x", 
+                  tag->getData(), target->getData().pc(), valid->getData());
+
             uint64_t mask = 1 << numBit;
             if ( field == 0 ) {
               tag->setData(tag->getData() ^ mask );
@@ -99,6 +129,13 @@ class BTBEntry
             if ( field == 1 ) {
               target->getData().set(target->getData().pc() ^ mask);
             }
+            if ( field == 2 ) {
+              valid->setData(valid->getData() ^ mask );;
+            }
+
+            DPRINTF(Fetch, "BTB: After transient fault, tag: 0x%x, target: 0x%x, valid: 0x%x", 
+                  tag->getData(), target->getData().pc(), valid->getData());
+
         }
 
         bool getValid() {

@@ -19,6 +19,12 @@ Type::getData() {
 
 }
 
+uint64_t
+Type::getInitData() {
+
+        return realdato;
+
+}
 
 void
 Type::setData(uint64_t value) {

@@ -16,7 +16,7 @@ class FaultedType : public Type
 
 
         virtual uint64_t getData();
-
+        uint64_t getInitData();
 
         void setData(uint64_t value);
 
