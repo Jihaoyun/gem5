@@ -6,7 +6,7 @@ MultiRegisterFaultList::MultiRegisterFaultList(MultiRegisterFaultListParams *p):
 	{
 		sys = p->system;
 		bitPositionVector = p->bitPositionList;
-		faultLabel = p->faultLabelList;
+		faultLabel = p->faultLabel;
 		faultRegisterVector = p->faultRegisterList;
 		registerCategoryVector = p->registerCategoryList;
 		faultStuckBitVector = p->faultStuckBitList;
@@ -15,7 +15,7 @@ MultiRegisterFaultList::MultiRegisterFaultList(MultiRegisterFaultListParams *p):
 
         timesLeft = operationVector.size();
 
-        schedule(faultEvent, p->tickVector[0]);
+        schedule(faultEvent, tickVector[0]);
 	}
 
 void MultiRegisterFaultList::faultSimOperation()
@@ -29,7 +29,7 @@ void MultiRegisterFaultList::faultSimOperation()
     if ( registerCategoryVector[index] == 1 ) {
 
         //registerBits = (*tc).readFloatRegBits(faultRegister);
-        //DPRINTF(RegisterIntermittentFault,
+        //DPRINTF(MultiRegisterFaultList,
         //        "before FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
         if (operationVector[index] == 0)
             (*tc).setFloatRegBitsTransFault(faultRegisterVector[index], bitPositionVector[index]);
@@ -38,13 +38,13 @@ void MultiRegisterFaultList::faultSimOperation()
         else if (operationVector[index] == 2)
             (*tc).resetFloatRegBitsFault(faultRegisterVector[index], bitPositionVector[index]);
         //registerBits = (*tc).readFloatRegBits(faultRegister);
-        //DPRINTF(RegisterIntermittentFault,
+        //DPRINTF(MultiRegisterFaultList,
         //        "after FLOATREG_F%d: 0x%x\n", faultRegister, registerBits);
     }
     else if (registerCategoryVector[index] == 2 ){
 
         //registerBits = (*tc).readCCReg(faultRegister);
-        //DPRINTF(RegisterIntermittentFault,
+        //DPRINTF(MultiRegisterFaultList,
         //        "before CCREG_C%d: 0x%x\n", faultRegister, registerBits);
         if (operationVector[index] == 0)
             (*tc).setCCRegTransFault(faultRegisterVector[index], bitPositionVector[index]);
@@ -53,14 +53,14 @@ void MultiRegisterFaultList::faultSimOperation()
         else if (operationVector[index] == 2)
             (*tc).resetCCRegFault(faultRegisterVector[index], bitPositionVector[index]);
         //registerBits = (*tc).readCCReg(faultRegister);
-        //DPRINTF(RegisterIntermittentFault,
+        //DPRINTF(MultiRegisterFaultList,
         //        "after CCREG_C%d: 0x%x\n", faultRegister, registerBits);
         }
     else {
         //registerBits =
         //        (*tc).readIntRegFlat((faultRegister));
 
-        //DPRINTF(RegisterIntermittentFault,
+        //DPRINTF(MultiRegisterFaultList,
         //        "before INTREG_R%d: 0x%x\n",
         //        (faultRegister), registerBits);
 
@@ -74,13 +74,13 @@ void MultiRegisterFaultList::faultSimOperation()
         //registerBits =
         //        (*tc).readIntRegWithFaultFlat((faultRegister));
 
-        //        DPRINTF(RegisterIntermittentFault,
+        //        DPRINTF(MultiRegisterFaultList,
         //        "after INTREG_R%d: 0x%x\n",
         //        (faultRegister), registerBits);
     }
 
     if (--timesLeft > 0)
-        schedule(faultEvent, p->tickVector[index + 1]);
+        schedule(faultEvent, tickVector[index + 1]);
 }
 
 MultiRegisterFaultList*
