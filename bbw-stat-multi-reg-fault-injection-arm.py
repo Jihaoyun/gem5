@@ -70,7 +70,7 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 	#time = int(round(eval(re.match("FAULT(.*)", fault.label).group(1)) / 100000))
 
 	#cmd.insert(1, "--debug-start=" + str(500000000))
-	cmd.insert(1, "--debug-end=" + str(5000000))
+	cmd.insert(1, "--debug-end=" + str(20000000))
 
 	if args.debugFlags is not None:
 		cmd.insert(1, "--debug-flags=" + args.debugFlags)
@@ -121,8 +121,8 @@ if __name__ == '__main__':
 		if args.debugFlags is not None:
 			cmd.insert(1, "--debug-flags=" + args.debugFlags)
 		else:
-			#cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
-			cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
+			cmd.insert(1, "--debug-flags=" + "Registers,O3Registers,PseudoInst")
+			#cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
 
 		try:
 			call(cmd)

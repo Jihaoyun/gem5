@@ -117,18 +117,41 @@ system.cpu.createThreads()
 # set up the root SimObject and start the simulation
 root = Root(full_system = False, system = system)
 
-regCategory = args.regCategoryStr.strip('\'').split()
-regCategory = [int(elem) for elem in regCategory]
-faultReg = args.faultRegStr.strip('\'').split()
-faultReg = [int(elem) for elem in faultReg]
-bitPosition = args.bitPositionStr.strip('\'').split()
-bitPosition = [int(elem) for elem in bitPosition]
-stuckBit = args.stuckBitStr.strip('\'').split()
-stuckBit = [int(elem) for elem in stuckBit]
-tick = args.tickStr.strip('\'').split()
-tick = [int(elem) for elem in tick]
-operation = args.operationStr.strip('\'').split()
-operation = [int(elem) for elem in operation]
+if args.regCategoryStr is not None:
+	regCategory = args.regCategoryStr.strip('\'').split()
+	regCategory = [int(elem) for elem in regCategory]
+else:
+	regCategory = []
+
+if args.faultRegStr is not None:
+	faultReg = args.faultRegStr.strip('\'').split()
+	faultReg = [int(elem) for elem in faultReg]
+else:
+	faultReg = []
+
+if args.bitPositionStr is not None:
+	bitPosition = args.bitPositionStr.strip('\'').split()
+	bitPosition = [int(elem) for elem in bitPosition]
+else:
+	bitPosition = []
+
+if args.stuckBitStr is not None:
+	stuckBit = args.stuckBitStr.strip('\'').split()
+	stuckBit = [int(elem) for elem in stuckBit]
+else:
+	stuckBit = []
+
+if args.tickStr is not None:
+	tick = args.tickStr.strip('\'').split()
+	tick = [int(elem) for elem in tick]
+else:
+	tick = []
+
+if args.operationStr is not None:
+	operation = args.operationStr.strip('\'').split()
+	operation = [int(elem) for elem in operation]
+else:
+	operation = []
 
 if args.faultEnabled:
 	root.faultEntry = MultiRegisterFaultList()
