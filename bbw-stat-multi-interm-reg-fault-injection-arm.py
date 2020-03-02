@@ -24,6 +24,11 @@ parser.add_argument('-i', '--fault-input', type = str, dest = 'faultInput',
 					required = True,
 					help = 'The file of input faults.')
 
+parser.add_argument('-skip', '--skip-golden', dest = 'skipGolden',
+					action = 'store_true',
+					help = 'Skip golden simulation.')
+parser.set_defaults(skipGolden = False)
+
 parser.add_argument('-df', '--debug-flags', type=str,
 					dest='debugFlags',
 					help='Gem5 debug flags for debugging purpose')
@@ -125,7 +130,8 @@ if __name__ == '__main__':
 			#cmd.insert(1, "--debug-flags=" + "DataCommMonitor")
 
 		try:
-			call(cmd)
+			if not args.skipGolden:
+				call(cmd)
 		finally:
 			if args.faultInput is not None:
 				for inputFile in args.faultInput.split(" "):
