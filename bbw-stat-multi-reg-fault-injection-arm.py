@@ -39,6 +39,9 @@ parser.add_argument('-mt', '--multithread', type = int, dest = 'multiThread',
 
 parser.set_defaults(multiThread = None)
 
+parser.add_argument('-time', '--time-limit', type = int, dest = 'timeLimit',
+					help = 'The time limit of each simulation.')
+
 args = parser.parse_args()
 
 # Validate arguments
@@ -63,6 +66,9 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 		"-rfbp", " ".join([str(elem) for elem in fault.bitPositionList]),
 		"-t", " ".join([str(elem) for elem in fault.tickList]),
 		"-op", " ".join([str(elem) for elem in fault.operationList])]
+
+	if args.timeLimit is not None:
+		cmd.extend(["-m", str(args.timeLimit)])
 
 	cmd.insert(1, "--debug-file=" + statFolder + "/" + fault.label + "/" +\
 		fault.label + ".log")

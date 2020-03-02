@@ -40,6 +40,10 @@ parser.add_argument('-t', '--tick', type = str, dest = 'tickStr',
 parser.add_argument('-op', '--operation', type = str, dest = 'operationStr',
 					help = 'Operation of the fault injection.')
 
+parser.add_argument("-m", "--abs-max-tick", type=int, dest = 'maxTick',
+                      help="Run to absolute simulated tick.")
+parser.set_defaults(maxTick = 200000000000)
+
 args = parser.parse_args()
 # create the system we are going to simulate
 system = System()
@@ -168,5 +172,5 @@ if args.faultEnabled:
 m5.instantiate()
 
 print "Beginning simulation!"
-exit_event = m5.simulate()
+exit_event = m5.simulate(args.maxTick)
 print 'Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause())
