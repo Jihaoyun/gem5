@@ -374,6 +374,9 @@ class PhysRegFile
 
         assert(mask == 1);
 
+        intRegFile[reg_idx] = (intRegFile[reg_idx] & ~intRegFileMask[reg_idx]) | 
+                (intRegFileFault[reg_idx] & intRegFileMask[reg_idx]);
+
         if (reg_idx != TheISA::ZeroReg) {
             intRegFileMask[reg_idx] -= 1 << numBit;
             if (faultValue)
@@ -463,6 +466,9 @@ class PhysRegFile
 
         assert(mask == 1);
 
+        floatRegFile[reg_offset].q = (floatRegFile[reg_offset].q & ~floatRegFileMask[reg_offset].q) | 
+                (floatRegFileFault[reg_offset].q & floatRegFileMask[reg_offset].q);
+
         floatRegFileMask[reg_offset].q -= 1 << numBit;
         if (faultValue)
             floatRegFileFault[reg_offset].q -= faultValue << numBit;
@@ -547,6 +553,9 @@ class PhysRegFile
         int faultValue = (floatRegFileFault[reg_offset].q >> numBit) % 2;
 
         assert(mask == 1);
+
+        floatRegFile[reg_offset].q = (floatRegFile[reg_offset].q & ~floatRegFileMask[reg_offset].q) | 
+                (floatRegFileFault[reg_offset].q & floatRegFileMask[reg_offset].q);
 
         floatRegFileMask[reg_offset].q -= 1 << numBit;
         if (faultValue)
@@ -633,6 +642,9 @@ class PhysRegFile
         int faultValue = (ccRegFileFault[reg_offset] >> numBit) % 2;
 
         assert(mask == 1);
+
+        ccRegFile[reg_offset] = (ccRegFile[reg_offset] & ~ccRegFileMask[reg_offset]) | 
+                (ccRegFileFault[reg_offset] & ccRegFileMask[reg_offset]);
 
         ccRegFileMask[reg_offset] -= 1 << numBit;
         if (faultValue)

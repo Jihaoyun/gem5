@@ -607,6 +607,8 @@ class SimpleThread : public ThreadState
 
         assert(mask == 1);
 
+        intRegs[idx] = (intRegs[idx] & ~intRegsMask[idx]) | ((intRegsFault[idx] & intRegsMask[idx]));
+
         intRegsMask[idx] -= 1 << numBit;
         if (faultValue)
             intRegsFault[idx] -= faultValue << numBit;
@@ -641,6 +643,8 @@ class SimpleThread : public ThreadState
 
         assert(mask == 1);
 
+        floatRegs.i[idx] = (floatRegs.i[idx] & ~floatRegsMask.i[idx]) | (floatRegsFault.i[idx] & floatRegsMask.i[idx]);
+
         floatRegsMask.i[idx] -= 1 << numBit;
         if (faultValue)
             floatRegsFault.i[idx] -= faultValue << numBit;
@@ -671,6 +675,8 @@ class SimpleThread : public ThreadState
 
         assert(mask == 1);
 
+        floatRegs.i[idx] = (floatRegs.i[idx] & ~floatRegsMask.i[idx]) | (floatRegsFault.i[idx] & floatRegsMask.i[idx]);
+
         floatRegsMask.i[idx] -= 1 << numBit;
         if (faultValue)
             floatRegsFault.i[idx] -= faultValue << numBit;
@@ -700,6 +706,8 @@ class SimpleThread : public ThreadState
         int faultValue = (ccRegsFault[idx] >> numBit) % 2;
 
         assert(mask == 1);
+
+        ccRegs[idx] = (ccRegs[idx] & ~ccRegsMask[idx]) | (ccRegsFault[idx] & ccRegsMask[idx]);
 
         ccRegsMask[idx] -= 1 << numBit;
         if (faultValue)
