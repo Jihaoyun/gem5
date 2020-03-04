@@ -72,19 +72,19 @@ class BTBEntry
 
                 if ( field == 0 ) {
                     //Type* old_tag = tag;
-                    tag = new Type(tag->getInitData());
+                    tag = new Type(tag->getData());
                     //delete old_tag;
                 }
 
                 if ( field == 1 ) {
                     //TargetType* old_target = target;
-                    target = new TargetType(target->getInitData());
+                    target = new TargetType(target->getData());
                     //delete old_target;
                 }
 
                 if ( field == 2 ) {
                     //Type* old_valid = valid;
-                    valid = new Type(valid->getInitData());
+                    valid = new Type(valid->getData());
                     //delete old_valid;
                 }
 
