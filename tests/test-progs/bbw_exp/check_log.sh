@@ -10,7 +10,7 @@ stat_file="${current_dir}/gem5_stat.txt"
 debug_file="${current_dir}/gem5_debug.txt"
 script_file="lapo/reg_fault_injector_o3_monitor.py"
 
-cmd="${dir}/build/ARM/gem5.opt --debug-file=${debug_file} --debug-start=500000000 --debug-end=500200000 --debug-flags=DataCommMonitor --stats-file ${stat_file} ${dir}/configs/${script_file} -m 40000000000 -b"
+cmd="${dir}/build/ARM/gem5.opt --debug-file=${debug_file} --debug-start=500000000 --debug-end=500200000 --debug-flags=DataCommMonitor,Registers,O3Registers --stats-file ${stat_file} ${dir}/configs/${script_file} -m 40000000000 -b"
 src_file="${current_dir}/bbw_test_mod.assemble"
 
 result_file=$1
