@@ -54,3 +54,4 @@ reg_fault_generator_new.py
 tests/test-progs/bbw_stat/*.o
 test*.rcS
 fault_lite.py
+check*.log

@@ -76,12 +76,12 @@ def StartRegFaultSim(statFolder, benchmark, fault):
 		cmd.extend(["-m", str(args.timeLimit)])
 
 	cmd.insert(1, "--debug-file=" + statFolder + "/" + fault.label + "/" +\
-		fault.label + "_2.log")
+		fault.label + ".log")
 
 	#time = int(round(eval(re.match("FAULT(.*)", fault.label).group(1)) / 100000))
 
-	cmd.insert(1, "--debug-start=" + str(120000000))
-	cmd.insert(1, "--debug-end=" + str(220000000))
+	#cmd.insert(1, "--debug-start=" + str(320000000))
+	cmd.insert(1, "--debug-end=" + str(20000000))
 
 	if args.debugFlags is not None:
 		cmd.insert(1, "--debug-flags=" + args.debugFlags)
