@@ -10,7 +10,7 @@ stat_file="${current_dir}/gem5_stat.txt"
 debug_file="${current_dir}/gem5_debug.txt"
 script_file="lapo/reg_fault_injector_o3_monitor.py"
 
-cmd="${dir}/build/ARM/gem5.opt --debug-file=${debug_file} --debug-start=500000000 --debug-end=500200000 --debug-flags=DataCommMonitor,Registers,O3Registers --stats-file ${stat_file} ${dir}/configs/${script_file} -m 40000000000 -b"
+cmd="${dir}/build/ARM/gem5.opt --debug-file=${debug_file} --debug-start=0 --debug-end=0 --debug-flags=DataCommMonitor,Registers,O3Registers --stats-file ${stat_file} ${dir}/configs/${script_file} -m 40000000000 -b"
 src_file="${current_dir}/bbw_test_mod.assemble"
 
 result_file=$1
@@ -25,9 +25,21 @@ ref_sim_file="${current_dir}/goldenSimData.dat"
 if [ -e $result_file ]; then
     rm $result_file
 fi
-$cmd $src_file >> $result_file
 
-gem5_result=$?
+for ((i=1; i <= $2; i++))
+do
+    debug_file="${current_dir}/gem5_debug_${i}.txt"
+    lasti=$(($i-1))
+    debug_start="${lasti}00000000"
+    debug_end="${i}00000000"
+    cmd="${dir}/build/ARM/gem5.opt --debug-file=${debug_file} --debug-start=${debug_start} --debug-end=${debug_end} --debug-flags=DataCommMonitor,Registers,O3Registers --stats-file ${stat_file} ${dir}/configs/${script_file} -m 40000000000 -b"
+    if [ $i -eq 1 ]; then
+        $cmd $src_file >> $result_file
+        gem5_result=$?
+    else
+        $cmd $src_file
+    fi
+done
 
 #----------------------------
 # Attack causes blue screen

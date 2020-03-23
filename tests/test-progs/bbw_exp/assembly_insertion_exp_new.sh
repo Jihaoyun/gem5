@@ -23,7 +23,9 @@ chk_file="${dir}/checkData.dat"
 ckpt_file="${dir}/exp.ckpt"
 ckpt_clean_cmd="rm ${ckpt_file}"
 
-num_exp=100
+num_exp=2
+
+num_debug_files=3
 
 make build
 
@@ -67,7 +69,7 @@ test -f ${ckpt_file}
 flag=`echo $?`
 if [ $flag -eq 0 ]; then
     ckpt=`cat $ckpt_file`
-    if [ $ckpt -le $num_exp ]; then
+    if [ $ckpt -ge $num_exp ]; then
         ckpt=1
         #---------------------
         # Coverage Experiment
@@ -151,7 +153,7 @@ for exp_id in `seq $ckpt $num_exp`; do
     echo "- Run the check script and collect the result  "
     echo "-----------------------------------------------"
     echo ""
-    ${check_script} ${result_file}
+    ${check_script} ${result_file} ${num_debug_files}
     result=`echo $?`
     echo ""
 #    echo $result
@@ -162,61 +164,95 @@ for exp_id in `seq $ckpt $num_exp`; do
     cat $result_file >> $log_file
     cp ${log_file} ${exp_res_file}
     
+    error_type="No_error"
     if [ $result -eq 0 ]; then
-        mkdir ${result_dir}/No_error/$exp_id
-        mv ${exp_res_file} ${result_dir}/No_error/$exp_id
-        mv ${stat_file} ${result_dir}/No_error/$exp_id
-        #mv ${debug_file} ${result_dir}/No_error/$exp_id
-        grep "monitor" ${debug_file} > ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
-        grep -i "reg" ${debug_file} > ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
-        cp ${src_file/.assemble/.s} ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/.s}
-        cp ${sim_file} ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_sim.dat}
-        cp ${chk_file} ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_check.dat}
-
+        error_type="No_error"
     elif [ $result -eq 1 ]; then
-        mkdir ${result_dir}/Detected_blue_screen_error/$exp_id
-        mv ${exp_res_file} ${result_dir}/Detected_blue_screen_error/$exp_id
-        mv ${stat_file} ${result_dir}/Detected_blue_screen_error/$exp_id
-        #mv ${debug_file} ${result_dir}/Detected_blue_screen_error/$exp_id
-        grep "monitor" ${debug_file} > ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
-        grep -i "reg" ${debug_file} > ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
-        cp ${src_file/.assemble/.s} ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/.s}
-        cp ${sim_file} ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_sim.dat}
-        cp ${chk_file} ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_check.dat}
-
+        error_type="Detected_blue_screen_error"
     elif [ $result -eq 2 ]; then
-        mkdir ${result_dir}/Undetected_product_error/$exp_id
-        mv ${exp_res_file} ${result_dir}/Undetected_product_error/$exp_id
-        mv ${stat_file} ${result_dir}/Undetected_product_error/$exp_id
-        #mv ${debug_file} ${result_dir}/Undetected_product_error/$exp_id
-        grep "monitor" ${debug_file} > ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
-        grep -i "reg" ${debug_file} > ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
-        cp ${src_file/.assemble/.s} ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/.s}
-        cp ${sim_file} ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_sim.dat}
-        cp ${chk_file} ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_check.dat}
-
+        error_type="Undetected_product_error"
     elif [ $result -eq 3 ]; then
-        mkdir ${result_dir}/Undetected_timeout_error/$exp_id
-        mv ${exp_res_file} ${result_dir}/Undetected_timeout_error/$exp_id
-        mv ${stat_file} ${result_dir}/Undetected_timeout_error/$exp_id
-        #mv ${debug_file} ${result_dir}/Undetected_timeout_error/$exp_id
-        grep "monitor" ${debug_file} > ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
-        grep -i "reg" ${debug_file} > ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
-        cp ${src_file/.assemble/.s} ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/.s}
-        cp ${sim_file} ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_sim.dat}
-        cp ${chk_file} ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_check.dat}
-
+        error_type="Undetected_timeout_error"
     elif [ $result -eq 4 ]; then
-        mkdir ${result_dir}/Detected_checksum_error/$exp_id
-        mv ${exp_res_file} ${result_dir}/Detected_checksum_error/$exp_id
-        mv ${stat_file} ${result_dir}/Detected_checksum_error/$exp_id
-        #mv ${debug_file} ${result_dir}/Detected_checksum_error/$exp_id
-        grep "monitor" ${debug_file} > ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
-        grep -i "reg" ${debug_file} > ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
-        cp ${src_file/.assemble/.s} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/.s}
-        cp ${sim_file} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_sim.dat}
-        cp ${chk_file} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_check.dat}
+        error_type="Detected_checksum_error"
     fi
+
+    mkdir ${result_dir}/${error_type}/$exp_id
+    mv ${exp_res_file} ${result_dir}/${error_type}/$exp_id
+    mv ${stat_file} ${result_dir}/${error_type}/$exp_id
+    #mv ${debug_file} ${result_dir}/${error_type}/$exp_id
+    for ((i=0; i<=${num_debug_files}; i++))
+    do
+        debug_file="${dir}/gem5_debug_${i}.txt"
+        grep "monitor" ${debug_file} > ${result_dir}/${error_type}/$exp_id/${exp_res_file/.txt/_bus_debug_${i}.txt}
+        grep -i "reg" ${debug_file} > ${result_dir}/${error_type}/$exp_id/${exp_res_file/.txt/_reg_debug_${i}.txt}
+    done
+    cp ${src_file/.assemble/.s} ${result_dir}/${error_type}/$exp_id/${exp_res_file/.txt/.s}
+    cp ${sim_file} ${result_dir}/${error_type}/$exp_id/${exp_res_file/.txt/_sim.dat}
+    cp ${chk_file} ${result_dir}/${error_type}/$exp_id/${exp_res_file/.txt/_check.dat}
+
+########################################
+##    Rewrite Dingxin's script on Mar 13th
+########################################
+#    if [ $result -eq 0 ]; then
+#        mkdir ${result_dir}/No_error/$exp_id
+#        mv ${exp_res_file} ${result_dir}/No_error/$exp_id
+#        mv ${stat_file} ${result_dir}/No_error/$exp_id
+#        #mv ${debug_file} ${result_dir}/No_error/$exp_id
+#        for i in {1..27}
+#        do
+#            debug_file="${dir}/gem5_debug_${i}.txt"
+#            grep "monitor" ${debug_file} > ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
+#            grep -i "reg" ${debug_file} > ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
+#        done
+#        cp ${src_file/.assemble/.s} ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/.s}
+#        cp ${sim_file} ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_sim.dat}
+#        cp ${chk_file} ${result_dir}/No_error/$exp_id/${exp_res_file/.txt/_check.dat}
+#
+#    elif [ $result -eq 1 ]; then
+#        mkdir ${result_dir}/Detected_blue_screen_error/$exp_id
+#        mv ${exp_res_file} ${result_dir}/Detected_blue_screen_error/$exp_id
+#        mv ${stat_file} ${result_dir}/Detected_blue_screen_error/$exp_id
+#        #mv ${debug_file} ${result_dir}/Detected_blue_screen_error/$exp_id
+#        grep "monitor" ${debug_file} > ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
+#        grep -i "reg" ${debug_file} > ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
+#        cp ${src_file/.assemble/.s} ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/.s}
+#        cp ${sim_file} ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_sim.dat}
+#        cp ${chk_file} ${result_dir}/Detected_blue_screen_error/$exp_id/${exp_res_file/.txt/_check.dat}
+#
+#    elif [ $result -eq 2 ]; then
+#        mkdir ${result_dir}/Undetected_product_error/$exp_id
+#        mv ${exp_res_file} ${result_dir}/Undetected_product_error/$exp_id
+#        mv ${stat_file} ${result_dir}/Undetected_product_error/$exp_id
+#        #mv ${debug_file} ${result_dir}/Undetected_product_error/$exp_id
+#        grep "monitor" ${debug_file} > ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
+#        grep -i "reg" ${debug_file} > ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
+#        cp ${src_file/.assemble/.s} ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/.s}
+#        cp ${sim_file} ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_sim.dat}
+#        cp ${chk_file} ${result_dir}/Undetected_product_error/$exp_id/${exp_res_file/.txt/_check.dat}
+#
+#    elif [ $result -eq 3 ]; then
+#        mkdir ${result_dir}/Undetected_timeout_error/$exp_id
+#        mv ${exp_res_file} ${result_dir}/Undetected_timeout_error/$exp_id
+#        mv ${stat_file} ${result_dir}/Undetected_timeout_error/$exp_id
+#        #mv ${debug_file} ${result_dir}/Undetected_timeout_error/$exp_id
+#        grep "monitor" ${debug_file} > ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
+#        grep -i "reg" ${debug_file} > ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
+#        cp ${src_file/.assemble/.s} ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/.s}
+#        cp ${sim_file} ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_sim.dat}
+#        cp ${chk_file} ${result_dir}/Undetected_timeout_error/$exp_id/${exp_res_file/.txt/_check.dat}
+#
+#    elif [ $result -eq 4 ]; then
+#        mkdir ${result_dir}/Detected_checksum_error/$exp_id
+#        mv ${exp_res_file} ${result_dir}/Detected_checksum_error/$exp_id
+#        mv ${stat_file} ${result_dir}/Detected_checksum_error/$exp_id
+#        #mv ${debug_file} ${result_dir}/Detected_checksum_error/$exp_id
+#        grep "monitor" ${debug_file} > ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_bus_debug.txt}
+#        grep -i "reg" ${debug_file} > ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_reg_debug.txt}
+#        cp ${src_file/.assemble/.s} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/.s}
+#        cp ${sim_file} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_sim.dat}
+#        cp ${chk_file} ${result_dir}/Detected_checksum_error/$exp_id/${exp_res_file/.txt/_check.dat}
+#    fi
 
     #--------------------
     # Checkpoint
